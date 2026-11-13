@@ -64,35 +64,35 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#0b0e14] text-[#e9ebee]">
+    <div className="flex min-h-screen flex-col bg-ink text-[#f1f5f9]">
       {/* Top Banner if Render backend is cold-starting */}
       {wakingUp && !health && (
-        <div className="bg-amber-950/50 border-b border-amber-800/40 px-4 py-1.5 text-center text-xs text-amber-300 flex items-center justify-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
-          <span>Waking up Render backend (Free Tier sleeps when idle ~25s)... App features are ready.</span>
+        <div className="bg-blue-950/60 border-b border-blue-800/50 px-4 py-1.5 text-center text-xs text-blue-200 flex items-center justify-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-ping" />
+          <span>Connecting to Render backend & Supabase... App features are ready.</span>
         </div>
       )}
 
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-5 border-b border-neutral-800 bg-[#0b0e14]/90 px-5 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-5 border-b border-line bg-ink/95 px-5 backdrop-blur">
         <div className="flex min-w-[240px] items-center gap-2.5">
-          <span className="h-2 w-2 rounded-sm bg-amber-500 shadow-[0_0_0_4px_rgba(245,158,11,0.15)]" />
+          <span className="h-2 w-2 rounded-sm bg-blue-500 shadow-[0_0_0_4px_rgba(59,130,246,0.25)]" />
           <div className="leading-tight">
             <div className="text-[13px] font-semibold tracking-tight text-white">
               Meridian Growth Partners
             </div>
-            <div className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
-              Call guide
+            <div className="text-[10px] uppercase tracking-[0.14em] text-blue-400/90 font-medium">
+              Cold Call Copilot
             </div>
           </div>
         </div>
 
-        <nav className="flex gap-1 rounded-lg border border-neutral-800 bg-neutral-900/60 p-0.5">
+        <nav className="flex gap-1 rounded-lg border border-line bg-[#0a101f]/80 p-0.5">
           <button
             onClick={() => setView(callId ? "live" : "start")}
             className={`rounded-md px-3.5 py-1.5 text-[12.5px] font-medium transition ${
               view === "live" || view === "start"
-                ? "bg-neutral-800 text-white shadow"
-                : "text-neutral-400 hover:text-white"
+                ? "bg-blue-600 text-white shadow-sm shadow-blue-500/25"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             Live call
@@ -101,23 +101,23 @@ export default function App() {
             onClick={() => setView("history")}
             className={`rounded-md px-3.5 py-1.5 text-[12.5px] font-medium transition ${
               view === "history"
-                ? "bg-neutral-800 text-white shadow"
-                : "text-neutral-400 hover:text-white"
+                ? "bg-blue-600 text-white shadow-sm shadow-blue-500/25"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             Past calls
           </button>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 text-[11px] text-neutral-400">
+        <div className="ml-auto flex items-center gap-2 text-[11px] text-slate-400">
           <span
             className={`h-2 w-2 rounded-full ${
               health
-                ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
-                : "bg-amber-400 animate-pulse"
+                ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"
+                : "bg-blue-400 animate-pulse"
             }`}
           />
-          <span className="font-mono text-xs">
+          <span className="font-mono text-xs text-slate-300">
             {health
               ? `${health.storage} · ${health.llm}`
               : wakingUp

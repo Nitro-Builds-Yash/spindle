@@ -263,13 +263,13 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
                     onClick={() => setTap(t.key)}
                     className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left text-[13.5px] transition-colors ${
                       on
-                        ? "border-accent bg-accent/10 text-[#e9ebee]"
-                        : "border-line bg-[#0b0e11] text-[#d5d9de] hover:border-[#363d47]"
+                        ? "border-blue-500 bg-blue-500/15 text-white"
+                        : "border-line bg-[#090f1d] text-slate-200 hover:border-blue-500/40"
                     }`}
                   >
                     <span
                       className={`grid h-[17px] w-[17px] shrink-0 place-items-center rounded-[4px] font-mono text-[10px] ${
-                        on ? "bg-accent text-[#1d1405]" : "bg-line text-faint"
+                        on ? "bg-blue-600 text-white font-semibold" : "bg-line text-slate-400"
                       }`}
                     >
                       {i + 1}
@@ -409,8 +409,8 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
               onClick={() => setOutcome(o.key)}
               className={`rounded-lg border px-3 py-2 text-left text-[12.5px] transition-colors ${
                 outcome === o.key
-                  ? "border-accent bg-accent/10 text-[#e9ebee]"
-                  : "border-line bg-[#0b0e11] text-muted hover:border-[#363d47]"
+                  ? "border-blue-500 bg-blue-500/15 text-white font-medium"
+                  : "border-line bg-[#090f1d] text-slate-300 hover:border-blue-500/40"
               }`}
             >
               {o.label}

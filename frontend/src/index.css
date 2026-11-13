@@ -9,56 +9,57 @@
     height: 100%;
   }
   body {
-    @apply bg-ink text-[#e9ebee] font-sans antialiased;
+    @apply bg-ink text-[#f1f5f9] font-sans antialiased;
     background-image: radial-gradient(
-      900px 500px at 15% -8%,
-      #14181e 0%,
-      transparent 60%
+      1100px 650px at 15% -10%,
+      #1e3a8a30 0%,
+      #0d1527 50%,
+      #070b14 90%
     );
   }
   ::selection {
-    @apply bg-accent/30;
+    @apply bg-blue-500/35 text-white;
   }
 }
 
 @layer components {
   .eyebrow {
-    @apply text-[10px] font-semibold uppercase tracking-[0.16em] text-accent;
+    @apply text-[10.5px] font-semibold uppercase tracking-[0.16em] text-blue-400;
   }
   .label {
-    @apply text-[10px] font-semibold uppercase tracking-[0.14em] text-faint;
+    @apply text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-400;
   }
   .card {
-    @apply rounded-xl2 border border-line bg-panel;
+    @apply rounded-xl2 border border-line bg-panel shadow-lg shadow-black/30;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-default;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 disabled:opacity-40 disabled:cursor-default;
   }
   .btn-primary {
-    @apply btn bg-accent font-semibold text-[#1d1405] hover:brightness-110;
+    @apply btn bg-blue-600 font-semibold text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 hover:shadow-blue-500/40 active:scale-[0.98];
   }
   .btn-ghost {
-    @apply btn border border-line text-[#e9ebee] hover:border-[#363d47] hover:bg-panel;
+    @apply btn border border-line bg-[#0a101f]/70 text-[#f1f5f9] hover:border-blue-400/50 hover:bg-slate-800/80;
   }
   .btn-link {
-    @apply text-xs text-accent underline decoration-accent/40 underline-offset-2 hover:decoration-accent;
+    @apply text-xs text-blue-400 underline decoration-blue-400/40 underline-offset-2 hover:decoration-blue-400 hover:text-blue-300;
   }
   .input {
-    @apply w-full rounded-lg border border-line bg-[#0a0d10] px-3 py-2.5 text-sm text-[#e9ebee] outline-none placeholder:text-[#4c535e] focus:border-accent/50 focus:ring-2 focus:ring-accent/10;
+    @apply w-full rounded-lg border border-line bg-[#060a14] px-3 py-2.5 text-sm text-[#f1f5f9] outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all;
   }
   .badge {
     @apply inline-flex items-center rounded-full border border-line px-2.5 py-0.5 text-[11px] text-muted;
   }
   .badge-good {
-    @apply border-good/30 bg-good/[0.07] text-good;
+    @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-400;
   }
   .badge-ok {
-    @apply border-ok/25 bg-ok/[0.07] text-ok;
+    @apply border-blue-500/30 bg-blue-500/10 text-blue-400;
   }
   .badge-bad {
-    @apply border-bad/25 bg-bad/[0.06] text-bad;
+    @apply border-rose-500/30 bg-rose-500/10 text-rose-400;
   }
   .badge-live {
-    @apply border-accent/35 bg-accent/10 text-accent;
+    @apply border-blue-500/40 bg-blue-500/15 text-blue-300 font-medium;
   }
 }
