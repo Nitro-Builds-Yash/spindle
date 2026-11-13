@@ -77,11 +77,11 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
 
   useEffect(() => {
     const existing = logs.find((l) => Number(l.stage_number) === stageNo);
-    setTap(stage.default_tap);
+    setTap(existing?.what_happened || stage.default_tap);
     setWords(existing?.prospect_words || "");
     setCue(existing?.ai_suggestion ? { cue: existing.ai_suggestion } : null);
     setErr("");
-  }, [stageNo, stage, logs.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stageNo, stage, logs]);
 
   useEffect(() => {
     function onKey(e) {
@@ -115,12 +115,18 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       setErr("Tap what happened. The tap is the record.");
       return false;
     }
-    await api.saveStage(callId, {
+    const res = await api.saveStage(callId, {
       stage_number: stageNo,
       what_happened: tap,
       prospect_words: words,
       ai_suggestion: cue?.cue || "",
     });
+    if (res?.stage_logs) {
+      setLogs(res.stage_logs);
+    }
+    if (res?.call) {
+      setCall(res.call);
+    }
     return true;
   }
 
@@ -269,17 +275,26 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
 
         {/* THEY MAY SAY */}
         <div className="mt-4 pt-3.5 border-t border-slate-200/60">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-2">
-            THEY MAY SAY
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+              THEY MAY SAY
+            </p>
+            <span className="font-mono text-[9px] text-slate-400">Click to insert</span>
+          </div>
           <div className="space-y-1.5">
             {stage.what_they_say.map((q, i) => (
-              <div
+              <button
                 key={i}
-                className="rounded-xs border border-slate-200/80 bg-white/70 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-800 leading-snug shadow-2xs"
+                type="button"
+                onClick={() => {
+                  setWords(q);
+                  if (wordsRef.current) wordsRef.current.focus();
+                }}
+                className="w-full text-left rounded-xs border border-slate-200/80 bg-white/70 hover:bg-blue-50/50 hover:border-blue-300 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-800 leading-snug shadow-2xs transition-all cursor-pointer group"
+                title="Click to insert this quote into 'Their Words'"
               >
-                “{q}”
-              </div>
+                <span>“{q}”</span>
+              </button>
             ))}
           </div>
         </div>

@@ -161,14 +161,29 @@ export default function App() {
           />
         )}
         {view === "live" && (
-          <LiveCall
-            key={callId}
-            callId={callId}
-            content={content}
-            onNew={() => setView("start")}
-            onFinished={finishCall}
-            onClear={clearCall}
-          />
+          callId ? (
+            <LiveCall
+              key={callId}
+              callId={callId}
+              content={content}
+              onNew={() => setView("start")}
+              onFinished={finishCall}
+              onClear={clearCall}
+            />
+          ) : (
+            <div className="mx-auto max-w-md py-16 text-center rounded-2xl border border-slate-200/90 bg-white p-8 shadow-sm">
+              <p className="font-mono text-xs uppercase tracking-wider text-slate-400">Live Call Cockpit</p>
+              <h3 className="text-lg font-bold text-slate-900 mt-1">No active call in this session</h3>
+              <p className="text-xs text-slate-500 mt-1.5">
+                Start a live call or launch the simulation to use the 8-stage guide.
+              </p>
+              <div className="mt-5 flex justify-center gap-3">
+                <button className="btn-primary" onClick={() => setView("start")}>
+                  Start a call now →
+                </button>
+              </div>
+            </div>
+          )
         )}
         {view === "history" && (
           <History

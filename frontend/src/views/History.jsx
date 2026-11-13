@@ -23,6 +23,27 @@ export default function History({ content, onOpen, onNew }) {
   const [openId, setOpenId] = useState(
     () => new URLSearchParams(window.location.search).get("open") || null
   );
+  const [selectedDetail, setSelectedDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [filterQuery, setFilterQuery] = useState("");
+
+  useEffect(() => {
+    if (!openId) {
+      setSelectedDetail(null);
+      return;
+    }
+    setLoadingDetail(true);
+    api
+      .getCall(openId)
+      .then((data) => {
+        setSelectedDetail({ ...data.call, stage_logs: data.stage_logs || [] });
+      })
+      .catch(() => {
+        const item = calls?.find((c) => c.id === openId);
+        if (item) setSelectedDetail(item);
+      })
+      .finally(() => setLoadingDetail(false));
+  }, [openId, calls]);
 
   useEffect(() => {
     api
@@ -47,6 +68,18 @@ export default function History({ content, onOpen, onNew }) {
 
   if (err) return <div className="py-20 text-center text-rose-600 font-mono text-sm">{err}</div>;
   if (!calls) return <div className="py-20 text-center text-slate-500 font-mono text-sm">Loading past calls…</div>;
+
+  const filteredCalls = useMemo(() => {
+    if (!calls) return [];
+    if (!filterQuery.trim()) return calls;
+    const q = filterQuery.toLowerCase();
+    return calls.filter((c) =>
+      (c.prospect_name || "").toLowerCase().includes(q) ||
+      (c.company_name || "").toLowerCase().includes(q) ||
+      (c.outcome || "").toLowerCase().includes(q) ||
+      (c.highest_stage_name || "").toLowerCase().includes(q)
+    );
+  }, [calls, filterQuery]);
 
   const selected = calls.find((c) => c.id === openId);
   const byStage = stats?.ended_by_stage || {};
@@ -100,14 +133,38 @@ export default function History({ content, onOpen, onNew }) {
         </div>
       </div>
 
+      {/* Search & Filter Bar */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <input
+            type="text"
+            value={filterQuery}
+            onChange={(e) => setFilterQuery(e.target.value)}
+            placeholder="Search by prospect, company, outcome..."
+            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15 shadow-2xs"
+          />
+          {filterQuery && (
+            <button
+              onClick={() => setFilterQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        <span className="font-mono text-xs text-slate-400">
+          Showing {filteredCalls.length} of {calls.length} calls
+        </span>
+      </div>
+
       {/* Reference Card List (Matches ClinicBooks Past Calls Exactly) */}
-      {calls.length === 0 ? (
+      {filteredCalls.length === 0 ? (
         <div className="card p-16 text-center text-slate-500 font-mono text-sm">
-          No calls recorded yet. Click "+ New call" above to dial your first prospect.
+          {filterQuery ? "No calls match your search query." : "No calls recorded yet. Click '+ New call' above to dial your first prospect."}
         </div>
       ) : (
         <div className="space-y-3">
-          {calls.map((c) => {
+          {filteredCalls.map((c) => {
             const outcome = outcomeByKey[c.outcome];
             const live = c.status === "in_progress";
             return (
@@ -144,23 +201,27 @@ export default function History({ content, onOpen, onNew }) {
         </div>
       )}
 
-      {selected && (
+      {(selectedDetail || selected) && (
         <Drawer
-          call={selected}
+          call={selectedDetail || selected}
+          loading={loadingDetail}
           content={content}
-          onClose={() => setOpenId(null)}
-          onResume={() => onOpen(selected.id)}
+          onClose={() => {
+            setOpenId(null);
+            setSelectedDetail(null);
+          }}
+          onResume={() => onOpen((selectedDetail || selected).id)}
           when={when}
           tapLabel={tapLabel}
           stageName={stageName}
-          outcome={outcomeByKey[selected.outcome]}
+          outcome={outcomeByKey[(selectedDetail || selected).outcome]}
         />
       )}
     </div>
   );
 }
 
-function Drawer({ call, content, onClose, onResume, when, tapLabel, stageName, outcome }) {
+function Drawer({ call, loading, content, onClose, onResume, when, tapLabel, stageName, outcome }) {
   return (
     <div className="fixed inset-0 z-50" onClick={onClose}>
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" />
@@ -250,7 +311,10 @@ function Drawer({ call, content, onClose, onResume, when, tapLabel, stageName, o
                   </div>
                 </div>
               ))}
-              {(call.stage_logs || []).length === 0 && (
+              {loading && (
+                <p className="text-xs text-blue-600 font-mono animate-pulse py-2">Loading stage logs from Supabase…</p>
+              )}
+              {!loading && (call.stage_logs || []).length === 0 && (
                 <p className="text-xs text-slate-400 font-mono">No stage logs saved.</p>
               )}
             </div>
