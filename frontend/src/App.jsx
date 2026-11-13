@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { api } from "./api.js";
+import { DEFAULT_CONTENT } from "./data/defaultContent.js";
 import StartCall from "./views/StartCall.jsx";
 import LiveCall from "./views/LiveCall.jsx";
 import History from "./views/History.jsx";
@@ -7,22 +8,37 @@ import History from "./views/History.jsx";
 const STORAGE_KEY = "meridian.currentCall";
 
 export default function App() {
-  const [content, setContent] = useState(null);
+  const [content, setContent] = useState(DEFAULT_CONTENT);
   const [health, setHealth] = useState(null);
-  const [error, setError] = useState("");
   const [view, setView] = useState("start");
   const [callId, setCallId] = useState(() => localStorage.getItem(STORAGE_KEY) || null);
+  const [wakingUp, setWakingUp] = useState(false);
+
+  const checkHealth = useCallback(async () => {
+    try {
+      const h = await api.health();
+      setHealth(h);
+      setWakingUp(false);
+    } catch {
+      setHealth(null);
+      setWakingUp(true);
+    }
+  }, []);
 
   useEffect(() => {
+    // Sync live content if backend has updates
     api
       .content()
       .then(setContent)
-      .catch((e) => setError(`Cannot reach the API at ${api.base}. ${e.message}`));
-    api.health().then(setHealth).catch(() => setHealth(null));
-  }, []);
+      .catch(() => {
+        // Keeps DEFAULT_CONTENT safely
+      });
 
-  // A call can be opened directly: /?call=<id>. Used by the README screenshots
-  // and to reopen a call on another machine.
+    checkHealth();
+    const interval = setInterval(checkHealth, 8000);
+    return () => clearInterval(interval);
+  }, [checkHealth]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get("call");
@@ -47,73 +63,66 @@ export default function App() {
     setView("history");
   }, []);
 
-  if (error) {
-    return (
-      <div className="grid min-h-screen place-items-center p-6 text-muted">
-        <div className="card max-w-lg p-6">
-          <h1 className="mb-2 text-lg font-semibold text-[#e9ebee]">Backend not reachable</h1>
-          <p className="text-sm">{error}</p>
-          <pre className="mt-4 overflow-auto rounded-lg border border-line bg-[#080a0d] p-3 text-xs text-[#e9ebee]">
-            cd backend{"\n"}pip install -r requirements.txt{"\n"}uvicorn app.main:app --reload --port 8000
-          </pre>
-          <p className="mt-3 text-xs text-faint">
-            The screen reads VITE_API_BASE. On Vercel that is the Render URL.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!content) {
-    return <div className="grid min-h-screen place-items-center text-muted">Loading the call model…</div>;
-  }
-
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-5 border-b border-line bg-ink/90 px-5 backdrop-blur">
+    <div className="flex min-h-screen flex-col bg-[#0b0e14] text-[#e9ebee]">
+      {/* Top Banner if Render backend is cold-starting */}
+      {wakingUp && !health && (
+        <div className="bg-amber-950/50 border-b border-amber-800/40 px-4 py-1.5 text-center text-xs text-amber-300 flex items-center justify-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
+          <span>Waking up Render backend (Free Tier sleeps when idle ~25s)... App features are ready.</span>
+        </div>
+      )}
+
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-5 border-b border-neutral-800 bg-[#0b0e14]/90 px-5 backdrop-blur">
         <div className="flex min-w-[240px] items-center gap-2.5">
-          <span className="h-2 w-2 rounded-sm bg-accent shadow-[0_0_0_4px_rgba(233,161,59,0.12)]" />
+          <span className="h-2 w-2 rounded-sm bg-amber-500 shadow-[0_0_0_4px_rgba(245,158,11,0.15)]" />
           <div className="leading-tight">
-            <div className="text-[13px] font-semibold tracking-tight">
+            <div className="text-[13px] font-semibold tracking-tight text-white">
               Meridian Growth Partners
             </div>
-            <div className="text-[10px] uppercase tracking-[0.14em] text-faint">
+            <div className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
               Call guide
             </div>
           </div>
         </div>
 
-        <nav className="flex gap-0.5 rounded-lg border border-line bg-panel p-0.5">
+        <nav className="flex gap-1 rounded-lg border border-neutral-800 bg-neutral-900/60 p-0.5">
           <button
             onClick={() => setView(callId ? "live" : "start")}
-            className={`rounded-md px-3.5 py-1.5 text-[12.5px] font-medium ${
+            className={`rounded-md px-3.5 py-1.5 text-[12.5px] font-medium transition ${
               view === "live" || view === "start"
-                ? "bg-raised text-[#e9ebee] shadow-[inset_0_0_0_1px_#232830]"
-                : "text-muted hover:text-[#e9ebee]"
+                ? "bg-neutral-800 text-white shadow"
+                : "text-neutral-400 hover:text-white"
             }`}
           >
             Live call
           </button>
           <button
             onClick={() => setView("history")}
-            className={`rounded-md px-3.5 py-1.5 text-[12.5px] font-medium ${
+            className={`rounded-md px-3.5 py-1.5 text-[12.5px] font-medium transition ${
               view === "history"
-                ? "bg-raised text-[#e9ebee] shadow-[inset_0_0_0_1px_#232830]"
-                : "text-muted hover:text-[#e9ebee]"
+                ? "bg-neutral-800 text-white shadow"
+                : "text-neutral-400 hover:text-white"
             }`}
           >
             Past calls
           </button>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 text-[11px] text-faint">
+        <div className="ml-auto flex items-center gap-2 text-[11px] text-neutral-400">
           <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              health ? "bg-good shadow-[0_0_0_3px_rgba(70,207,149,0.14)]" : "bg-bad"
+            className={`h-2 w-2 rounded-full ${
+              health
+                ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                : "bg-amber-400 animate-pulse"
             }`}
           />
-          <span className="font-mono">
-            {health ? `${health.storage} · ${health.llm}` : "offline"}
+          <span className="font-mono text-xs">
+            {health
+              ? `${health.storage} · ${health.llm}`
+              : wakingUp
+              ? "Waking up server..."
+              : "Connecting..."}
           </span>
         </div>
       </header>

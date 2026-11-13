@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "https://call-copilot-api.onrender.com/health"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://call-copilot-api.onrender.com/api/:path*"
+    }
+  ]
+}
