@@ -9,7 +9,8 @@
     min-height: 100%;
   }
   body {
-    @apply bg-[#f8fafc] text-[#0f172a] font-sans antialiased;
+    @apply bg-[#f8fafc] text-ink-900 font-sans antialiased;
+    background: radial-gradient(1400px 700px at 50% -50px, #eef4ff 0%, #f8fafc 50%, #f8fafc 100%);
   }
   ::selection {
     @apply bg-[#0047ff] text-white;
@@ -18,31 +19,31 @@
 
 @layer components {
   .eyebrow {
-    @apply text-[11px] font-mono font-semibold uppercase tracking-[0.16em] text-[#0047ff];
+    @apply text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-[#0047ff];
   }
   .label {
-    @apply text-[11px] font-mono font-semibold uppercase tracking-[0.14em] text-slate-500;
+    @apply text-[11px] font-mono font-semibold uppercase tracking-[0.14em] text-ink-500;
   }
   .card {
-    @apply rounded-md border border-slate-300 bg-white shadow-sm;
+    @apply rounded-xl2 border border-slate-200/90 bg-white shadow-card transition-all;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-all duration-150 disabled:opacity-40 disabled:cursor-default;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply btn bg-[#0f172a] text-white hover:bg-black active:scale-[0.98] shadow-sm font-mono uppercase tracking-wider text-xs;
+    @apply btn bg-ink-950 text-white hover:bg-black shadow-sm hover:shadow active:scale-[0.98];
   }
   .btn-ghost {
-    @apply btn border border-slate-300 bg-white text-[#0f172a] hover:border-black hover:bg-slate-50 font-mono uppercase tracking-wider text-xs;
+    @apply btn border border-slate-200/90 bg-white text-ink-700 hover:border-ink-900 hover:bg-slate-50 active:scale-[0.98];
   }
   .btn-blue {
-    @apply btn bg-[#0047ff] text-white hover:bg-blue-700 shadow-sm font-mono uppercase tracking-wider text-xs;
+    @apply btn bg-[#0047ff] text-white hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-[0.98];
   }
   .input {
-    @apply w-full rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0f172a] outline-none placeholder:text-slate-400 focus:border-[#0047ff] focus:ring-1 focus:ring-[#0047ff] transition-all;
+    @apply w-full rounded-lg border border-slate-200/90 bg-white px-3.5 py-2.5 text-sm text-ink-900 outline-none placeholder:text-slate-400 focus:border-[#0047ff] focus:ring-4 focus:ring-blue-500/10 transition-all;
   }
   .badge {
-    @apply inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-2 py-0.5 text-[10.5px] font-mono font-semibold uppercase tracking-wider text-slate-700;
+    @apply inline-flex items-center rounded-md border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[10.5px] font-mono font-semibold uppercase tracking-wider text-ink-700;
   }
   .badge-good {
     @apply border-emerald-300 bg-emerald-50 text-emerald-800;
@@ -54,6 +55,6 @@
     @apply border-rose-300 bg-rose-50 text-rose-800;
   }
   .badge-live {
-    @apply border-[#0047ff] bg-blue-50 text-[#0047ff] font-bold;
+    @apply border-[#0047ff] bg-blue-50 text-[#0047ff] font-bold shadow-xs;
   }
 }

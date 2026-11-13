@@ -61,60 +61,74 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f8fafc] text-[#0f172a]">
+    <div className="flex min-h-screen flex-col bg-[#f8fafc] text-ink-900">
       {/* Top Banner if Render backend is cold-starting */}
       {wakingUp && !health && (
-        <div className="bg-blue-50 border-b border-blue-200 px-4 py-1.5 text-center text-xs text-blue-900 flex items-center justify-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#0047ff] animate-ping" />
-          <span className="font-mono">Connecting to Render backend & Supabase... App features are ready.</span>
+        <div className="bg-blue-50/90 border-b border-blue-200/80 px-4 py-2 text-center text-xs text-blue-900 flex items-center justify-center gap-2.5 backdrop-blur-xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0047ff] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0047ff]"></span>
+          </span>
+          <span className="font-mono font-medium">Connecting to Render backend & Supabase... App features are ready.</span>
         </div>
       )}
 
-      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur">
-        <div className="flex min-w-[240px] items-center gap-2.5">
-          <span className="h-2.5 w-2.5 rounded-none bg-[#0047ff]" />
+      {/* Enterprise Frosted Glass Header */}
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/85 px-6 sm:px-8 backdrop-blur-md shadow-xs">
+        {/* Brand Mark */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#0047ff] to-blue-700 text-white shadow-sm shadow-blue-500/25 font-mono text-sm font-bold">
+            M
+          </div>
           <div className="leading-tight">
-            <div className="text-[13px] font-bold tracking-tight text-[#0f172a]">
+            <div className="text-[13.5px] font-bold tracking-tight text-ink-950 flex items-center gap-2">
               Meridian Growth Partners
+              <span className="rounded-full bg-blue-50 border border-blue-200/80 px-2 py-0.2 text-[9.5px] font-mono font-bold text-[#0047ff] uppercase">
+                Copilot
+              </span>
             </div>
-            <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-[#0047ff] font-semibold">
-              Call Guide · FDE Platform
+            <div className="text-[10.5px] font-mono uppercase tracking-[0.16em] text-ink-500">
+              Forward Deployed Engineer Surface
             </div>
           </div>
         </div>
 
-        <nav className="flex gap-1 rounded-md border border-slate-300 bg-slate-100 p-0.5">
+        {/* Central Segmented Pill Navigation */}
+        <nav className="flex gap-1 rounded-xl bg-slate-100/90 border border-slate-200/80 p-1 shadow-inner">
           <button
             onClick={() => setView(callId ? "live" : "start")}
-            className={`rounded-sm px-3.5 py-1.5 text-[12px] font-mono font-semibold uppercase tracking-wider transition ${
+            className={`flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
               view === "live" || view === "start"
-                ? "bg-[#0f172a] text-white shadow-xs"
-                : "text-slate-600 hover:text-black"
+                ? "bg-white text-ink-950 shadow-xs"
+                : "text-slate-600 hover:text-ink-950"
             }`}
           >
+            {callId && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
             Live call
           </button>
           <button
             onClick={() => setView("history")}
-            className={`rounded-sm px-3.5 py-1.5 text-[12px] font-mono font-semibold uppercase tracking-wider transition ${
+            className={`rounded-lg px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
               view === "history"
-                ? "bg-[#0f172a] text-white shadow-xs"
-                : "text-slate-600 hover:text-black"
+                ? "bg-white text-ink-950 shadow-xs"
+                : "text-slate-600 hover:text-ink-950"
             }`}
           >
             Past calls
           </button>
         </nav>
 
-        <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
-          <span
-            className={`h-2 w-2 rounded-full ${
-              health
-                ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                : "bg-blue-500 animate-pulse"
-            }`}
-          />
-          <span>
+        {/* Cloud Infrastructure Health Status */}
+        <div className="hidden sm:flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-slate-50/80 px-3.5 py-1 text-[11px] text-ink-600 font-mono shadow-xs">
+          <span className="relative flex h-2 w-2">
+            {health && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
+            <span
+              className={`relative inline-flex rounded-full h-2 w-2 ${
+                health ? "bg-emerald-500" : "bg-blue-500 animate-pulse"
+              }`}
+            />
+          </span>
+          <span className="font-semibold text-ink-700">
             {health
               ? `${health.storage} · ${health.llm}`
               : wakingUp
@@ -124,7 +138,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1200px] flex-1 px-5 pb-16 pt-7">
+      {/* Main Container */}
+      <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 sm:px-6 pb-20 pt-8">
         {view === "start" && (
           <StartCall
             content={content}

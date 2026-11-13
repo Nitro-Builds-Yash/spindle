@@ -65,30 +65,30 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-10 pt-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+    <div className="grid grid-cols-1 gap-12 pt-4 lg:grid-cols-[minmax(0,1fr)_360px]">
       <section className="max-w-[620px]">
-        <p className="eyebrow">Before you dial</p>
-        <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight text-[#0f172a]">
+        <p className="eyebrow">Before you dial · Live Call Initiation</p>
+        <h1 className="mt-2 text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-ink-950">
           The call is eight stages. The screen holds one at a time.
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+        <p className="mt-3 text-[14.5px] leading-relaxed text-slate-600">
           Fill in who you are calling. The timer starts when the screen opens, and the
           caller types nothing on the call except one tap and the prospect's own words.
         </p>
 
         {hasCall && (
-          <div className="card mt-4 flex items-center justify-between p-3.5 text-xs text-slate-700 bg-blue-50/50 border-blue-200">
-            <span>An active call is still open in this session.</span>
+          <div className="card mt-5 flex items-center justify-between p-4 text-xs text-slate-700 bg-blue-50/60 border-blue-200/80 shadow-xs">
+            <span className="font-medium">An active cold call is currently open in this session.</span>
             <button className="font-mono text-xs font-bold text-[#0047ff] hover:underline uppercase" onClick={resume}>
               Return to it →
             </button>
           </div>
         )}
 
-        <form onSubmit={start} className="card mt-5 grid gap-4 p-6">
-          <div className="grid grid-cols-2 gap-3.5">
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-700">Prospect name</span>
+        <form onSubmit={start} className="card mt-6 grid gap-4 p-7 sm:p-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-semibold text-ink-800">Prospect name</span>
               <input
                 className="input"
                 value={form.prospect_name}
@@ -98,8 +98,8 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
                 required
               />
             </label>
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-700">Role</span>
+            <label className="grid gap-1.5">
+              <span className="text-xs font-semibold text-ink-800">Role</span>
               <input
                 className="input"
                 value={form.prospect_role}
@@ -109,8 +109,8 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
             </label>
           </div>
 
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-700">Company name</span>
+          <label className="grid gap-1.5">
+            <span className="text-xs font-semibold text-ink-800">Company name</span>
             <input
               className="input"
               value={form.company_name}
@@ -120,9 +120,9 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
             />
           </label>
 
-          <div className="grid grid-cols-2 gap-3.5">
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-700">Company kind</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-semibold text-ink-800">Company kind</span>
               <select
                 className="input cursor-pointer"
                 value={form.company_kind}
@@ -135,8 +135,8 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
                 ))}
               </select>
             </label>
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-700">Call type</span>
+            <label className="grid gap-1.5">
+              <span className="text-xs font-semibold text-ink-800">Call type</span>
               <select className="input cursor-pointer" value={form.call_type} onChange={set("call_type")}>
                 <option value="first call">first call</option>
                 <option value="follow-up">follow-up</option>
@@ -146,44 +146,48 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
 
           {err && <p className="text-xs text-rose-600 font-mono">{err}</p>}
 
-          <button className="btn-primary mt-2 py-3" disabled={busy}>
-            {busy ? "Starting…" : "Start the call"}
+          <button className="btn-primary mt-3 py-3.5 shadow-md shadow-slate-900/10 text-xs" disabled={busy}>
+            {busy ? "Starting session…" : "Start the call →"}
           </button>
         </form>
       </section>
 
-      <aside>
-        <p className="eyebrow">The eight stages</p>
-        <ol className="mt-3 space-y-0 border-t border-slate-200">
-          {content.stages.map((s) => (
-            <li key={s.key} className="border-b border-slate-200 py-2.5">
-              <div className="flex gap-2.5">
-                <span className="font-mono text-xs font-bold text-[#0047ff]">
-                  {String(s.number).padStart(2, "0")}
-                </span>
-                <div>
-                  <div className="text-xs font-bold text-[#0f172a]">{s.name}</div>
-                  <div className="text-[11px] leading-snug text-slate-500 mt-0.5">{s.purpose}</div>
+      <aside className="space-y-6">
+        <div>
+          <p className="eyebrow">The eight stages</p>
+          <ol className="mt-3 space-y-0 border-t border-slate-200/80">
+            {content.stages.map((s) => (
+              <li key={s.key} className="border-b border-slate-200/80 py-2.5">
+                <div className="flex gap-3">
+                  <span className="font-mono text-xs font-bold text-[#0047ff]">
+                    {String(s.number).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <div className="text-xs font-bold text-ink-950">{s.name}</div>
+                    <div className="text-[11.5px] leading-snug text-slate-500 mt-0.5">{s.purpose}</div>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ol>
+              </li>
+            ))}
+          </ol>
+        </div>
 
-        <p className="eyebrow mt-6">Load real transcript</p>
-        <div className="mt-2.5 space-y-2">
-          {PRESETS.map((p) => (
-            <button
-              key={p.company_name}
-              onClick={() => setForm(p)}
-              className="w-full rounded-md border border-slate-300 bg-white p-3 text-left hover:border-[#0047ff] hover:shadow-xs transition-all"
-            >
-              <div className="text-xs font-bold text-[#0f172a]">{p.company_name}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">
-                {p.prospect_name} · {p.prospect_role}
-              </div>
-            </button>
-          ))}
+        <div>
+          <p className="eyebrow">Rehearse with real transcripts</p>
+          <div className="mt-2.5 space-y-2">
+            {PRESETS.map((p) => (
+              <button
+                key={p.company_name}
+                onClick={() => setForm(p)}
+                className="w-full rounded-xl border border-slate-200/90 bg-white p-3.5 text-left hover:border-[#0047ff] hover:shadow-card hover:-translate-y-0.5 transition-all duration-150"
+              >
+                <div className="text-xs font-bold text-ink-950">{p.company_name}</div>
+                <div className="text-[11px] text-slate-500 font-medium mt-0.5">
+                  {p.prospect_name} · {p.prospect_role}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </aside>
     </div>

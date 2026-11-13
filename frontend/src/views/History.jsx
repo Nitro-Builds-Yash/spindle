@@ -53,44 +53,47 @@ export default function History({ content, onOpen, onNew }) {
   const peak = Math.max(1, ...Object.values(byStage));
 
   return (
-    <div className="flex flex-col gap-6 max-w-[960px] mx-auto">
+    <div className="flex flex-col gap-8 max-w-[1020px] mx-auto">
       {/* Header */}
-      <div className="flex items-end justify-between gap-6 border-b border-slate-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/80 pb-5">
         <div>
-          <p className="eyebrow">The Second Screen</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#0f172a]">Past calls</h1>
-          <p className="text-xs text-slate-600 mt-0.5">
+          <p className="eyebrow">The Second Screen · Performance Analytics</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-ink-950">Past calls</h1>
+          <p className="text-sm text-slate-600 mt-1 max-w-[65ch]">
             After a call is saved it appears here with the stage it reached. A list like this is how a caller sees where their calls end.
           </p>
         </div>
-        <button className="btn-primary" onClick={onNew}>
+        <button className="btn-primary self-start sm:self-auto" onClick={onNew}>
           + New call
         </button>
       </div>
 
       {/* Analytics Snapshot Bar */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[140px_200px_1fr]">
-        <div className="card flex flex-col justify-center p-4">
-          <span className="font-mono text-3xl font-bold text-[#0f172a] leading-none">{stats?.calls ?? calls.length}</span>
-          <span className="label mt-1">Total calls</span>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[160px_220px_1fr]">
+        <div className="card flex flex-col justify-center p-5">
+          <span className="font-mono text-4xl font-bold text-ink-950 leading-none">{stats?.calls ?? calls.length}</span>
+          <span className="label mt-2">Total calls logged</span>
         </div>
-        <div className="card flex flex-col justify-center p-4">
-          <span className="font-mono text-3xl font-bold text-[#0047ff] leading-none">
+        <div className="card flex flex-col justify-center p-5">
+          <span className="font-mono text-4xl font-bold text-[#0047ff] leading-none">
             {Math.round((stats?.connect_rate || 0) * 100)}%
           </span>
-          <span className="label mt-1">Reached right person</span>
+          <span className="label mt-2">Reached right person</span>
         </div>
-        <div className="card p-4">
-          <span className="label">Where calls ended</span>
-          <div className="mt-2 grid grid-cols-8 items-end gap-1.5 border-b border-slate-200 pb-1">
+        <div className="card p-5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="label">Where calls ended (Stage Drop-off Funnel)</span>
+            <span className="font-mono text-[10px] text-slate-400">Stages 1–8</span>
+          </div>
+          <div className="mt-3 grid grid-cols-8 items-end gap-2 border-b border-slate-100 pb-1.5">
             {Object.entries(byStage).map(([n, c]) => (
-              <div key={n} className="grid h-[52px] grid-rows-[12px_1fr_11px] items-end justify-items-center gap-0.5">
+              <div key={n} className="grid h-[54px] grid-rows-[12px_1fr_12px] items-end justify-items-center gap-0.5">
                 <span className="font-mono text-[9px] text-slate-500 font-bold">{c || ""}</span>
                 <div
-                  className="w-1/2 max-w-[24px] self-end rounded-xs bg-[#0047ff]"
-                  style={{ height: `${c ? Math.max(8, (c / peak) * 100) : 0}%` }}
+                  className="w-full max-w-[20px] self-end rounded-t-sm bg-gradient-to-t from-[#0047ff] to-blue-500 transition-all hover:brightness-110"
+                  style={{ height: `${c ? Math.max(10, (c / peak) * 100) : 0}%` }}
                 />
-                <span className="font-mono text-[9px] text-slate-500 font-semibold">{n}</span>
+                <span className="font-mono text-[10px] text-slate-500 font-semibold">{n}</span>
               </div>
             ))}
           </div>
@@ -99,11 +102,11 @@ export default function History({ content, onOpen, onNew }) {
 
       {/* Reference Card List (Matches ClinicBooks Past Calls Exactly) */}
       {calls.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500 font-mono text-sm">
-          No calls recorded yet. Click "+ New call" above to start your first cold call!
+        <div className="card p-16 text-center text-slate-500 font-mono text-sm">
+          No calls recorded yet. Click "+ New call" above to dial your first prospect.
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {calls.map((c) => {
             const outcome = outcomeByKey[c.outcome];
             const live = c.status === "in_progress";
@@ -111,23 +114,26 @@ export default function History({ content, onOpen, onNew }) {
               <div
                 key={c.id}
                 onClick={() => setOpenId(c.id)}
-                className="rounded-md border border-slate-300 bg-white p-4 hover:border-[#0f172a] hover:shadow-xs transition-all cursor-pointer"
+                className="rounded-xl border border-slate-200/90 bg-white p-4.5 hover:border-ink-950 hover:shadow-card hover:-translate-y-0.5 transition-all duration-150 cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <h4 className="font-bold text-sm text-[#0f172a] tracking-tight">
-                      {c.prospect_name || "Unknown prospect"}
-                      {c.company_name ? `, ${c.company_name}` : ""}
-                    </h4>
-                    <p className="text-xs text-slate-600 mt-1 line-clamp-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2.5">
+                      <h4 className="font-bold text-[14.5px] text-ink-950 tracking-tight">
+                        {c.prospect_name || "Unknown prospect"}
+                        {c.company_name ? `, ${c.company_name}` : ""}
+                      </h4>
+                      {live && <span className="badge badge-live">Live</span>}
+                    </div>
+                    <p className="text-xs text-slate-600 mt-1 line-clamp-1 font-medium">
                       {c.next_step || c.ai_summary || "No notes logged for this call."}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#0047ff]">
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0047ff] bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-sm">
                       {c.highest_stage_name}
                     </span>
-                    <p className="font-mono text-[10.5px] text-slate-500 mt-0.5 font-medium">
+                    <p className="font-mono text-[11px] text-slate-400 mt-1 font-medium">
                       {when(c.started_at)}
                     </p>
                   </div>
@@ -156,28 +162,28 @@ export default function History({ content, onOpen, onNew }) {
 
 function Drawer({ call, content, onClose, onResume, when, tapLabel, stageName, outcome }) {
   return (
-    <div className="fixed inset-0 z-40" onClick={onClose}>
+    <div className="fixed inset-0 z-50" onClick={onClose}>
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" />
       <aside
-        className="absolute inset-y-0 right-0 flex w-full max-w-[540px] flex-col overflow-y-auto border-l border-slate-300 bg-white shadow-2xl text-[#0f172a]"
+        className="absolute inset-y-0 right-0 flex w-full max-w-[560px] flex-col overflow-y-auto border-l border-slate-200 bg-white shadow-float text-ink-950"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-200 bg-white px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-200/80 bg-white/95 px-6 py-5 backdrop-blur-md">
           <div>
             <p className="eyebrow">{when(call.started_at)}</p>
-            <h2 className="mt-1 text-lg font-bold">
-              {call.prospect_name || "Unknown"}
+            <h2 className="mt-1 text-xl font-bold tracking-tight text-ink-950">
+              {call.prospect_name || "Unknown prospect"}
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
               {[call.prospect_role, call.company_name, call.call_type].filter(Boolean).join(" · ")}
             </p>
           </div>
-          <button className="btn-ghost px-2.5 py-1 text-xs" onClick={onClose}>
+          <button className="btn-ghost px-3 py-1.5 text-xs" onClick={onClose}>
             ✕ Close
           </button>
         </div>
 
-        <div className="space-y-4 px-6 py-5">
+        <div className="space-y-4 px-6 py-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className={toneClass[outcome?.tone] || "badge"}>
               {outcome?.label || call.outcome || "in progress"}
@@ -185,7 +191,7 @@ function Drawer({ call, content, onClose, onResume, when, tapLabel, stageName, o
             <span className="badge">
               Stage {call.highest_stage_reached}/8 · {call.highest_stage_name}
             </span>
-            <span className="badge font-mono">{call.duration_seconds}s</span>
+            <span className="badge font-mono font-bold text-ink-900">{call.duration_seconds}s</span>
             {call.status === "in_progress" && (
               <button className="text-xs font-mono font-bold text-[#0047ff] ml-auto hover:underline" onClick={onResume}>
                 Resume call →
@@ -193,49 +199,49 @@ function Drawer({ call, content, onClose, onResume, when, tapLabel, stageName, o
             )}
           </div>
 
-          <div className="rounded-md border border-slate-200 bg-slate-50 p-3.5">
-            <p className="label mb-1">AI 1-line CRM summary</p>
-            <p className="text-xs text-slate-800 leading-relaxed font-medium">
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-4">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">AI 1-line CRM summary</p>
+            <p className="text-xs text-ink-900 leading-relaxed font-medium">
               {call.ai_summary || "No summary written."}
             </p>
           </div>
 
           {call.next_step && (
-            <div className="rounded-md border border-slate-200 p-3">
-              <p className="label mb-1">Next step agreed</p>
-              <p className="text-xs text-[#0f172a] font-semibold">{call.next_step}</p>
+            <div className="rounded-xl border border-slate-200/80 p-4">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Next step agreed</p>
+              <p className="text-xs text-ink-950 font-bold">{call.next_step}</p>
             </div>
           )}
 
           {call.audit_warning && (
-            <div className="rounded-md border border-rose-300 bg-rose-50 p-3">
-              <p className="label mb-1 text-rose-700 font-bold">Audit inconsistency note</p>
-              <p className="text-xs text-rose-800 leading-relaxed font-medium">
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700">Audit inconsistency warning</p>
+              <p className="text-xs text-rose-900 leading-relaxed font-medium mt-1">
                 {call.audit_warning}
               </p>
             </div>
           )}
 
-          <div className="rounded-md border border-slate-200 p-3">
-            <p className="label mb-1">Prospect's exact words (Stage 5 Need Quote)</p>
-            <p className="text-xs italic text-slate-800">
+          <div className="rounded-xl border border-slate-200/80 p-4">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Prospect's exact words (Stage 5 Need Quote)</p>
+            <p className="text-xs italic text-slate-800 leading-relaxed font-serif">
               {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "Nothing captured."}
             </p>
           </div>
 
           <div>
-            <p className="label mb-2">Stage-by-stage progression</p>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Stage-by-stage progression</p>
             <div className="space-y-2">
               {(call.stage_logs || []).map((l) => (
-                <div key={l.id} className="grid grid-cols-[24px_1fr] gap-2 rounded-sm border border-slate-200 p-2.5 bg-slate-50/50">
-                  <span className="font-mono text-xs font-bold text-slate-500">
+                <div key={l.id} className="grid grid-cols-[28px_1fr] gap-2.5 rounded-lg border border-slate-200/80 p-3 bg-slate-50/50">
+                  <span className="font-mono text-xs font-bold text-slate-400">
                     {String(l.stage_number).padStart(2, "0")}
                   </span>
                   <div>
-                    <div className="font-mono text-[10px] uppercase tracking-wider text-[#0047ff] font-semibold">
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-[#0047ff] font-bold">
                       {stageName(Number(l.stage_number))}
                     </div>
-                    <div className="text-xs font-semibold text-[#0f172a] mt-0.5">{tapLabel(l)}</div>
+                    <div className="text-xs font-semibold text-ink-950 mt-0.5">{tapLabel(l)}</div>
                     {l.prospect_words && (
                       <div className="mt-1 text-[11.5px] italic text-slate-600 border-l-2 border-slate-300 pl-2">
                         “{l.prospect_words}”
