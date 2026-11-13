@@ -9,13 +9,19 @@ a **close audit** that catches an outcome that does not match the call.
 Built for the DeepThought CultureTech FDE task, against all 100 rewritten calls
 from Meridian Growth Partners.
 
-- **App (Vercel):** `https://<your-app>.vercel.app`
-- **Health (Render):** `https://<your-api>.onrender.com/health` → `{"status":"ok"}`
-- **LLM:** Gemini 2.0 Flash (Google AI Studio free tier), called only from Render.
-  No key in the browser, no `VITE_` secret. Without a key the app runs a rules
-  fallback and labels it `rules` in the UI.
+### Live Deployment Links & Architecture Snapshot
 
-![The live call screen](docs/shot-live.png)
+| Deliverable | URL | Notes |
+| :--- | :--- | :--- |
+| **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call |
+| **Health Endpoint (Render)** | [https://meridian-cold-call-copilot.onrender.com/health](https://meridian-cold-call-copilot.onrender.com/health) | Returns `{"status":"ok", ...}` |
+| **LLM Provider & Model** | **Google Gemini 2.0 Flash** *(via Google AI Studio free tier)* | Server-side only via Render environment variables. Zero browser leaks. |
+
+> **LLM Feature Rationale (Grounded in the 100 Transcripts):**  
+> We analyzed all 100 calls (`T001`–`T100`) and found that **13% were left completely `not_logged`**, while several calls had logged outcomes directly contradicting what the prospect actually said (e.g., `T010` & `T099` mislogged as `agreed_to_receive_report` when the person gave a referral or thought it was a job call; `T066` & `T013` mislogged as `not_interested` or `do_not_call` when the person had left the company years ago; `T084` mislogged as `do_not_call` after agreeing to a Thursday call; and `T020` mislogging a polite decline as `do_not_call`).  
+> Therefore, we built our LLM for two high-value interventions:  
+> 1. **Mid-Call AI Cue:** Suggests 1 spoken line or detects stage jumps from the prospect's messy words without cluttering the screen.  
+> 2. **Close Outcome Consistency Audit:** Cross-verifies the chosen outcome against the stage taps and Stage 5 need quote before writing to the database, flagging contradictions and drafting a 1-line CRM summary.
 
 ---
 
