@@ -14,7 +14,7 @@ from Meridian Growth Partners.
 | Deliverable | URL | Notes |
 | :--- | :--- | :--- |
 | **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call |
-| **Health Endpoint (Render)** | [https://meridian-cold-call-copilot.onrender.com/health](https://meridian-cold-call-copilot.onrender.com/health) | Returns `{"status":"ok", ...}` |
+| **Health Endpoint (Render)** | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | Returns `{"status":"ok", ...}` (Verified 200 OK) |
 | **LLM Provider & Model** | **Google Gemini 2.0 Flash** *(via Google AI Studio free tier)* | Server-side only via Render environment variables. Zero browser leaks. |
 
 > **LLM Feature Rationale (Grounded in the 100 Transcripts):**  
