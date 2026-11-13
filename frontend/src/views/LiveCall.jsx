@@ -241,10 +241,10 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
           </p>
         </div>
 
-        {/* SHE MAY SAY / THEY MAY SAY */}
+        {/* THEY MAY SAY */}
         <div className="mt-4 pt-3.5 border-t border-slate-200/60">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-2">
-            SHE MAY SAY
+            THEY MAY SAY
           </p>
           <div className="space-y-1.5">
             {stage.what_they_say.map((q, i) => (
@@ -286,11 +286,11 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
           </div>
         </div>
 
-        {/* HER WORDS / THEIR WORDS */}
+        {/* THEIR WORDS */}
         <div className="mt-4 pt-3.5 border-t border-slate-200/60">
           <div className="flex items-center justify-between mb-2">
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-              HER WORDS
+              THEIR WORDS
             </p>
             <button
               className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline flex items-center gap-1"
@@ -306,7 +306,7 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
             rows={2}
             value={words}
             onChange={(e) => setWords(e.target.value)}
-            placeholder="accounting for what, we already have a CA who files everything"
+            placeholder="Type exact words spoken by prospect..."
             className="w-full rounded-xs border border-slate-300/90 bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-900 outline-none focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400"
           />
           {cue && (

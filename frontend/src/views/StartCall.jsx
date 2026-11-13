@@ -76,14 +76,14 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
           caller types nothing on the call except one tap and the prospect's own words.
         </p>
 
-        {/* 1-Click Instant Reference Screen Launcher */}
+        {/* 1-Click Instant Live Call Launcher */}
         <div className="mt-5 rounded-2xl border border-blue-200/90 bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-white p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0047ff] flex items-center gap-1.5">
-              <span>⚡</span> 1-Click Reference Screen (Reading 2)
+              <span>⚡</span> 1-Click Live Call Launcher
             </div>
             <p className="text-xs text-slate-600 mt-1">
-              Open the exact 8-stage cold call screen directly with Dr. Anjali Menon.
+              Launch the live 8-stage screen directly with Ramesh Varma (Sri Balaji Precision).
             </p>
           </div>
           <button
@@ -93,10 +93,10 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
               setBusy(true);
               api
                 .startCall({
-                  prospect_name: "Dr. Anjali Menon",
-                  prospect_role: "Owner, Menon Family Clinic",
-                  company_name: "ClinicBooks",
-                  company_kind: "small private company",
+                  prospect_name: "Ramesh Varma",
+                  prospect_role: "Managing Director",
+                  company_name: "Sri Balaji Precision",
+                  company_kind: "mid-size private manufacturer",
                   call_type: "first call",
                 })
                 .then((res) => onStart(res.call.id))
@@ -105,7 +105,7 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
             }}
             disabled={busy}
           >
-            {busy ? "Opening..." : "▶ Open Reference Screen"}
+            {busy ? "Opening..." : "▶ Open Live Call Screen"}
           </button>
         </div>
 

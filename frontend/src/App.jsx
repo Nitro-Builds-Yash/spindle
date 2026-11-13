@@ -94,10 +94,10 @@ export default function App() {
               } else {
                 api
                   .startCall({
-                    prospect_name: "Dr. Anjali Menon",
-                    prospect_role: "Owner, Menon Family Clinic",
-                    company_name: "ClinicBooks",
-                    company_kind: "small private company",
+                    prospect_name: "Ramesh Varma",
+                    prospect_role: "Managing Director",
+                    company_name: "Sri Balaji Precision",
+                    company_kind: "mid-size private manufacturer",
                     call_type: "first call",
                   })
                   .then((res) => openCall(res.call.id))
