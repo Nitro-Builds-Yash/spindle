@@ -13,7 +13,7 @@ from Indian SME manufacturing operations.
 
 | Deliverable | URL | Notes |
 | :--- | :--- | :--- |
-| **GitHub Repository** | [https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot](https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot) | Clean, production-ready codebase |
+| **GitHub Repository** | [https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot](https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot) | Active, production-ready codebase |
 | **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call (React + Vite + Tailwind) |
 | **Health Endpoint (Render)** | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | Returns `{"status":"ok","storage":"supabase",...}` (Verified 200 OK) |
 | **Database (Supabase)** | [https://vajznvxzojiinwegtduv.supabase.co](https://vajznvxzojiinwegtduv.supabase.co) | Supabase PostgreSQL free tier with `schema.sql`, 2 tables, 2 analytical views, RLS enabled |
@@ -21,15 +21,24 @@ from Indian SME manufacturing operations.
 
 > **LLM Feature Rationale (Grounded in the 100 Transcripts):**  
 > We analyzed all 100 calls (`T001`–`T100`) and found that **13% were left completely `not_logged`**, while several calls had logged outcomes directly contradicting what the prospect actually said (e.g., `T010` & `T099` mislogged as `agreed_to_receive_report` when the person gave a referral or thought it was a job call; `T066` & `T013` mislogged as `not_interested` or `do_not_call` when the person had left the company years ago; `T084` mislogged as `do_not_call` after agreeing to a Thursday call; and `T020` mislogging a polite decline as `do_not_call`).  
-> Therefore, we built our LLM for two high-value interventions:  
+> Therefore, we built our LLM for three high-value interventions:  
 > 1. **Mid-Call AI Cue:** Suggests 1 spoken line or detects stage jumps from the prospect's messy words without cluttering the screen.  
-> 2. **Close Outcome Consistency Audit:** Cross-verifies the chosen outcome against the stage taps and Stage 5 need quote before writing to the database, flagging contradictions and drafting a 1-line CRM summary.
+> 2. **Interactive Prospect Phone Simulator:** A side-companion chatbot that roleplays as Ramesh Varma (MD, Sri Balaji Precision) using authentic transcript dialogue and Gemini Flash Lite, allowing real-time practice with 1-click quote insertion into "Their Words".  
+> 3. **Close Outcome Consistency Audit:** Cross-verifies the chosen outcome against the stage taps and Stage 5 need quote before writing to Supabase, flagging contradictions and drafting a 1-line CRM summary.
 
 ---
 
 ## 1. What the caller sees
 
-### Live call (Rule A: the screen is deliberately poor in features)
+The application provides a seamless 3-screen workflow designed for zero distraction:
+
+### Screen 1: Start a Call (Pre-Call Initiation)
+- **1-Click Simulation:** Instantly launches an interactive 8-stage rehearsal call with Ramesh Varma (Managing Director, Sri Balaji Precision).
+- **Transcript Presets:** Pre-configured manufacturing prospects (Precision Machining in Coimbatore, Chemical Processing in Gujarat, Industrial Coatings in Pune).
+- **8-Stage Overview:** A glanceable reference of all 8 call stages and their purpose before dialing.
+- **Active Call Banner:** Intelligently informs the caller if an active call is already open and lets them return to it in one click.
+
+### Screen 2: Live Call Cockpit & Side Companion (1:1 with Reading 2 Wireframe)
 
 | On screen | Why |
 |---|---|
@@ -39,24 +48,14 @@ from Indian SME manufacturing operations.
 | **What happened** — four taps, the happy path pre-pressed | The record. Number keys 1-4 hit them without looking. |
 | **Their words** — one box | The only free text on the screen while the call is live. |
 | **AI cue** — one button, one line | Help without a second input field. |
-| `Next: Purpose →` / `Close call →`, and `End call` on every stage | Saving advances. Ending works from stage 1, which is where 13 of the hundred stopped. |
+| **Simulated Prospect Chatbot (Side Companion)** | Roleplays as the prospect on the phone line; lets the caller practice live dialogue and insert quotes directly into "Their Words". |
+| `Next: [Stage] →` / `Close call →`, and `End call` on every stage | Saving advances. Ending works from stage 1, which is where 13 of the hundred stopped. |
 
-### Close (Rule: the outcome is the caller's word, so it gets audited)
+### Screen 3: Close & Past Calls Dashboard (Rule: The outcome is audited)
 
-Choosing an outcome runs a **preview audit** before anything is written: pick
-`agreed_to_receive_report` after a stage-1 "wrong person" tap, and the modal says
-so, in red, with the tap it disagrees with. Saving writes the outcome, the next
-step, the Stage 5 quote, the one-line summary and the audit warning.
-
-![Past calls](docs/shot-history.png)
-
-### Past calls
-
-Cards of `Prospect, Company`, the one-line summary, the highest stage reached
-(`8/8 Close`), when it happened, and the outcome tag. Clicking opens a drawer
-with every stage, the verbatim Stage 5 quote, the AI summary and the audit note.
-
-![Call drawer](docs/shot-drawer.png)
+- **Preview Audit Modal:** Choosing an outcome runs a preview audit before anything is written to Supabase: pick `agreed_to_receive_report` after a stage-1 "wrong person" tap, and the modal flags it in red with the specific tap it contradicts.
+- **Past Calls Funnel:** Real-time drop-off analytics (Stages 1–8) powered by Supabase SQL views, connect rates, and total calls.
+- **Call Inspection Drawer:** Clicking any past call opens a full audit drawer showing the 1-line AI CRM summary, agreed next step, audit warnings, and the stage-by-stage progression.
 
 ---
 
