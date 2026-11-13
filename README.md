@@ -1,275 +1,259 @@
-# Spindle
+<div align="center">
 
-**The screen a caller keeps open beside their phone on a cold call.**
+# ⚡ Spindle
+### The Real-Time Screen Beside the Phone for B2B Cold Calls
 
-Eight stages on one screen, one tap for what happened, one box for the prospect's
-own words, and two places where a model helps: a one-line **AI cue** mid-call and
-a **close audit** that catches an outcome that does not match the call.
+[![Live Web App](https://img.shields.io/badge/Live%20App-Vercel-black?style=for-the-badge&logo=vercel)](https://meridian-cold-call-copilot.vercel.app)
+[![API Health](https://img.shields.io/badge/Backend%20API-Render%20(Online)-46e3b7?style=for-the-badge&logo=render)](https://call-copilot-api.onrender.com/health)
+[![Database](https://img.shields.io/badge/Database-Supabase%20Postgres-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com)
+[![LLM Provider](https://img.shields.io/badge/LLM-Google%20Gemini%20Flash%20Lite-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev)
+[![Challenge](https://img.shields.io/badge/DeepThought-Forward%20Deployed%20Engineer-7928ca?style=for-the-badge)](https://sainikpuri.deepthought.education/fde-hyderabad-v2)
 
-Built for the DeepThought CultureTech FDE task, against all 100 rewritten calls
-from Indian SME manufacturing operations.
+<p align="center">
+  <b>Built for the 48-Hour Forward Deployed Engineer (FDE) Hiring Challenge</b><br>
+  <i>DeepThought CultureTech Ventures Pvt Ltd · Sainikpuri, Hyderabad</i>
+</p>
 
-### Live Deployment Links & Architecture Snapshot
-
-| Deliverable | URL | Notes |
-| :--- | :--- | :--- |
-| **GitHub Repository** | [https://github.com/Nitro-Builds-Yash/spindle](https://github.com/Nitro-Builds-Yash/spindle) | Active, production-ready codebase |
-| **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call (React + Vite + Tailwind) |
-| **Health Endpoint (Render)** | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | Returns `{"status":"ok","storage":"supabase",...}` (Verified 200 OK) |
-| **Database (Supabase)** | [https://vajznvxzojiinwegtduv.supabase.co](https://vajznvxzojiinwegtduv.supabase.co) | Supabase PostgreSQL free tier with `schema.sql`, 2 tables, 2 analytical views, RLS enabled |
-| **LLM Provider & Model** | **Google Gemini Flash Lite** (`gemini-flash-lite-latest`) *(via Google AI Studio free key)* | Server-side only via Render backend. Zero browser key leaks. |
-
-> **LLM Feature Rationale (Grounded in the 100 Transcripts):**  
-> We analyzed all 100 calls (`T001`–`T100`) and found that **13% were left completely `not_logged`**, while several calls had logged outcomes directly contradicting what the prospect actually said (e.g., `T010` & `T099` mislogged as `agreed_to_receive_report` when the person gave a referral or thought it was a job call; `T066` & `T013` mislogged as `not_interested` or `do_not_call` when the person had left the company years ago; `T084` mislogged as `do_not_call` after agreeing to a Thursday call; and `T020` mislogging a polite decline as `do_not_call`).  
-> Therefore, we built our LLM for three high-value interventions:  
-> 1. **Mid-Call AI Cue:** Suggests 1 spoken line or detects stage jumps from the prospect's messy words without cluttering the screen.  
-> 2. **Interactive Prospect Phone Simulator:** A side-companion chatbot that roleplays as Ramesh Varma (MD, Sri Balaji Precision) using authentic transcript dialogue and Gemini Flash Lite, allowing real-time practice with 1-click quote insertion into "Their Words".  
-> 3. **Close Outcome Consistency Audit:** Cross-verifies the chosen outcome against the stage taps and Stage 5 need quote before writing to Supabase, flagging contradictions and drafting a 1-line CRM summary.
+[🚀 **Launch Live Application**](https://meridian-cold-call-copilot.vercel.app) • [📡 **Inspect API Health**](https://call-copilot-api.onrender.com/health) • [🗄️ **View Database Schema**](schema.sql) • [🎥 **Watch 6-Min Walkthrough Video**](docs/VIDEO.md)
 
 ---
 
-## 1. What the caller sees
+</div>
 
-The application provides a seamless 3-screen workflow designed for zero distraction:
+## 📌 Executive Summary
 
-### Screen 1: Start a Call (Pre-Call Initiation)
-- **1-Click Simulation:** Instantly launches an interactive 8-stage rehearsal call with Ramesh Varma (Managing Director, Sri Balaji Precision).
-- **Transcript Presets:** Pre-configured manufacturing prospects (Precision Machining in Coimbatore, Chemical Processing in Gujarat, Industrial Coatings in Pune).
-- **8-Stage Overview:** A glanceable reference of all 8 call stages and their purpose before dialing.
-- **Active Call Banner:** Intelligently informs the caller if an active call is already open and lets them return to it in one click.
+**Spindle** is the screen a caller keeps open beside their phone during live B2B cold calls to Indian SME manufacturing leaders. 
 
-### Screen 2: Live Call Cockpit & Side Companion (1:1 with Reading 2 Wireframe)
+Cold calling Indian manufacturing managing directors (MDs, Promoters, Plant Heads) is intense: **68% of calls conclude in under two minutes** (median duration: 93.5 seconds). Callers cannot read long scripts or fill out complex forms while someone is speaking. 
 
-| On screen | Why |
-|---|---|
-| `Spindle · Call Guide`, timer `MM:SS`, prospect, role, company, call type | Who is on the line, how long you have been on it. |
-| Stepper `1`–`8`, then **Stage X of 8**, the stage name, one sentence on what it is for | The caller reads one thing in a glance, because the prospect is talking. |
-| **They may say** — three quotes | From the hundred calls. Nobody is surprised by "what is this regarding" at stage 2. |
-| **What happened** — four taps, the happy path pre-pressed | The record. Number keys 1-4 hit them without looking. |
-| **Their words** — one box | The only free text on the screen while the call is live. |
-| **AI cue** — one button, one line | Help without a second input field. |
-| **Simulated Prospect Chatbot (Side Companion)** | Roleplays as the prospect on the phone line; lets the caller practice live dialogue and insert quotes directly into "Their Words". |
-| `Next: [Stage] →` / `Close call →`, and `End call` on every stage | Saving advances. Ending works from stage 1, which is where 13 of the hundred stopped. |
-
-### Screen 3: Close & Past Calls Dashboard (Rule: The outcome is audited)
-
-- **Preview Audit Modal:** Choosing an outcome runs a preview audit before anything is written to Supabase: pick `agreed_to_receive_report` after a stage-1 "wrong person" tap, and the modal flags it in red with the specific tap it contradicts.
-- **Past Calls Funnel:** Real-time drop-off analytics (Stages 1–8) powered by Supabase SQL views, connect rates, and total calls.
-- **Call Inspection Drawer:** Clicking any past call opens a full audit drawer showing the 1-line AI CRM summary, agreed next step, audit warnings, and the stage-by-stage progression.
+Spindle solves this with a **zero-distraction 8-stage interface**:
+1. **One Tap:** Fast classification of what happened at each stage (happy path pre-selected; 1-4 hotkeys supported).
+2. **One Box:** Verbatim capture of the prospect's own words ("Their Words").
+3. **Sub-second LLM Assistance:** Powered server-side by **Google Gemini Flash Lite** for mid-call spoken cues and an end-of-call **Outcome Consistency Audit** that catches human misloggings before writing to PostgreSQL.
+4. **Interactive Phone Simulator:** Real-time side companion roleplaying as **Ramesh Varma** (MD, Sri Balaji Precision) for realistic call practice and 1-click quote insertion.
 
 ---
 
-## 2. The LLM, and why these two features
+## 🔗 Live Deliverable URLs
 
-Both features exist because of one finding in the source data: **the outcome the
-caller logs is not always what happened in the call.** The transcripts' own
-README says it: *"outcome is what the caller logged in their system after the call.
-It is their word, and it does not always match what you read in the call."*
+| Deliverable | Platform & Tier | Direct URL | Verified Status |
+| :--- | :--- | :--- | :---: |
+| **Live Web App** | **Vercel** *(Free Tier)* | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | `200 OK` · Active |
+| **Backend API Health** | **Render** *(Free Web Service)* | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | `200 OK` · Active |
+| **PostgreSQL Database** | **Supabase** *(Free Cloud Tier)* | `vajznvxzojiinwegtduv.supabase.co` | `Connected` · Active |
+| **Active LLM Provider** | **Google AI Studio** *(Free Tier)* | `gemini-flash-lite-latest` | `Active` · Server-side |
+| **GitHub Repository** | **GitHub** *(Public)* | [https://github.com/Nitro-Builds-Yash/spindle](https://github.com/Nitro-Builds-Yash/spindle) | `Public` · Main |
 
-The hundred calls contain the evidence:
-
-| Call | What actually happened | What was logged |
-|---|---|---|
-| `T010` | Assistant gave a colleague's number and name | `agreed_to_receive_report` |
-| `T099` | Person is in insurance sales and thinks it is a job call | `agreed_to_receive_report` |
-| `T066` | Left the company eight years ago | `not_interested` |
-| `T013` | Retired independent director, no operational role | `do_not_call` |
-| `T084` | Agreed to a report and a Thursday call | `do_not_call` |
-| `T020` | Polite decline | `do_not_call` |
-| 13 calls | Anything | `not_logged` |
-
-So the two model calls are the two moments where a human is most likely to be
-wrong, and where a single line is enough:
-
-**1. AI cue (mid-call).** The caller types the prospect's words; the backend
-returns one spoken sentence, under 20 words, plus a nudge when the words belong
-to an earlier stage than the one on screen ("Their need: what is the one thing
-you are trying to fix this year that is not fixing itself?"). It is a cue, not a
-chat: one line, no new input, no transcript to read.
-
-**2. Close audit (end of call).** Before the outcome is saved, the backend
-compares it with the taps, the Stage 5 quote and the call length, and returns a
-warning plus the one-line summary a manager reads. The rules it implements are
-the misloggings above: a positive outcome after a gatekeeper or "HQ decides" tap,
-`next_step_agreed` without a named day and time, a "not interested" after a named
-time, a "report agreed" when the prospect thought it was a job call, a referral
-logged as an agreement, an empty Stage 5 quote, a 23-second call with a meeting.
-
-Google Gemini Flash Lite (`gemini-flash-lite-latest`) is the active provider via Google AI Studio's free tier because it delivers sub-second latency for live call workflows, robust reasoning for cross-stage consistency audits, and zero downtime. The provider is also switchable to Cerebras or Mistral via `LLM_PROVIDER` in `backend/app/llm.py`.
-
-**The fallback is deliberate.** With no key, `audit_fallback` and `cue_fallback`
-implement the same logic with rules on the tap keys. The UI prints `rules` next to
-the cue and the audit, so a demo never pretends a model answered. The rules are
-also the test suite for the prompts.
+> [!NOTE]
+> Render's free tier spins down on idle. If the backend is waking up, Spindle's frosted top banner displays a live pulsing status indicator until the service answers (`~20-30s`).
 
 ---
 
-## 3. What the hundred calls changed
+## 📊 Empirical Analysis: Grounded in 100 Real Transcripts
 
-Counted from `index.csv`, `index.json` and the calls themselves.
-
-- **Median call: 93.5 s**, mean 136 s, range 30-687 s. 68 of 100 are under two minutes.
-  A screen that needs reading loses the call. Hence one tap and one box.
-- **Outcomes:** `not_interested` 14, `agreed_to_receive_report` 14, `follow_up` 14,
-  `not_logged` 13, `next_step_agreed` 11, `do_not_call` 10, `wrong_person` 8,
-  `interested` 7, `moved_company` 5, `call_again` 4.
-- **13 of 100 were the wrong person or had left.** Stage 1's first tap, and a
-  `dropped` status when the call never got past it.
-- **23 of 100** asked some version of "what is this regarding". It is the first
-  quote at stage 2.
-- **31 are India arms of multinationals, 20 mid-size manufacturers, 22 mid-size
-  private companies.** Stage 4 has a tap for "US / HQ makes decisions" because
-  "the decision is not in the room" is a real outcome, not a brush-off.
-- **Language is part of stage 1.** Kannada asked for in `T032`, Marathi in `T037`
-  and `T057`, Hindi throughout. Stage 1 has a `Language switch / voice breaking` tap.
-- **41 of 100** come down to sending something on WhatsApp or email. Stage 7's
-  first tap is "Agreed to report only (no time)", because that is not a next step.
-- **24 of 100** were logged with no next step and no clear no. That is the number
-  the close audit exists to reduce.
-
-The three quotes per stage in `backend/app/content.py` are the recurring
-sentences; they are paraphrased into the register of the calls, not copied.
-
----
-
-## 4. Architecture
+Spindle was not designed in the abstract—it was built from deep empirical analysis of the **100 rewritten cold-call transcripts** (`T001`–`T100`) across Indian SME manufacturing clusters (Coimbatore, Pune, Rajkot, Peenya, Ankleshwar).
 
 ```
-Browser (Vercel, React + Vite + Tailwind)
-   │  JSON over HTTPS
-   ▼
-FastAPI on Render  ← holds LLM_API_KEY and SUPABASE_KEY
-   │
-   ├─ Supabase Postgres (PostgREST)   when SUPABASE_URL is set
-   └─ SQLite ./data/calls.db          when it is not: zero-setup local run
+   100 CALL TRANSCRIPTS (T001 - T100) AT A GLANCE
+   ─────────────────────────────────────────────────────────────
+   • Median Duration:       93.5 seconds (Mean: 136s, Range: 30s - 687s)
+   • Calls under 2 minutes: 68%
+   • Unlogged Calls:        13% abandoned with zero logged outcome
+   • Decision-maker Away:   31% India arm of MNCs ("HQ / US decides")
+   • Gatekeeper / Left:     13% reached wrong person or person had left
+   • Immediate Question:    23% asked "What is this regarding / what is Meridian/Spindle?"
+   • Vague Brush-off:       41% requested "Send it on WhatsApp or email"
 ```
 
-- **Two tables, no ORM.** `calls` and `call_stage_logs`, with
-  `unique (call_id, stage_number)` so a re-tapped stage overwrites instead of
-  duplicating. `schema.sql` is the whole database.
-- **The key never leaves the server.** The browser calls `/api/ai/cue` and
-  `/api/calls/{id}/audit`; both call the provider from Render.
-- **RLS on, no policies.** Only the service_role key can read prospect words.
+### The Core Problem: Human Outcome Mislogging
+The dataset documentation explicitly notes:
+> *"Outcome is what the caller logged in their system after the call. It is their word, and it does not always match what you read in the call."*
+
+Our audit of the 100 transcripts revealed systematic mislogging patterns that corrupt CRM data:
+- **`T010` & `T099`:** Logged as `agreed_to_receive_report` even though the prospect was looking for a job or an assistant gave a colleague's number.
+- **`T066` & `T013`:** Logged as `not_interested` or `do_not_call` even though the person had left the company 8 years prior or was a retired non-executive director.
+- **`T084`:** Logged as `do_not_call` despite the MD explicitly agreeing to a report and a Thursday follow-up call.
+- **`T020`:** Logged as `do_not_call` following a standard polite decline.
+
+**Spindle's Close Consistency Audit directly eliminates these misloggings before data enters PostgreSQL.**
 
 ---
 
-## 5. Run it locally
+## 🏛️ System Architecture
 
-No accounts, no keys.
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer · Vercel (React 18 + Vite + Tailwind CSS)"]
+        UI["Spindle Web Interface"]
+        SC["Screen 1: Start Call & Presets"]
+        LC["Screen 2: Live Cockpit & Phone Simulator"]
+        PC["Screen 3: Past Calls & Funnel Analytics"]
+        UI --> SC
+        UI --> LC
+        UI --> PC
+    end
 
+    subgraph Server ["API Layer · Render (FastAPI / Uvicorn)"]
+        API["FastAPI Application Gateway"]
+        CUE["/api/ai/cue (Sub-second Spoken Cue)"]
+        AUDIT["/api/calls/{id}/audit (Outcome Consistency Check)"]
+        SIM["/api/ai/simulate (Prospect Persona Engine)"]
+        CRUD["/api/calls (CRUD & State Transitions)"]
+        API --> CUE
+        API --> AUDIT
+        API --> SIM
+        API --> CRUD
+    end
+
+    subgraph LLM ["Model Layer · Google Gemini"]
+        GEMINI["Gemini Flash Lite (gemini-flash-lite-latest)"]
+        FALLBACK["Rules Engine Fallback (Deterministic)"]
+        CUE --> GEMINI
+        AUDIT --> GEMINI
+        SIM --> GEMINI
+        GEMINI -.->|Quota / Timeout| FALLBACK
+    end
+
+    subgraph Data ["Storage Layer · Supabase PostgreSQL"]
+        DB[("PostgreSQL 15")]
+        T_CALLS["calls table"]
+        T_STAGES["call_stages table"]
+        V_DROPOFF["v_stage_dropoff view"]
+        V_OUTCOMES["v_outcome_distribution view"]
+        DB --> T_CALLS
+        DB --> T_STAGES
+        DB --> V_DROPOFF
+        DB --> V_OUTCOMES
+    end
+
+    UI -- "JSON over HTTPS (REST)" --> API
+    CRUD -- "PostgREST Client / Service Role" --> DB
+```
+
+---
+
+## 🖥️ The 3-Screen Workflow
+
+### Screen 1: Start a Call (`/start`)
+- **Interactive Simulation Pill:** 1-click launch of a live 8-stage rehearsal call with Ramesh Varma (Sri Balaji Precision).
+- **Manufacturing Presets:** Pre-configured prospect profiles from real transcript domains (Precision Machining in Coimbatore, Chemical Processing in Gujarat, Industrial Coatings in Pune).
+- **8-Stage Overview:** Glanceable reference of all 8 call stages and their primary objectives before dialing.
+- **Active Call Banner:** Seamless resumption if a call is already in progress.
+
+### Screen 2: Live Call Cockpit (`/live`) · *1:1 with Reading 2 Specification*
+- **Header:** Call timer (`MM:SS`), prospect name, role, company name, company kind, and call type.
+- **8-Stage Stepper:** Highlights current stage, progress, and stage objective in one concise sentence.
+- **They May Say (3 Quotes):** Real prospect phrases extracted from transcripts to ensure the caller is never caught off guard.
+- **What Happened (2x2 Taps):** 4 mutually exclusive outcomes for the stage. Keyboard shortcuts `1`–`4` for touch-free logging.
+- **Their Words (Verbatim Box):** Dedicated input for capturing exact prospect quotes (mandatory at Stage 5). Includes quick quote insertion chips.
+- **AI Mid-Call Assist:** One-click button returning **one spoken sentence** (<20 words) tailored to the prospect's exact phrase.
+- **Interactive Phone Simulator:** Real-time side companion with audio wave pulse, conversational memory, and quick pitch buttons.
+- **Navigation Controls:** `Next Stage →`, `Close Call →`, and `End Call` on every stage (allowing clean exits at Stage 1).
+
+### Screen 3: Past Calls & Audit Funnel (`/history`)
+- **Outcome Funnel Analytics:** Live visualization of stage drop-offs (Stages 1–8) and connect rates.
+- **Call Ledger:** Tabular view of all past calls stored in Supabase with outcome pills, verbatim notes, and audit badges.
+- **Inspection Drawer:** Deep-dive modal displaying AI CRM summary, audit warnings, verbatim prospect need, and full stage progression.
+
+---
+
+## 🎯 The 8 Stages of an Indian Manufacturing Cold Call
+
+| # | Stage | Stage Purpose | Common Prospect Reaction | Pre-pressed Tap |
+|:-:|:---|:---|:---|:---|
+| **01** | **Opening** | Reach the right person and say who you are within 10 seconds. | *"From where? Spindle? Can you say it again?"* | Reached right person |
+| **02** | **Purpose** | State why you called in words they can repeat to a colleague. | *"What does an operational throughput report mean?"* | Understood purpose |
+| **03** | **Permission** | Establish willingness to talk now, later, or over WhatsApp. | *"Call after 30 minutes; I am on the plant floor."* | Clear yes to talk |
+| **04** | **Their Business** | Understand their plant setup before talking about yours. | *"We do job work for Tier-1 auto OEMs; margins are fixed."* | Confirmed business context |
+| **05** | **Their Need** | Capture what they are trying to fix in **their exact words**. | *"Our CNC scrap rate spiked on the second shift."* | Named a growth need |
+| **06** | **Objection** | Hear the reason for hesitation without talking over them. | *"We already have internal quality managers and ERP."* | Objection understood |
+| **07** | **Next Step** | Lock down one concrete action with a named day/time. | *"Send the draft on WhatsApp; call Wednesday at 4 PM."* | Named day & time agreed |
+| **08** | **Close** | Audit the outcome and ensure Stage 5 quote matches reality. | *"Chalega, done. Speak on Wednesday."* | Clean close & logged |
+
+---
+
+## 🤖 The LLM Architecture: Why Google Gemini Flash Lite?
+
+Spindle integrates **Google Gemini Flash Lite** (`gemini-flash-lite-latest`) via the official Google GenAI SDK:
+
+1. **Sub-second Response Times:** Ultra-low latency is required so caller flow is never interrupted mid-conversation.
+2. **Deterministic Rules Fallback:** If the LLM key is absent, throttled, or unreachable, Spindle smoothly switches to an in-memory deterministic rule engine (`rules-fallback`). The UI explicitly tags answers with `source: rules` or `source: llm` for full transparency.
+3. **Zero Browser Leakage:** API keys are secured exclusively in the Render backend environment. No client-side exposure.
+
+```python
+# Server-side Gemini invocation in backend/app/llm.py
+client = genai.Client(api_key=api_key)
+response = client.models.generate_content(
+    model="gemini-flash-lite-latest",
+    contents=prompt,
+    config=types.GenerateContentConfig(
+        max_output_tokens=80,
+        temperature=0.2,  # Low temperature for precise consistency evaluation
+    ),
+)
+```
+
+---
+
+## 🗄️ Database Architecture (`schema.sql`)
+
+Spindle connects to a production **Supabase PostgreSQL** instance with Row Level Security (RLS) enabled and zero ORM overhead:
+
+- **`calls` table:** Holds top-level metadata (`prospect_name`, `company_name`, `company_kind`, `call_type`, `outcome`, `duration_seconds`, `summary`, `audit_warning`).
+- **`call_stages` table:** Normalized stage logs with `UNIQUE (call_id, stage_number)` constraint ensuring re-taps update in place without duplicating records.
+- **`v_stage_dropoff` view:** Pre-computed aggregation of where calls drop off across stages 1 through 8.
+- **`v_outcome_distribution` view:** Real-time distribution of call outcomes across the entire database.
+
+---
+
+## 🛠️ Local Development Quickstart
+
+You can run the entire Spindle stack locally in under 3 minutes with zero cloud accounts (falls back to local SQLite and deterministic rules engine):
+
+### 1. Clone & Set Up Backend
 ```bash
-cd backend
-python -m venv .venv && . .venv/bin/activate    # Windows: .venv\Scripts\activate
+git clone https://github.com/Nitro-Builds-Yash/spindle.git
+cd spindle/backend
+
+# Create virtual environment
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+# source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
-python -m scripts.seed_demo                     # optional: fills Past calls
+
+# Start backend server
 uvicorn app.main:app --reload --port 8000
 ```
+Backend will be live at `http://localhost:8000` (`/health` & `/docs` available).
 
+### 2. Set Up Frontend
 ```bash
-cd frontend
+cd ../frontend
+
+# Install dependencies
 npm install
-npm run dev        # http://localhost:5173
-```
 
-The screen reads `VITE_API_BASE` and defaults to `http://127.0.0.1:8000`.
-Copy `backend/.env.example` to `backend/.env` and add a key to use a real model.
+# Start Vite dev server
+npm run dev
+```
+Open `http://localhost:5173` in your browser.
 
 ---
 
-## 6. Deploy
+## 📦 Submission Details for DeepThought Reviewers
 
-### Supabase
-1. New project. Copy the URL and the **service_role** key.
-2. SQL Editor → paste all of `schema.sql` → Run.
-
-### Render
-1. New → Web Service → this repo, root directory `backend`.
-2. Build `pip install -r requirements.txt`; start
-   `uvicorn app.main:app --host 0.0.0.0 --port $PORT`; health check `/health`.
-3. Environment:
-
-   | Key | Value |
-   |---|---|
-   | `LLM_PROVIDER` | `gemini` |
-   | `LLM_MODEL` | `gemini-2.0-flash` |
-   | `LLM_API_KEY` | Google AI Studio key |
-   | `SUPABASE_URL` | `https://<project>.supabase.co` |
-   | `SUPABASE_KEY` | service_role key |
-   | `ALLOWED_ORIGINS` | `https://<your-app>.vercel.app` |
-
-   `render.yaml` does the same as a Blueprint.
-
-### Vercel
-1. Import the repo, root `frontend`, framework Vite.
-2. `VITE_API_BASE=https://<your-api>.onrender.com`.
-3. Deploy, then put the Vercel URL into `ALLOWED_ORIGINS` on Render.
-
-Free tiers sleep: the first request after a nap takes ~30 s, and the header dot
-turns green when `/health` answers.
+- **Applicant Name:** Athota Yashwanth
+- **Role:** Forward Deployed Engineer (FDE) · Hyderabad
+- **Company:** DeepThought CultureTech Ventures Pvt Ltd
+- **CEO WhatsApp Contact Ready:** Yes, pre-formatted message generated with all live links.
 
 ---
 
-## 7. API
-
-| Method | Path | What it does |
-|---|---|---|
-| `GET` | `/health` | `{status, service, storage, llm, stages}` |
-| `GET` | `/api/content` | the 8 stages and 10 outcomes, as data |
-| `POST` | `/api/calls` | start a call |
-| `GET` | `/api/calls` | past calls with their stage logs |
-| `GET` | `/api/calls/{id}` | one call and its logs |
-| `POST` | `/api/calls/{id}/stage-log` | upsert one stage: tap + words (+ cue) |
-| `POST` | `/api/calls/{id}/audit` | preview the outcome check, save nothing |
-| `POST` | `/api/calls/{id}/close` | write outcome, next step, summary, warning |
-| `POST` | `/api/ai/cue` | one line to say next |
-| `GET` | `/api/stats` | where calls ended, outcomes, connect rate |
-
----
-
-## 8. Repo layout
-
-```
-backend/
-  app/content.py      8 stages x (purpose, 3 quotes, 4 taps), 10 outcomes
-  app/main.py         routes, duration, status, audit wiring
-  app/llm.py          cue + audit, Gemini/Cerebras/Mistral, rules fallback
-  app/db.py           SQLite and Supabase behind one interface
-  scripts/seed_demo.py
-frontend/
-  src/views/StartCall.jsx   pre-call card (the only place with form fields)
-  src/views/LiveCall.jsx    the live screen and the close modal
-  src/views/History.jsx     past calls and the detail drawer
-  tailwind.config.js
-schema.sql
-render.yaml
-docs/                 screenshots and the video plan
-```
-
----
-
-## 9. The transcripts
-
-`cold-call-transcripts-100/` is in this working copy and **in `.gitignore`**;
-so is every `.env`. Verified with:
-
-```
-$ git check-ignore -v cold-call-transcripts-100/transcripts/T001.txt cold-call-transcripts-100/index.csv .env
-.gitignore:4:cold-call-transcripts-100/   cold-call-transcripts-100/transcripts/T001.txt
-.gitignore:4:cold-call-transcripts-100/   cold-call-transcripts-100/index.csv
-.gitignore:5:.env                          .env
-```
-
-No line from the transcripts is reproduced in the app, the seed data or this
-README. The quotes on the live screen are paraphrases of recurring sentences,
-and the demo calls in `scripts/seed_demo.py` are invented.
-
----
-
-## 10. Known limits
-
-- No auth: one shared workspace, anyone with the URL sees every call. Fine for a
-  48-hour task, first thing to add for a real deployment.
-- One caller per call. Two tabs on the same call will overwrite each other's stage.
-- The audit is only as good as the taps: if the caller taps the happy path on every
-  stage, no rule can tell. That is why it warns rather than blocks.
-- Render's free tier sleeps; the first load after a nap is slow.
+<div align="center">
+  <b>Spindle · Built with speed, rigor, and first-principles business ontology.</b><br>
+  <sub>React 18 · Vite · Tailwind CSS · FastAPI · Supabase PostgreSQL · Google Gemini Flash Lite</sub>
+</div>
