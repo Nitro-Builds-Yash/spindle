@@ -52,7 +52,6 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
       setLogs(data.stage_logs || []);
       const no = Number(data.call.highest_stage_reached) || 1;
       setStageNo(no);
-      setLogs((prev) => prev);
       if (data.call.status !== "in_progress") {
         setClosed({ outcome: data.call.outcome, summary: data.call.ai_summary });
       }
@@ -72,8 +71,6 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
     return () => clearInterval(t);
   }, [call?.started_at]);
 
-  // On entering a stage: the fourth tap is pre-selected, and any words already
-  // saved for that stage come back. One tap, one box, nothing else.
   useEffect(() => {
     const existing = logs.find((l) => Number(l.stage_number) === stageNo);
     setTap(stage.default_tap);
@@ -156,7 +153,7 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
 
   if (err && !call) {
     return (
-      <div className="grid place-items-center gap-4 py-24 text-muted">
+      <div className="grid place-items-center gap-4 py-24 text-slate-500">
         <p>{err}</p>
         <button className="btn-primary" onClick={onNew}>
           Start a new call
@@ -164,7 +161,7 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
       </div>
     );
   }
-  if (!call) return <div className="py-24 text-center text-muted">Loading call…</div>;
+  if (!call) return <div className="py-24 text-center text-slate-500 font-mono text-sm">Loading call…</div>;
 
   if (closed) {
     return (
@@ -177,147 +174,163 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
     );
   }
 
-  const progress = stageNo;
-
   return (
-    <div className="flex flex-col gap-5">
-      {/* Header: who you are calling, the clock, and a way out from anywhere. */}
-      <div className="flex items-start justify-between gap-6">
-        <div>
-          <p className="eyebrow">Meridian Growth Partners · Call Guide</p>
-          <h2 className="mt-1 text-[22px] font-semibold tracking-tight">
+    <div className="flex flex-col items-center">
+      {/* Reference Card Container (Exact ClinicBooks reference layout) */}
+      <div className="w-full max-w-[560px] rounded-md border border-slate-300 bg-white p-6 shadow-sm text-[#0f172a]">
+        
+        {/* Top Reference Header */}
+        <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-[#0047ff]">
+            Meridian Growth Partners · Call Guide
+          </span>
+          <span className="font-mono text-base font-bold text-[#0f172a] tabular-nums">
+            {tick}
+          </span>
+        </div>
+
+        {/* Prospect Title */}
+        <div className="mb-4">
+          <h2 className="text-xl font-bold tracking-tight text-[#0f172a]">
             {call.prospect_name || "Unknown prospect"}
           </h2>
-          <p className="text-[13px] text-muted">
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
             {[call.prospect_role, call.company_name, call.call_type]
               .filter(Boolean)
               .join(" · ")}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-[20px] tabular-nums">{tick}</span>
-          <button className="btn-ghost px-3 py-1.5 text-xs" onClick={endCall}>
+
+        {/* 8-Stage Square Stepper (Matches Reference Screen Exactly) */}
+        <div className="grid grid-cols-8 gap-1.5 my-3">
+          {stages.map((s) => {
+            const now = s.number === stageNo;
+            const past = s.number < stageNo;
+            return (
+              <button
+                key={s.key}
+                onClick={() => setStageNo(s.number)}
+                className={`h-8 flex items-center justify-center font-mono text-xs font-bold rounded-sm border transition-all ${
+                  now
+                    ? "bg-[#0047ff] text-white border-[#0047ff] shadow-xs"
+                    : past
+                    ? "bg-slate-100 text-slate-800 border-slate-300"
+                    : "bg-white text-slate-400 border-slate-200 hover:border-slate-400"
+                }`}
+              >
+                {s.number}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Stage Name & Purpose */}
+        <div className="mt-4 mb-5">
+          <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Stage {stage.number} of 8
+          </p>
+          <h3 className="text-2xl font-bold tracking-tight text-[#0f172a] mt-0.5">
+            {stage.name}
+          </h3>
+          <p className="text-[14px] text-slate-600 mt-1 leading-relaxed">
+            {stage.purpose}
+          </p>
+        </div>
+
+        {/* They May Say */}
+        <div className="mt-5 pt-4 border-t border-slate-200">
+          <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-2">
+            She may say / They may say
+          </p>
+          <div className="space-y-1.5">
+            {stage.what_they_say.map((q, i) => (
+              <div
+                key={i}
+                className="rounded-sm border border-slate-200 bg-slate-50 px-3 py-2 text-[13px] text-slate-800 italic"
+              >
+                “{q}”
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* What Happened (2x2 Grid with Blue Active Button) */}
+        <div className="mt-5 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+              What happened
+            </p>
+            <span className="font-mono text-[10px] text-slate-400">Keys 1–4</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {stage.taps.map((t, i) => {
+              const on = tap === t.key;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTap(t.key)}
+                  className={`p-2.5 rounded-sm border text-left text-[13px] transition-all ${
+                    on
+                      ? "bg-[#0047ff] text-white border-[#0047ff] font-semibold shadow-xs"
+                      : "bg-white text-slate-800 border-slate-300 hover:border-slate-500 hover:bg-slate-50"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Their Words */}
+        <div className="mt-5 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+              Her words / Their words
+            </p>
+            <button
+              className="text-xs font-mono font-bold text-[#0047ff] hover:underline"
+              onClick={askCue}
+              disabled={cueBusy}
+            >
+              {cueBusy ? "Thinking…" : "⚡ AI Cue (Gemini)"}
+            </button>
+          </div>
+          <textarea
+            ref={wordsRef}
+            rows={2}
+            value={words}
+            onChange={(e) => setWords(e.target.value)}
+            placeholder="Type exact words spoken by prospect..."
+            className="w-full rounded-sm border border-slate-300 bg-white px-3 py-2 text-sm text-[#0f172a] outline-none focus:border-[#0047ff] focus:ring-1 focus:ring-[#0047ff]"
+          />
+          {cue && (
+            <div className="mt-2 rounded-sm border border-blue-200 bg-blue-50 p-2.5 text-xs text-blue-950">
+              <span className="font-mono font-bold text-[#0047ff] uppercase mr-2">Cue:</span>
+              {cue.cue}
+            </div>
+          )}
+        </div>
+
+        {err && <p className="mt-3 text-xs text-rose-600 font-mono">{err}</p>}
+
+        {/* Action Buttons (Matches Reference Screen Exactly: Black Next + Outline End) */}
+        <div className="mt-6 pt-4 border-t border-slate-200 flex gap-3">
+          <button
+            className="flex-1 rounded-sm bg-[#0f172a] hover:bg-black text-white font-mono font-bold text-xs uppercase tracking-wider py-3 shadow-xs transition"
+            onClick={goNext}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : next ? `Next: ${next.name}` : "Close call"}
+          </button>
+          <button
+            className="px-5 rounded-sm border border-slate-300 hover:border-black text-[#0f172a] font-mono font-bold text-xs uppercase tracking-wider py-3 transition bg-white"
+            onClick={endCall}
+            disabled={saving}
+          >
             End call
           </button>
         </div>
-      </div>
-
-      {/* The eight stages, and where the caller is. */}
-      <div className="mx-auto grid w-full max-w-[880px] grid-cols-8 gap-1 border-b border-line pb-3">
-        {stages.map((s) => {
-          const now = s.number === stageNo;
-          const past = s.number < progress;
-          return (
-            <button
-              key={s.key}
-              onClick={() => setStageNo(s.number)}
-              className={`border-t-2 px-1 pt-2 text-left transition-colors ${
-                now
-                  ? "border-accent text-[#e9ebee]"
-                  : past
-                  ? "border-good/50 text-muted hover:text-[#e9ebee]"
-                  : "border-line text-faint hover:text-muted"
-              }`}
-            >
-              <span className={`block font-mono text-[11px] ${now ? "text-accent" : ""}`}>
-                {s.number}
-              </span>
-              <span className={`block text-[11.5px] leading-tight ${now ? "font-semibold" : ""}`}>
-                {s.name}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mx-auto w-full max-w-[880px]">
-        <section className="card px-6 py-6">
-          <p className="label">Stage {stage.number} of 8</p>
-          <h3 className="mt-2 text-[26px] font-semibold tracking-tight">{stage.name}</h3>
-          <p className="mt-2 max-w-[62ch] text-[17px] leading-relaxed text-[#d5d9de]">
-            {stage.purpose}
-          </p>
-
-          <div className="mt-6 border-t border-hair pt-5">
-            <p className="label mb-3">They may say</p>
-            <ul className="space-y-2">
-              {stage.what_they_say.map((q) => (
-                <li key={q} className="text-[15px] leading-snug text-muted">
-                  “{q}”
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="mt-6 border-t border-hair pt-5">
-            <div className="mb-3 flex items-baseline justify-between">
-              <p className="label">What happened</p>
-              <span className="text-[10px] text-faint">keys 1–{stage.taps.length}</span>
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {stage.taps.map((t, i) => {
-                const on = tap === t.key;
-                return (
-                  <button
-                    key={t.key}
-                    onClick={() => setTap(t.key)}
-                    className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left text-[13.5px] transition-colors ${
-                      on
-                        ? "border-blue-500 bg-blue-500/15 text-white"
-                        : "border-line bg-[#090f1d] text-slate-200 hover:border-blue-500/40"
-                    }`}
-                  >
-                    <span
-                      className={`grid h-[17px] w-[17px] shrink-0 place-items-center rounded-[4px] font-mono text-[10px] ${
-                        on ? "bg-blue-600 text-white font-semibold" : "bg-line text-slate-400"
-                      }`}
-                    >
-                      {i + 1}
-                    </span>
-                    {t.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-6 border-t border-hair pt-5">
-            <div className="mb-2 flex items-baseline justify-between">
-              <p className="label">Their words</p>
-              <button className="btn-link" onClick={askCue} disabled={cueBusy}>
-                {cueBusy ? "thinking…" : "AI cue"}
-              </button>
-            </div>
-            <textarea
-              ref={wordsRef}
-              rows={3}
-              value={words}
-              onChange={(e) => setWords(e.target.value)}
-              placeholder="Type it as they say it. This is the only free text on the screen."
-              className="input resize-y leading-relaxed"
-            />
-            {cue && (
-              <div className="mt-3 rounded-lg border border-accent/30 bg-accent/[0.06] px-3.5 py-3">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="label text-accent">AI cue</span>
-                  <span className="font-mono text-[10px] text-faint">{cue.source}</span>
-                </div>
-                <p className="text-[14.5px] leading-snug">{cue.cue}</p>
-              </div>
-            )}
-          </div>
-
-          {err && <p className="mt-4 text-[12.5px] text-bad">{err}</p>}
-
-          <div className="mt-7 flex items-center justify-end gap-2.5 border-t border-hair pt-5">
-            <button className="btn-ghost" onClick={endCall} disabled={saving}>
-              End call
-            </button>
-            <button className="btn-primary px-6" onClick={goNext} disabled={saving}>
-              {saving ? "Saving…" : next ? `Next: ${next.name} →` : "Close call →"}
-            </button>
-          </div>
-        </section>
 
       </div>
 
@@ -340,12 +353,6 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
   );
 }
 
-function tapLabel(content, log) {
-  const stage = content.stages.find((s) => s.number === Number(log.stage_number));
-  const t = stage?.taps.find((x) => x.key === log.what_happened);
-  return t?.label || String(log.what_happened).replace(/_/g, " ");
-}
-
 function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
   const [outcome, setOutcome] = useState(() => suggestOutcome(logs));
   const [nextStep, setNextStep] = useState("");
@@ -354,8 +361,6 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
-  // Audit is a preview, not a save: it runs whenever the choice changes, so the
-  // caller sees the contradiction before the record is written.
   useEffect(() => {
     let live = true;
     const t = setTimeout(() => {
@@ -385,32 +390,32 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 grid place-items-center bg-slate-900/50 p-6 backdrop-blur-xs"
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-[620px] rounded-xl2 border border-line bg-panel p-6 shadow-2xl"
+        className="w-full max-w-[580px] rounded-md border border-slate-300 bg-white p-6 shadow-2xl text-[#0f172a]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-baseline justify-between">
-          <h3 className="text-lg font-semibold">Close the call</h3>
-          <span className="label">Stage {stageNo} of 8</span>
+        <div className="flex items-baseline justify-between border-b border-slate-200 pb-3">
+          <h3 className="text-lg font-bold">Close the call</h3>
+          <span className="font-mono text-xs text-slate-500 font-semibold uppercase">Stage {stageNo} of 8</span>
         </div>
-        <p className="mt-1 text-[12.5px] text-muted">
+        <p className="mt-2 text-xs text-slate-600">
           The outcome is the caller's word. The audit checks it against the taps before
-          the record is written.
+          the record is written to Supabase.
         </p>
 
-        <p className="label mb-2 mt-5">Outcome</p>
+        <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-2 mt-4">Outcome</p>
         <div className="grid grid-cols-2 gap-1.5">
           {content.outcomes.map((o) => (
             <button
               key={o.key}
               onClick={() => setOutcome(o.key)}
-              className={`rounded-lg border px-3 py-2 text-left text-[12.5px] transition-colors ${
+              className={`rounded-sm border px-3 py-2 text-left text-xs transition-all ${
                 outcome === o.key
-                  ? "border-blue-500 bg-blue-500/15 text-white font-medium"
-                  : "border-line bg-[#090f1d] text-slate-300 hover:border-blue-500/40"
+                  ? "border-[#0047ff] bg-[#0047ff] text-white font-semibold"
+                  : "border-slate-300 bg-white text-slate-800 hover:border-slate-500"
               }`}
             >
               {o.label}
@@ -418,17 +423,17 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
           ))}
         </div>
 
-        <p className="label mb-2 mt-5">Next step</p>
+        <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-1 mt-4">Next step</p>
         <input
-          className="input"
+          className="w-full rounded-sm border border-slate-300 bg-white px-3 py-2 text-xs text-[#0f172a] outline-none focus:border-[#0047ff]"
           value={nextStep}
           onChange={(e) => setNextStep(e.target.value)}
-          placeholder="Tuesday 11:00, plant visit with the MD"
+          placeholder="e.g. Tuesday 14:00 Google Meet with MD"
         />
 
-        <p className="label mb-2 mt-4">Anything else for the record</p>
+        <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-1 mt-3">Additional notes</p>
         <input
-          className="input"
+          className="w-full rounded-sm border border-slate-300 bg-white px-3 py-2 text-xs text-[#0f172a] outline-none focus:border-[#0047ff]"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Optional"
@@ -436,29 +441,29 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
 
         {audit && (
           <div
-            className={`mt-5 rounded-lg border px-3.5 py-3 ${
+            className={`mt-4 rounded-sm border p-3 ${
               audit.warning
-                ? "border-bad/40 bg-bad/[0.07]"
-                : "border-good/30 bg-good/[0.05]"
+                ? "border-rose-300 bg-rose-50"
+                : "border-emerald-300 bg-emerald-50"
             }`}
           >
             <div className="mb-1 flex items-center justify-between">
-              <span className={`label ${audit.warning ? "text-bad" : "text-good"}`}>
+              <span className={`font-mono text-xs font-bold uppercase tracking-wider ${audit.warning ? "text-rose-700" : "text-emerald-700"}`}>
                 {audit.warning ? "Audit: this does not match" : "Audit: consistent"}
               </span>
-              <span className="font-mono text-[10px] text-faint">{audit.source}</span>
+              <span className="font-mono text-[10px] text-slate-500">{audit.source}</span>
             </div>
-            <p className="text-[12.5px] leading-relaxed text-[#d5d9de]">
+            <p className="text-xs leading-relaxed text-slate-800 font-medium">
               {audit.warning || audit.summary}
             </p>
           </div>
         )}
 
-        {err && <p className="mt-3 text-[12.5px] text-bad">{err}</p>}
+        {err && <p className="mt-3 text-xs text-rose-600">{err}</p>}
 
-        <div className="mt-6 flex justify-end gap-2.5">
+        <div className="mt-6 flex justify-end gap-2.5 pt-3 border-t border-slate-200">
           <button className="btn-ghost" onClick={onCancel}>
-            Keep the call open
+            Keep call open
           </button>
           <button className="btn-primary" onClick={submit} disabled={busy}>
             {busy ? "Saving…" : "Save and close"}
@@ -472,46 +477,50 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
 function Closed({ call, content, onNew, onFinished }) {
   const outcome = content.outcomes.find((o) => o.key === call.outcome);
   return (
-    <div className="mx-auto max-w-[720px] py-10 text-center">
-      <p className="eyebrow">Call closed · {call.company_name}</p>
-      <h1 className="mt-2 text-[30px] font-semibold tracking-tight">
+    <div className="mx-auto max-w-[620px] rounded-md border border-slate-300 bg-white p-8 shadow-sm text-center">
+      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#0047ff]">
+        Call closed · {call.company_name}
+      </p>
+      <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#0f172a]">
         {call.prospect_name || "Unknown prospect"}
       </h1>
       <div
-        className={`mt-4 inline-flex rounded-full border px-4 py-1.5 text-[13px] font-semibold ${
+        className={`mt-3 inline-flex rounded-sm border px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider ${
           outcome?.tone === "good"
-            ? "border-good/35 bg-good/10 text-good"
+            ? "border-emerald-300 bg-emerald-50 text-emerald-800"
             : outcome?.tone === "ok"
-            ? "border-ok/30 bg-ok/[0.08] text-ok"
-            : "border-bad/30 bg-bad/[0.08] text-bad"
+            ? "border-blue-300 bg-blue-50 text-[#0047ff]"
+            : "border-rose-300 bg-rose-50 text-rose-800"
         }`}
       >
         {outcome?.label || call.outcome}
       </div>
 
-      <div className="card mt-6 p-5 text-left">
-        <p className="label mb-2">What a manager reads</p>
-        <p className="text-[15.5px] leading-relaxed">{call.ai_summary}</p>
+      <div className="mt-5 rounded-sm border border-slate-200 bg-slate-50 p-4 text-left">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+          What a manager reads
+        </p>
+        <p className="text-sm leading-relaxed text-slate-800">{call.ai_summary}</p>
         {call.next_step && (
-          <>
-            <p className="label mb-2 mt-4">Next step</p>
-            <p className="text-[14px] text-muted">{call.next_step}</p>
-          </>
+          <div className="mt-3 pt-3 border-t border-slate-200">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Next step</p>
+            <p className="text-xs text-slate-700 font-medium">{call.next_step}</p>
+          </div>
         )}
         {call.audit_warning && (
-          <div className="mt-4 rounded-lg border border-bad/40 bg-bad/[0.07] px-3.5 py-3 text-left">
-            <p className="label mb-1 text-bad">Audit warning</p>
-            <p className="text-[12.5px] leading-relaxed text-[#d5d9de]">{call.audit_warning}</p>
+          <div className="mt-3 rounded-sm border border-rose-300 bg-rose-50 p-3 text-left">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700 mb-1">Audit warning</p>
+            <p className="text-xs text-rose-800">{call.audit_warning}</p>
           </div>
         )}
       </div>
 
-      <p className="mt-3 text-[12px] text-muted">
+      <p className="mt-4 font-mono text-xs text-slate-500">
         {call.duration_seconds}s · reached {call.highest_stage_name} ·{" "}
         {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "no need quote"}
       </p>
 
-      <div className="mt-6 flex justify-center gap-2.5">
+      <div className="mt-6 flex justify-center gap-3">
         <button className="btn-ghost" onClick={onFinished}>
           See it in past calls
         </button>

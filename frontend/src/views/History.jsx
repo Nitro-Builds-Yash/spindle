@@ -45,106 +45,97 @@ export default function History({ content, onOpen, onNew }) {
     );
   };
 
-  if (err) return <div className="py-20 text-center text-muted">{err}</div>;
-  if (!calls) return <div className="py-20 text-center text-muted">Loading calls…</div>;
+  if (err) return <div className="py-20 text-center text-rose-600 font-mono text-sm">{err}</div>;
+  if (!calls) return <div className="py-20 text-center text-slate-500 font-mono text-sm">Loading past calls…</div>;
 
   const selected = calls.find((c) => c.id === openId);
   const byStage = stats?.ended_by_stage || {};
   const peak = Math.max(1, ...Object.values(byStage));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-end justify-between gap-6">
+    <div className="flex flex-col gap-6 max-w-[960px] mx-auto">
+      {/* Header */}
+      <div className="flex items-end justify-between gap-6 border-b border-slate-200 pb-4">
         <div>
-          <p className="eyebrow">After the call</p>
-          <h1 className="mt-1 text-[28px] font-semibold tracking-tight">Past calls</h1>
-          <p className="text-[13px] text-muted">
-            Every call, the highest stage it reached, and the outcome as logged.
+          <p className="eyebrow">The Second Screen</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#0f172a]">Past calls</h1>
+          <p className="text-xs text-slate-600 mt-0.5">
+            After a call is saved it appears here with the stage it reached. A list like this is how a caller sees where their calls end.
           </p>
         </div>
         <button className="btn-primary" onClick={onNew}>
-          New call
+          + New call
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-[130px_200px_1fr]">
-        <div className="card flex flex-col gap-0.5 p-3.5">
-          <span className="font-mono text-[24px] leading-none">{stats?.calls ?? calls.length}</span>
-          <span className="label">calls</span>
+      {/* Analytics Snapshot Bar */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[140px_200px_1fr]">
+        <div className="card flex flex-col justify-center p-4">
+          <span className="font-mono text-3xl font-bold text-[#0f172a] leading-none">{stats?.calls ?? calls.length}</span>
+          <span className="label mt-1">Total calls</span>
         </div>
-        <div className="card flex flex-col gap-0.5 p-3.5">
-          <span className="font-mono text-[24px] leading-none">
+        <div className="card flex flex-col justify-center p-4">
+          <span className="font-mono text-3xl font-bold text-[#0047ff] leading-none">
             {Math.round((stats?.connect_rate || 0) * 100)}%
           </span>
-          <span className="label">reached the right person</span>
+          <span className="label mt-1">Reached right person</span>
         </div>
-        <div className="card p-3.5">
+        <div className="card p-4">
           <span className="label">Where calls ended</span>
-          <div className="mt-2 grid grid-cols-8 items-end gap-1.5 border-b border-line pb-1">
+          <div className="mt-2 grid grid-cols-8 items-end gap-1.5 border-b border-slate-200 pb-1">
             {Object.entries(byStage).map(([n, c]) => (
               <div key={n} className="grid h-[52px] grid-rows-[12px_1fr_11px] items-end justify-items-center gap-0.5">
-                <span className="font-mono text-[9px] text-faint">{c || ""}</span>
+                <span className="font-mono text-[9px] text-slate-500 font-bold">{c || ""}</span>
                 <div
-                  className="w-1/2 max-w-[26px] self-end rounded-t-sm bg-gradient-to-b from-accent to-accent/30"
-                  style={{ height: `${c ? Math.max(6, (c / peak) * 100) : 0}%` }}
+                  className="w-1/2 max-w-[24px] self-end rounded-xs bg-[#0047ff]"
+                  style={{ height: `${c ? Math.max(8, (c / peak) * 100) : 0}%` }}
                 />
-                <span className="font-mono text-[9px] text-faint">{n}</span>
+                <span className="font-mono text-[9px] text-slate-500 font-semibold">{n}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
+      {/* Reference Card List (Matches ClinicBooks Past Calls Exactly) */}
       {calls.length === 0 ? (
-        <div className="grid place-items-center gap-3 py-20 text-muted">
-          <p>No calls yet.</p>
-          <button className="btn-primary" onClick={onNew}>
-            Start a call
-          </button>
+        <div className="card p-12 text-center text-slate-500 font-mono text-sm">
+          No calls recorded yet. Click "+ New call" above to start your first cold call!
         </div>
       ) : (
-        <ul className="border-t border-line">
+        <div className="space-y-2.5">
           {calls.map((c) => {
             const outcome = outcomeByKey[c.outcome];
             const live = c.status === "in_progress";
             return (
-              <li key={c.id} className="border-b border-hair">
-                <button
-                  onClick={() => setOpenId(c.id)}
-                  className="grid w-full grid-cols-1 items-center gap-2 px-3 py-3.5 text-left hover:bg-white/[0.015] sm:grid-cols-[minmax(0,1fr)_220px_132px] sm:gap-5"
-                >
+              <div
+                key={c.id}
+                onClick={() => setOpenId(c.id)}
+                className="rounded-md border border-slate-300 bg-white p-4 hover:border-[#0f172a] hover:shadow-xs transition-all cursor-pointer"
+              >
+                <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <div className="text-[14px] font-semibold">
-                      {c.prospect_name || "No name"}
+                    <h4 className="font-bold text-sm text-[#0f172a] tracking-tight">
+                      {c.prospect_name || "Unknown prospect"}
                       {c.company_name ? `, ${c.company_name}` : ""}
-                    </div>
-                    <div className="truncate text-[12.5px] italic text-muted">
-                      {c.ai_summary || "No summary."}
-                    </div>
+                    </h4>
+                    <p className="text-xs text-slate-600 mt-1 line-clamp-1">
+                      {c.next_step || c.ai_summary || "No notes logged for this call."}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2.5">
-                    {live ? (
-                      <span className="badge badge-live">on the phone</span>
-                    ) : (
-                      <span className={toneClass[outcome?.tone] || "badge"}>
-                        {outcome?.label || c.outcome || "closed"}
-                      </span>
-                    )}
-                    <span className="whitespace-nowrap text-[12px] text-muted">
-                      <span className="font-mono text-[10.5px] text-faint">
-                        {c.highest_stage_reached}/8
-                      </span>{" "}
+                  <div className="text-right shrink-0">
+                    <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#0047ff]">
                       {c.highest_stage_name}
                     </span>
+                    <p className="font-mono text-[10.5px] text-slate-500 mt-0.5 font-medium">
+                      {when(c.started_at)}
+                    </p>
                   </div>
-                  <span className="whitespace-nowrap font-mono text-[11.5px] text-faint sm:text-right">
-                    {when(c.started_at)}
-                  </span>
-                </button>
-              </li>
+                </div>
+              </div>
             );
           })}
-        </ul>
+        </div>
       )}
 
       {selected && (
@@ -166,97 +157,97 @@ export default function History({ content, onOpen, onNew }) {
 function Drawer({ call, content, onClose, onResume, when, tapLabel, stageName, outcome }) {
   return (
     <div className="fixed inset-0 z-40" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" />
       <aside
-        className="absolute inset-y-0 right-0 flex w-full max-w-[560px] flex-col overflow-y-auto border-l border-line bg-panel"
+        className="absolute inset-y-0 right-0 flex w-full max-w-[540px] flex-col overflow-y-auto border-l border-slate-300 bg-white shadow-2xl text-[#0f172a]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-panel px-6 py-5">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-200 bg-white px-6 py-4">
           <div>
             <p className="eyebrow">{when(call.started_at)}</p>
-            <h2 className="mt-1 text-[19px] font-semibold">
-              {call.prospect_name || "No name"}
+            <h2 className="mt-1 text-lg font-bold">
+              {call.prospect_name || "Unknown"}
             </h2>
-            <p className="text-[12.5px] text-muted">
+            <p className="text-xs text-slate-500">
               {[call.prospect_role, call.company_name, call.call_type].filter(Boolean).join(" · ")}
             </p>
           </div>
           <button className="btn-ghost px-2.5 py-1 text-xs" onClick={onClose}>
-            Close
+            ✕ Close
           </button>
         </div>
 
-        <div className="space-y-5 px-6 py-5">
+        <div className="space-y-4 px-6 py-5">
           <div className="flex flex-wrap items-center gap-2">
             <span className={toneClass[outcome?.tone] || "badge"}>
               {outcome?.label || call.outcome || "in progress"}
             </span>
             <span className="badge">
-              {call.highest_stage_reached}/8 · {call.highest_stage_name}
+              Stage {call.highest_stage_reached}/8 · {call.highest_stage_name}
             </span>
-            <span className="badge">{call.duration_seconds}s</span>
+            <span className="badge font-mono">{call.duration_seconds}s</span>
             {call.status === "in_progress" && (
-              <button className="btn-link ml-auto" onClick={onResume}>
-                Resume this call →
+              <button className="text-xs font-mono font-bold text-[#0047ff] ml-auto hover:underline" onClick={onResume}>
+                Resume call →
               </button>
             )}
           </div>
 
-          <div>
-            <p className="label mb-1.5">AI summary</p>
-            <p className="text-[13.5px] leading-relaxed text-[#d5d9de]">
+          <div className="rounded-md border border-slate-200 bg-slate-50 p-3.5">
+            <p className="label mb-1">AI 1-line CRM summary</p>
+            <p className="text-xs text-slate-800 leading-relaxed font-medium">
               {call.ai_summary || "No summary written."}
             </p>
           </div>
 
           {call.next_step && (
-            <div>
-              <p className="label mb-1.5">Next step</p>
-              <p className="text-[13px] text-muted">{call.next_step}</p>
+            <div className="rounded-md border border-slate-200 p-3">
+              <p className="label mb-1">Next step agreed</p>
+              <p className="text-xs text-[#0f172a] font-semibold">{call.next_step}</p>
             </div>
           )}
 
           {call.audit_warning && (
-            <div className="rounded-lg border border-bad/40 bg-bad/[0.07] px-3.5 py-3">
-              <p className="label mb-1 text-bad">Audit note</p>
-              <p className="text-[12.5px] leading-relaxed text-[#d5d9de]">
+            <div className="rounded-md border border-rose-300 bg-rose-50 p-3">
+              <p className="label mb-1 text-rose-700 font-bold">Audit inconsistency note</p>
+              <p className="text-xs text-rose-800 leading-relaxed font-medium">
                 {call.audit_warning}
               </p>
             </div>
           )}
 
-          <div>
-            <p className="label mb-1.5">Their words, stage 5</p>
-            <p className="text-[13px] italic text-muted">
+          <div className="rounded-md border border-slate-200 p-3">
+            <p className="label mb-1">Prospect's exact words (Stage 5 Need Quote)</p>
+            <p className="text-xs italic text-slate-800">
               {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "Nothing captured."}
             </p>
           </div>
 
           <div>
-            <p className="label mb-2">Stage by stage</p>
-            <ol className="space-y-3">
+            <p className="label mb-2">Stage-by-stage progression</p>
+            <div className="space-y-2">
               {(call.stage_logs || []).map((l) => (
-                <li key={l.id} className="grid grid-cols-[22px_1fr] gap-2.5">
-                  <span className="font-mono text-[10.5px] text-faint">
+                <div key={l.id} className="grid grid-cols-[24px_1fr] gap-2 rounded-sm border border-slate-200 p-2.5 bg-slate-50/50">
+                  <span className="font-mono text-xs font-bold text-slate-500">
                     {String(l.stage_number).padStart(2, "0")}
                   </span>
                   <div>
-                    <div className="text-[11px] uppercase tracking-[0.1em] text-faint">
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-[#0047ff] font-semibold">
                       {stageName(Number(l.stage_number))}
                     </div>
-                    <div className="text-[13px]">{tapLabel(l)}</div>
+                    <div className="text-xs font-semibold text-[#0f172a] mt-0.5">{tapLabel(l)}</div>
                     {l.prospect_words && (
-                      <div className="mt-0.5 text-[12px] italic text-muted">
+                      <div className="mt-1 text-[11.5px] italic text-slate-600 border-l-2 border-slate-300 pl-2">
                         “{l.prospect_words}”
                       </div>
                     )}
                   </div>
-                </li>
+                </div>
               ))}
               {(call.stage_logs || []).length === 0 && (
-                <li className="text-[12px] text-faint">No stages logged.</li>
+                <p className="text-xs text-slate-400 font-mono">No stage logs saved.</p>
               )}
-            </ol>
+            </div>
           </div>
         </div>
       </aside>

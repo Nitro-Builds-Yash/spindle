@@ -4,26 +4,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#070b14",
-        panel: "#0d1527",
-        raised: "#131f38",
-        line: "#1c2e50",
-        hair: "#14223d",
-        muted: "#94a3b8",
-        faint: "#64748b",
-        accent: "#3b82f6",
-        accentHover: "#2563eb",
-        accentDark: "#1d4ed8",
-        good: "#10b981",
-        ok: "#60a5fa",
-        bad: "#f43f5e",
+        ink: "#0f172a",          // High-contrast slate-900
+        paper: "#f8fafc",        // Clean slate-50 background
+        card: "#ffffff",         // Pure white surface
+        line: "#cbd5e1",         // Crisp slate-300 border
+        lineLight: "#e2e8f0",    // Soft slate-200 divider
+        muted: "#475569",        // Slate-600
+        faint: "#64748b",        // Slate-500
+        cobalt: "#0047ff",       // Reference screen electric blue
+        accent: "#0047ff",       // Electric blue accent
+        good: "#059669",         // Emerald-600
+        ok: "#0284c7",           // Sky-600
+        bad: "#dc2626",          // Rose-600
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
         mono: ['"IBM Plex Mono"', "ui-monospace", "monospace"],
       },
       borderRadius: {
-        xl2: "14px",
+        md: "6px",
       },
     },
   },
