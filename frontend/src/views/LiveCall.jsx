@@ -195,6 +195,14 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={onNew}
+              className="rounded-xs px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all"
+              title="Start a new cold call"
+            >
+              + New Call
+            </button>
+            <button
+              type="button"
               onClick={() => setShowSim(!showSim)}
               className={`rounded-xs px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider transition-all ${
                 showSim
