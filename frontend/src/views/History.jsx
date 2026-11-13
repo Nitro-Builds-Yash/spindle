@@ -66,9 +66,6 @@ export default function History({ content, onOpen, onNew }) {
     );
   };
 
-  if (err) return <div className="py-20 text-center text-rose-600 font-mono text-sm">{err}</div>;
-  if (!calls) return <div className="py-20 text-center text-slate-500 font-mono text-sm">Loading past calls…</div>;
-
   const filteredCalls = useMemo(() => {
     if (!calls) return [];
     if (!filterQuery.trim()) return calls;
@@ -80,6 +77,9 @@ export default function History({ content, onOpen, onNew }) {
       (c.highest_stage_name || "").toLowerCase().includes(q)
     );
   }, [calls, filterQuery]);
+
+  if (err) return <div className="py-20 text-center text-rose-600 font-mono text-sm">{err}</div>;
+  if (!calls) return <div className="py-20 text-center text-slate-500 font-mono text-sm">Loading past calls…</div>;
 
   const exportCSV = () => {
     if (!calls || calls.length === 0) return;
