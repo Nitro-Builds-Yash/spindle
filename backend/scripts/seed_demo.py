@@ -19,6 +19,9 @@ from datetime import datetime, timedelta, timezone
 # Ensure backend root is on sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
 from app.db import build_store, now_iso
 from app.content import STAGES_BY_NUMBER
 from app.llm import audit_fallback
