@@ -217,9 +217,11 @@ class SupabaseStore:
         return rows[0]
 
     def get_call(self, call_id: str) -> Optional[dict[str, Any]]:
-        rows = self._rows(
-            self.client.get("/calls", params={"id": f"eq.{call_id}", "select": "*"})
-        )
+        r = self.client.get("/calls", params={"id": f"eq.{call_id}", "select": "*"})
+        if r.status_code in (400, 404):  # Invalid UUID syntax or not found
+            return None
+        r.raise_for_status()
+        rows = r.json()
         return rows[0] if rows else None
 
     def list_calls(self, limit: int = 100) -> list[dict[str, Any]]:
@@ -276,16 +278,18 @@ class SupabaseStore:
         return rows[0]
 
     def logs_for(self, call_id: str) -> list[dict[str, Any]]:
-        return self._rows(
-            self.client.get(
-                "/call_stage_logs",
-                params={
-                    "call_id": f"eq.{call_id}",
-                    "select": "*",
-                    "order": "stage_number.asc",
-                },
-            )
+        r = self.client.get(
+            "/call_stage_logs",
+            params={
+                "call_id": f"eq.{call_id}",
+                "select": "*",
+                "order": "stage_number.asc",
+            },
         )
+        if r.status_code in (400, 404):
+            return []
+        r.raise_for_status()
+        return r.json()
 
 
 def build_store():

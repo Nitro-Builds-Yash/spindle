@@ -7,6 +7,7 @@
 [![API Health](https://img.shields.io/badge/Backend%20API-Render%20(Online)-46e3b7?style=for-the-badge&logo=render)](https://call-copilot-api.onrender.com/health)
 [![Database](https://img.shields.io/badge/Database-Supabase%20Postgres-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com)
 [![LLM Provider](https://img.shields.io/badge/LLM-Google%20Gemini%20Flash%20Lite-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev)
+[![CI Pipeline](https://img.shields.io/badge/CI-Automated%20Tests%20Passing-success?style=for-the-badge&logo=githubactions)](https://github.com/Nitro-Builds-Yash/spindle/actions)
 [![Challenge](https://img.shields.io/badge/DeepThought-Forward%20Deployed%20Engineer-7928ca?style=for-the-badge)](https://sainikpuri.deepthought.education/fde-hyderabad-v2)
 
 <p align="center">
@@ -19,6 +20,21 @@
 ---
 
 </div>
+
+## 📑 Table of Contents
+- [Executive Summary](#-executive-summary)
+- [Live Deliverable URLs](#-live-deliverable-urls)
+- [Empirical Analysis (100 Transcripts)](#-empirical-analysis-grounded-in-100-real-transcripts)
+- [System Architecture](#️-system-architecture)
+- [UI Walkthrough & Visual Tour](#-ui-walkthrough--visual-tour)
+- [The 8 Call Stages](#-the-8-stages-of-an-indian-manufacturing-cold-call)
+- [LLM Strategy (Google Gemini)](#-the-llm-architecture-why-google-gemini-flash-lite)
+- [Database Schema (Supabase)](#️-database-architecture-schemasql)
+- [Automated Testing & CI Pipeline](#-automated-testing--ci-pipeline)
+- [Local Development Quickstart](#️-local-development-quickstart)
+- [Submission Details](#-submission-details-for-deepthought-reviewers)
+
+---
 
 ## 📌 Executive Summary
 
@@ -132,28 +148,43 @@ flowchart TD
 
 ---
 
-## 🖥️ The 3-Screen Workflow
+## 🖥️ UI Walkthrough & Visual Tour
 
 ### Screen 1: Start a Call (`/start`)
-- **Interactive Simulation Pill:** 1-click launch of a live 8-stage rehearsal call with Ramesh Varma (Sri Balaji Precision).
+- **1-Click Simulation Pill:** Instantly launches an interactive 8-stage rehearsal call with Ramesh Varma (Sri Balaji Precision).
 - **Manufacturing Presets:** Pre-configured prospect profiles from real transcript domains (Precision Machining in Coimbatore, Chemical Processing in Gujarat, Industrial Coatings in Pune).
 - **8-Stage Overview:** Glanceable reference of all 8 call stages and their primary objectives before dialing.
-- **Active Call Banner:** Seamless resumption if a call is already in progress.
+
+<p align="center">
+  <img src="docs/shot-start.png" alt="Start a Call Screen" width="850" style="border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+</p>
 
 ### Screen 2: Live Call Cockpit (`/live`) · *1:1 with Reading 2 Specification*
 - **Header:** Call timer (`MM:SS`), prospect name, role, company name, company kind, and call type.
 - **8-Stage Stepper:** Highlights current stage, progress, and stage objective in one concise sentence.
-- **They May Say (3 Quotes):** Real prospect phrases extracted from transcripts to ensure the caller is never caught off guard.
-- **What Happened (2x2 Taps):** 4 mutually exclusive outcomes for the stage. Keyboard shortcuts `1`–`4` for touch-free logging.
-- **Their Words (Verbatim Box):** Dedicated input for capturing exact prospect quotes (mandatory at Stage 5). Includes quick quote insertion chips.
+- **They May Say (3 Quotes):** Real prospect phrases extracted from transcripts to ensure the caller is never caught off guard. Clicking any quote instantly fills "Their Words".
+- **What Happened (2x2 Taps):** 4 mutually exclusive outcomes with keyboard shortcut indicators `[1]`–`[4]`.
+- **Their Words (Verbatim Box):** Dedicated input for capturing exact prospect quotes (mandatory at Stage 5).
 - **AI Mid-Call Assist:** One-click button returning **one spoken sentence** (<20 words) tailored to the prospect's exact phrase.
-- **Interactive Phone Simulator:** Real-time side companion with audio wave pulse, conversational memory, and quick pitch buttons.
-- **Navigation Controls:** `Next Stage →`, `Close Call →`, and `End Call` on every stage (allowing clean exits at Stage 1).
+- **Interactive Phone Simulator:** Real-time side companion with active audio wave visualizer, conversational memory, and quick pitch buttons.
+
+<p align="center">
+  <img src="docs/shot-live.png" alt="Live Call Screen" width="850" style="border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+</p>
 
 ### Screen 3: Past Calls & Audit Funnel (`/history`)
 - **Outcome Funnel Analytics:** Live visualization of stage drop-offs (Stages 1–8) and connect rates.
-- **Call Ledger:** Tabular view of all past calls stored in Supabase with outcome pills, verbatim notes, and audit badges.
+- **1-Click CSV Export:** Export all calls, outcomes, durations, and AI summaries for CRM synchronization.
+- **Real-Time Search:** Instant filtering by prospect name, company, or outcome tone.
 - **Inspection Drawer:** Deep-dive modal displaying AI CRM summary, audit warnings, verbatim prospect need, and full stage progression.
+
+<p align="center">
+  <img src="docs/shot-history.png" alt="Past Calls Screen" width="850" style="border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+</p>
+
+<p align="center">
+  <img src="docs/shot-drawer.png" alt="Call Inspection Drawer" width="850" style="border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+</p>
 
 ---
 
@@ -203,6 +234,25 @@ Spindle connects to a production **Supabase PostgreSQL** instance with Row Level
 - **`call_stages` table:** Normalized stage logs with `UNIQUE (call_id, stage_number)` constraint ensuring re-taps update in place without duplicating records.
 - **`v_stage_dropoff` view:** Pre-computed aggregation of where calls drop off across stages 1 through 8.
 - **`v_outcome_distribution` view:** Real-time distribution of call outcomes across the entire database.
+
+---
+
+## 🧪 Automated Testing & CI Pipeline
+
+Spindle includes a comprehensive automated test suite in `backend/tests/test_api.py` covering:
+- Health check and stages schema integrity
+- Full call lifecycle: Start &rarr; Stage 1 &rarr; Stage 5 Quote &rarr; Pre-close Consistency Audit &rarr; Close
+- Real-time simulated prospect responses
+- CRM CSV export data generation
+- Error boundaries and non-existent UUID handling
+
+```bash
+cd backend
+pytest -v
+```
+
+GitHub Actions automatically executes this test suite and runs `npm run build` on every push to `main`:
+[![CI Pipeline](https://github.com/Nitro-Builds-Yash/spindle/actions/workflows/ci.yml/badge.svg)](https://github.com/Nitro-Builds-Yash/spindle/actions)
 
 ---
 
