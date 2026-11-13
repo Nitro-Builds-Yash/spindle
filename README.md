@@ -95,10 +95,7 @@ the misloggings above: a positive outcome after a gatekeeper or "HQ decides" tap
 time, a "report agreed" when the prospect thought it was a job call, a referral
 logged as an agreement, an empty Stage 5 quote, a 23-second call with a meeting.
 
-Gemini 2.0 Flash is the provider because the free tier is enough for this
-workload (two short calls per call record), the latency fits a live call, and
-JSON mode keeps both responses to one field each. The provider is one env var
-away from Cerebras or Mistral, both wired in `backend/app/llm.py`.
+Google Gemini Flash Lite (`gemini-flash-lite-latest`) is the active provider via Google AI Studio's free tier because it delivers sub-second latency for live call workflows, robust reasoning for cross-stage consistency audits, and zero downtime. The provider is also switchable to Cerebras or Mistral via `LLM_PROVIDER` in `backend/app/llm.py`.
 
 **The fallback is deliberate.** With no key, `audit_fallback` and `cue_fallback`
 implement the same logic with rules on the tap keys. The UI prints `rules` next to
