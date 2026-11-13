@@ -169,9 +169,14 @@ export default function PhoneSimulator({
               <span className="text-xs font-bold tracking-tight">
                 {call?.prospect_name || "Ramesh Varma"}
               </span>
-              <span className="rounded-xs bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-mono font-bold uppercase text-emerald-400">
-                Call Live
-              </span>
+              <div className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-mono font-bold uppercase text-emerald-400">
+                <span>Active Call</span>
+                <span className="flex items-end gap-0.5 h-2">
+                  <span className="w-0.5 h-full bg-emerald-400 animate-pulse"></span>
+                  <span className="w-0.5 h-2/3 bg-emerald-400 animate-pulse delay-75"></span>
+                  <span className="w-0.5 h-4/5 bg-emerald-400 animate-pulse delay-150"></span>
+                </span>
+              </div>
             </div>
             <p className="text-[10px] text-slate-400 font-medium">
               {call?.company_name || "Sri Balaji Precision"} · {tick}

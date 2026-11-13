@@ -314,12 +314,21 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
                 <button
                   key={t.key}
                   onClick={() => setTap(t.key)}
-                  className={`p-3 rounded-xs border text-center text-[12px] font-medium transition-all ${
+                  className={`relative p-3 rounded-xs border text-center text-[12px] font-medium transition-all group ${
                     on
                       ? "bg-[#0047ff] text-white border-[#0047ff] font-bold shadow-md shadow-blue-500/25"
                       : "bg-white/80 backdrop-blur-xs text-slate-800 border-slate-300/80 hover:border-slate-500 hover:bg-white"
                   }`}
                 >
+                  <span
+                    className={`absolute top-1.5 right-1.5 font-mono text-[9px] px-1 rounded-2xs transition-all ${
+                      on
+                        ? "text-blue-100 bg-blue-700/60"
+                        : "text-slate-400 bg-slate-100 group-hover:text-slate-600 group-hover:bg-slate-200"
+                    }`}
+                  >
+                    {i + 1}
+                  </span>
                   {t.label}
                 </button>
               );
@@ -334,11 +343,17 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
               THEIR WORDS
             </p>
             <button
-              className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline"
+              className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline flex items-center gap-1"
               onClick={askCue}
               disabled={cueBusy}
             >
-              {cueBusy ? "Thinking…" : "Ask AI cue"}
+              {cueBusy && (
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0047ff]"></span>
+                </span>
+              )}
+              {cueBusy ? "Gemini is thinking…" : "⚡ Ask AI cue"}
             </button>
           </div>
           <textarea
@@ -346,13 +361,23 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             rows={2}
             value={words}
             onChange={(e) => setWords(e.target.value)}
-            placeholder="Type exact words spoken by prospect..."
-            className="w-full rounded-xs border border-slate-300/90 bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-900 outline-none focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400"
+            placeholder="Type or click prospect quotes above..."
+            className="w-full rounded-xs border border-slate-300/90 bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-900 outline-none focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400 font-sans"
           />
           {cue && (
-            <div className="mt-2 rounded-xs border border-blue-200 bg-blue-50/90 backdrop-blur-xs p-2.5 text-xs text-blue-950 flex items-start gap-2 shadow-2xs">
-              <span className="font-mono font-bold text-[#0047ff] uppercase text-[10px]">Cue:</span>
-              <p className="flex-1 font-medium leading-relaxed text-[11.5px]">{cue.cue}</p>
+            <div className="mt-2.5 rounded-lg border border-blue-200/90 bg-gradient-to-r from-blue-50/95 to-indigo-50/90 backdrop-blur-xs p-3 text-xs text-blue-950 shadow-2xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-mono font-bold text-[#0047ff] uppercase text-[10px] flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#0047ff]"></span>
+                  Spoken AI Cue
+                </span>
+                <span className="font-mono text-[9px] text-blue-700 font-semibold bg-white/90 border border-blue-200 px-1.5 py-0.2 rounded-xs">
+                  ⚡ Gemini Flash Lite
+                </span>
+              </div>
+              <p className="font-medium text-slate-900 leading-relaxed text-[12px] pl-2.5 border-l-2 border-[#0047ff]">
+                “{cue.cue}”
+              </p>
             </div>
           )}
         </div>

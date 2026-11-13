@@ -6,6 +6,8 @@ Health:       GET /health
 
 from __future__ import annotations
 
+import csv
+import io
 import os
 from datetime import datetime, timezone
 from typing import Any, Optional
@@ -13,6 +15,7 @@ from typing import Any, Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from . import llm
@@ -129,6 +132,34 @@ def list_calls(limit: int = 100) -> dict[str, Any]:
     for c in calls:
         c.setdefault("stage_logs", [])
     return {"calls": calls}
+
+
+@app.get("/api/calls/export.csv")
+def export_calls_csv() -> Response:
+    """Enterprise CSV export for CRM synchronization."""
+    calls = store.list_calls(500)
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "id", "started_at", "prospect_name", "company_name", "prospect_role",
+        "company_kind", "call_type", "status", "highest_stage_reached",
+        "highest_stage_name", "duration_seconds", "outcome", "next_step",
+        "stage5_need_quote", "ai_summary", "audit_warning"
+    ])
+    for c in calls:
+        writer.writerow([
+            c.get("id"), c.get("started_at"), c.get("prospect_name"),
+            c.get("company_name"), c.get("prospect_role"), c.get("company_kind"),
+            c.get("call_type"), c.get("status"), c.get("highest_stage_reached"),
+            c.get("highest_stage_name"), c.get("duration_seconds"), c.get("outcome"),
+            c.get("next_step"), c.get("stage5_need_quote"), c.get("ai_summary"),
+            c.get("audit_warning")
+        ])
+    return Response(
+        content=output.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=spindle-calls.csv"}
+    )
 
 
 @app.get("/api/calls/{call_id}")

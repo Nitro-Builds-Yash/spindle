@@ -81,6 +81,46 @@ export default function History({ content, onOpen, onNew }) {
     );
   }, [calls, filterQuery]);
 
+  const exportCSV = () => {
+    if (!calls || calls.length === 0) return;
+    const headers = [
+      "ID",
+      "Date",
+      "Prospect Name",
+      "Company",
+      "Role",
+      "Highest Stage",
+      "Duration (s)",
+      "Outcome",
+      "Next Step",
+      "Stage 5 Need Quote",
+      "AI Summary",
+    ];
+    const rows = calls.map((c) => [
+      c.id,
+      c.started_at,
+      `"${(c.prospect_name || "").replace(/"/g, '""')}"`,
+      `"${(c.company_name || "").replace(/"/g, '""')}"`,
+      `"${(c.prospect_role || "").replace(/"/g, '""')}"`,
+      c.highest_stage_name || c.highest_stage_reached,
+      c.duration_seconds || 0,
+      c.outcome || "",
+      `"${(c.next_step || "").replace(/"/g, '""')}"`,
+      `"${(c.stage5_need_quote || "").replace(/"/g, '""')}"`,
+      `"${(c.ai_summary || "").replace(/"/g, '""')}"`,
+    ]);
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `spindle-calls-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const selected = calls.find((c) => c.id === openId);
   const byStage = stats?.ended_by_stage || {};
   const peak = Math.max(1, ...Object.values(byStage));
@@ -96,9 +136,21 @@ export default function History({ content, onOpen, onNew }) {
             After a call is saved it appears here with the stage it reached. A list like this is how a caller sees where their calls end.
           </p>
         </div>
-        <button className="btn-primary self-start sm:self-auto" onClick={onNew}>
-          + New call
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <button
+            onClick={exportCSV}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition-all shadow-2xs"
+            title="Export all logged calls to CSV"
+          >
+            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Export CSV
+          </button>
+          <button className="btn-primary" onClick={onNew}>
+            + New call
+          </button>
+        </div>
       </div>
 
       {/* Analytics Snapshot Bar */}
