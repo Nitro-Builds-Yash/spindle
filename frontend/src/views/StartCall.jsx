@@ -76,6 +76,39 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
           caller types nothing on the call except one tap and the prospect's own words.
         </p>
 
+        {/* 1-Click Instant Reference Screen Launcher */}
+        <div className="mt-5 rounded-2xl border border-blue-200/90 bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-white p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0047ff] flex items-center gap-1.5">
+              <span>⚡</span> 1-Click Reference Screen (Reading 2)
+            </div>
+            <p className="text-xs text-slate-600 mt-1">
+              Open the exact 8-stage cold call screen directly with Dr. Anjali Menon.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn-blue py-2.5 px-5 rounded-xl shadow-md text-xs shrink-0"
+            onClick={() => {
+              setBusy(true);
+              api
+                .startCall({
+                  prospect_name: "Dr. Anjali Menon",
+                  prospect_role: "Owner, Menon Family Clinic",
+                  company_name: "ClinicBooks",
+                  company_kind: "small private company",
+                  call_type: "first call",
+                })
+                .then((res) => onStart(res.call.id))
+                .catch((e) => setErr(e.message))
+                .finally(() => setBusy(false));
+            }}
+            disabled={busy}
+          >
+            {busy ? "Opening..." : "▶ Open Reference Screen"}
+          </button>
+        </div>
+
         {hasCall && (
           <div className="card mt-5 flex items-center justify-between p-4 text-xs text-slate-700 bg-blue-50/60 border-blue-200/80 shadow-xs">
             <span className="font-medium">An active cold call is currently open in this session.</span>

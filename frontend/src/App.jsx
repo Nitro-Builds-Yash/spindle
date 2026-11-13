@@ -88,7 +88,22 @@ export default function App() {
         {/* Central Segmented Pill Navigation */}
         <nav className="flex gap-1 rounded-xl bg-slate-100/90 border border-slate-200/80 p-1 shadow-inner">
           <button
-            onClick={() => setView(callId ? "live" : "start")}
+            onClick={() => {
+              if (callId) {
+                setView("live");
+              } else {
+                api
+                  .startCall({
+                    prospect_name: "Dr. Anjali Menon",
+                    prospect_role: "Owner, Menon Family Clinic",
+                    company_name: "ClinicBooks",
+                    company_kind: "small private company",
+                    call_type: "first call",
+                  })
+                  .then((res) => openCall(res.call.id))
+                  .catch(() => setView("start"));
+              }
+            }}
             className={`flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
               view === "live" || view === "start"
                 ? "bg-white text-ink-950 shadow-xs"
