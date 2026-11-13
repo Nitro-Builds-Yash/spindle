@@ -20,6 +20,7 @@ const PRESETS = [
     company_name: "Sri Balaji Precision",
     company_kind: "mid-size private manufacturer",
     call_type: "first call",
+    industry: "Precision Machining · Coimbatore",
   },
   {
     prospect_name: "Dev ji",
@@ -27,6 +28,7 @@ const PRESETS = [
     company_name: "Kalpana Chem Supplies",
     company_kind: "mid-size private company",
     call_type: "first call",
+    industry: "Chemical Processing · Gujarat",
   },
   {
     prospect_name: "Vinod ji",
@@ -34,6 +36,7 @@ const PRESETS = [
     company_name: "ChromaChem India",
     company_kind: "mid-size private manufacturer",
     call_type: "first call",
+    industry: "Industrial Coatings · Pune",
   },
 ];
 
@@ -213,17 +216,30 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
         </div>
 
         <div>
-          <p className="eyebrow">Rehearse with real transcripts</p>
-          <div className="mt-2.5 space-y-2">
+          <div className="flex items-center justify-between mb-2">
+            <p className="eyebrow">Transcript Presets</p>
+            <span className="font-mono text-[10px] text-slate-400">1-Click Load</span>
+          </div>
+          <div className="space-y-2">
             {PRESETS.map((p) => (
               <button
                 key={p.company_name}
                 onClick={() => setForm(p)}
-                className="w-full rounded-xl border border-slate-200/90 bg-white p-3.5 text-left hover:border-[#0047ff] hover:shadow-card hover:-translate-y-0.5 transition-all duration-150"
+                className="w-full rounded-xl border border-slate-200/90 bg-white p-3 text-left hover:border-[#0047ff] hover:bg-blue-50/20 hover:shadow-card hover:-translate-y-0.5 transition-all duration-150 group"
               >
-                <div className="text-xs font-bold text-ink-950">{p.company_name}</div>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-bold text-ink-950 group-hover:text-[#0047ff] transition-colors">
+                    {p.company_name}
+                  </div>
+                  <span className="font-mono text-[9px] text-[#0047ff] opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                    Load →
+                  </span>
+                </div>
                 <div className="text-[11px] text-slate-500 font-medium mt-0.5">
                   {p.prospect_name} · {p.prospect_role}
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                  {p.industry}
                 </div>
               </button>
             ))}

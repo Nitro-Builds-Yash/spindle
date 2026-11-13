@@ -191,9 +191,14 @@ export default function PhoneSimulator({
       </div>
 
       {/* Simulator Description Banner */}
-      <div className="bg-blue-50/80 border-b border-blue-200/60 px-3.5 py-1.5 flex items-center justify-between text-[11px] text-blue-900">
-        <span className="font-mono font-medium">Interactive Prospect Chatbot (Transcripts & Gemini)</span>
-        <span className="font-mono text-[10px] text-[#0047ff] font-bold">Stage {stageNo}/8</span>
+      <div className="bg-slate-50 border-b border-slate-200/80 px-3.5 py-2 flex items-center justify-between text-xs text-slate-700">
+        <div className="flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+          <span className="font-mono text-[11px] font-semibold text-slate-800">Gemini Flash Lite & Transcripts</span>
+        </div>
+        <span className="font-mono text-[10px] text-[#0047ff] font-bold bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-sm">
+          Stage {stageNo}/8
+        </span>
       </div>
 
       {/* Chat Messages Feed */}

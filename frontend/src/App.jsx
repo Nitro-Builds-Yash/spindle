@@ -85,8 +85,14 @@ export default function App() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#0047ff] to-blue-700 text-white shadow-sm shadow-blue-500/25 font-mono text-sm font-bold">
             M
           </div>
-          <div className="text-[14px] font-bold tracking-tight text-ink-950">
-            Meridian Growth Partners
+          <div>
+            <div className="text-[14px] font-bold tracking-tight text-ink-950">
+              Meridian Growth Partners
+            </div>
+            <div className="hidden md:flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block"></span>
+              <span>PostgreSQL Supabase · Gemini Flash Lite</span>
+            </div>
           </div>
         </div>
 
@@ -96,7 +102,7 @@ export default function App() {
             onClick={() => setView("start")}
             className={`rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
               view === "start"
-                ? "bg-white text-ink-950 shadow-xs"
+                ? "bg-white text-ink-950 shadow-xs ring-1 ring-slate-900/5"
                 : "text-slate-600 hover:text-ink-950"
             }`}
           >
@@ -121,7 +127,7 @@ export default function App() {
             }}
             className={`flex items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
               view === "live"
-                ? "bg-white text-ink-950 shadow-xs"
+                ? "bg-white text-ink-950 shadow-xs ring-1 ring-slate-900/5"
                 : "text-slate-600 hover:text-ink-950"
             }`}
           >
@@ -132,7 +138,7 @@ export default function App() {
             onClick={() => setView("history")}
             className={`rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
               view === "history"
-                ? "bg-white text-ink-950 shadow-xs"
+                ? "bg-white text-ink-950 shadow-xs ring-1 ring-slate-900/5"
                 : "text-slate-600 hover:text-ink-950"
             }`}
           >
@@ -145,7 +151,7 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 sm:px-6 pb-20 pt-8">
+      <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 sm:px-6 pb-16 pt-8">
         {view === "start" && (
           <StartCall
             content={content}
@@ -172,6 +178,37 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* Enterprise Tech Stack Footer */}
+      <footer className="mt-auto border-t border-slate-200/80 bg-white/70 py-5 px-6 backdrop-blur-md">
+        <div className="mx-auto max-w-[1240px] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="font-semibold text-slate-700">Meridian Cold Call Copilot</span>
+            <span className="text-slate-300">|</span>
+            <span>8-Stage Indian B2B Call Guide</span>
+          </div>
+
+          {/* Technology Stack Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px]">
+            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
+              Supabase PostgreSQL
+            </span>
+            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
+              Google Gemini Flash Lite
+            </span>
+            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
+              Python FastAPI
+            </span>
+            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
+              React 18 · Vite · Tailwind
+            </span>
+            <span className="rounded-md bg-blue-50 border border-blue-200 px-2 py-0.5 font-bold text-[#0047ff]">
+              100 Transcripts (T001–T100)
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
