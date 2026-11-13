@@ -358,7 +358,7 @@ def audit(call: dict[str, Any], logs: list[dict[str, Any]], outcome: str) -> dic
 
 
 SIMULATE_PROMPT = """You are roleplaying as {prospect}, Managing Director at {company} (mid-size Indian precision manufacturing plant).
-A cold caller from Meridian Growth Partners has you on the phone.
+A cold caller from Spindle has you on the phone.
 Current Stage: {stage_number} - {stage_name}
 The caller just said to you:
 "{caller_message}"
@@ -376,7 +376,7 @@ Answer in JSON:
 
 STAGE_FALLBACK_REPLIES = {
     1: "Haan, Ramesh Varma speaking. Kaun baat kar rahe hain?",
-    2: "Meridian? Look, I'm on the machine shop floor right now. Is this a sales call? Where did you get this number?",
+    2: "Spindle? Look, I'm on the machine shop floor right now. Is this a sales call? Where did you get this number?",
     3: "Look, everyone is selling something. I can give you exactly two minutes. What do you people do?",
     4: "Right now our rework is touching 4.5% on the CNC line. Delivery schedules are slipping because of rework.",
     5: "Everyone claims they can optimize throughput. Our machinists have been here 15 years. How would an outsider fix it?",

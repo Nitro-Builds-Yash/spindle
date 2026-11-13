@@ -56,7 +56,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       setStageNo(no);
       if (data.call.status !== "in_progress") {
         if (onClear) onClear();
-        localStorage.removeItem("meridian.currentCall");
+        localStorage.removeItem("spindle.currentCall");
         setClosed({ outcome: data.call.outcome, summary: data.call.ai_summary });
       }
     } catch (e) {
@@ -190,7 +190,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
         {/* Top Reference Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 mb-3">
           <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#0047ff]">
-            MERIDIAN GROWTH PARTNERS · CALL GUIDE
+            SPINDLE · CALL GUIDE
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -544,7 +544,7 @@ function Closed({ call, content, onNew, onFinished }) {
   const outcome = content.outcomes.find((o) => o.key === call.outcome);
 
   useEffect(() => {
-    localStorage.removeItem("meridian.currentCall");
+    localStorage.removeItem("spindle.currentCall");
   }, []);
 
   useEffect(() => {

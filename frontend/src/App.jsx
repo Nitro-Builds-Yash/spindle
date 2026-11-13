@@ -5,7 +5,7 @@ import StartCall from "./views/StartCall.jsx";
 import LiveCall from "./views/LiveCall.jsx";
 import History from "./views/History.jsx";
 
-const STORAGE_KEY = "meridian.currentCall";
+const STORAGE_KEY = "spindle.currentCall";
 
 export default function App() {
   const [content, setContent] = useState(DEFAULT_CONTENT);
@@ -83,11 +83,11 @@ export default function App() {
         {/* Brand Mark */}
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#0047ff] to-blue-700 text-white shadow-sm shadow-blue-500/25 font-mono text-sm font-bold">
-            M
+            S
           </div>
           <div>
             <div className="text-[14px] font-bold tracking-tight text-ink-950">
-              Meridian Growth Partners
+              Spindle
             </div>
             <div className="hidden md:flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block"></span>
@@ -184,7 +184,7 @@ export default function App() {
         <div className="mx-auto max-w-[1240px] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="font-semibold text-slate-700">Meridian Cold Call Copilot</span>
+            <span className="font-semibold text-slate-700">Spindle Cold Call Copilot</span>
             <span className="text-slate-300">|</span>
             <span>8-Stage Indian B2B Call Guide</span>
           </div>

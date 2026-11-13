@@ -82,8 +82,8 @@ questions are already in the message. If you type it:
 
 ```
 Tarun, I registered for the Forward Deployed Engineer task on Friday.
-Repo: https://github.com/<you>/meridian-call-copilot
-App: https://<app>.vercel.app
+Repo: https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot
+App: https://meridian-cold-call-copilot.vercel.app
 Health: https://<api>.onrender.com/health
 
 Six minutes: <drive link>

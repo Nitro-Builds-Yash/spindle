@@ -1,4 +1,4 @@
-# Meridian Call Copilot
+# Spindle Cold Call Copilot
 
 **The screen a caller keeps open beside their phone on a cold call.**
 
@@ -7,12 +7,13 @@ own words, and two places where a model helps: a one-line **AI cue** mid-call an
 a **close audit** that catches an outcome that does not match the call.
 
 Built for the DeepThought CultureTech FDE task, against all 100 rewritten calls
-from Meridian Growth Partners.
+from Indian SME manufacturing operations.
 
 ### Live Deployment Links & Architecture Snapshot
 
 | Deliverable | URL | Notes |
 | :--- | :--- | :--- |
+| **GitHub Repository** | [https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot](https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot) | Clean, production-ready codebase |
 | **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call (React + Vite + Tailwind) |
 | **Health Endpoint (Render)** | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | Returns `{"status":"ok","storage":"supabase",...}` (Verified 200 OK) |
 | **Database (Supabase)** | [https://vajznvxzojiinwegtduv.supabase.co](https://vajznvxzojiinwegtduv.supabase.co) | Supabase PostgreSQL free tier with `schema.sql`, 2 tables, 2 analytical views, RLS enabled |
@@ -32,7 +33,7 @@ from Meridian Growth Partners.
 
 | On screen | Why |
 |---|---|
-| `Meridian Growth Partners · Call Guide`, timer `MM:SS`, prospect, role, company, call type | Who is on the line, how long you have been on it. |
+| `Spindle · Call Guide`, timer `MM:SS`, prospect, role, company, call type | Who is on the line, how long you have been on it. |
 | Stepper `1`–`8`, then **Stage X of 8**, the stage name, one sentence on what it is for | The caller reads one thing in a glance, because the prospect is talking. |
 | **They may say** — three quotes | From the hundred calls. Nobody is surprised by "what is this regarding" at stage 2. |
 | **What happened** — four taps, the happy path pre-pressed | The record. Number keys 1-4 hit them without looking. |

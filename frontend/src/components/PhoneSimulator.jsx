@@ -5,12 +5,12 @@ const DEFAULT_STAGE_DIALOGUES = {
   1: {
     prospect: "Haanji, Ramesh Varma speaking. Kaun baat kar rahe hain?",
     prompts: [
-      "Hello Ramesh ji, this is Athota from Meridian Growth Partners.",
+      "Hello Ramesh ji, this is Athota from Spindle.",
       "Ramesh ji, am I speaking with the Managing Director of Sri Balaji Precision?",
     ],
   },
   2: {
-    prospect: "Meridian? Look, I'm with a supervisor on the plant floor. What is this regarding? Is this a sales call?",
+    prospect: "Spindle? Look, I'm with a supervisor on the plant floor. What is this regarding? Is this a sales call?",
     prompts: [
       "We help mid-size precision machining plants fix CNC rework bottlenecks and cut scrap rates.",
       "We analyzed machining throughput in the cluster and noticed a pattern in precision tooling plants.",
