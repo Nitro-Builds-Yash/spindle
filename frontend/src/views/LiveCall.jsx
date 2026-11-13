@@ -153,7 +153,7 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
 
   if (err && !call) {
     return (
-      <div className="grid place-items-center gap-4 py-24 text-slate-500">
+      <div className="grid place-items-center gap-4 py-24 text-slate-500 font-mono text-sm">
         <p>{err}</p>
         <button className="btn-primary" onClick={onNew}>
           Start a new call
@@ -175,41 +175,38 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
   }
 
   return (
-    <div className="flex flex-col items-center">
-      {/* Reference Card Container (Exact ClinicBooks reference layout elevated with modern depth) */}
-      <div className="w-full max-w-[600px] rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-card text-ink-950 transition-all">
+    <div className="flex flex-col items-center justify-center py-2 sm:py-6 relative">
+      
+      {/* Subtle Background Glow Orbs for Glassmorphism */}
+      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[550px] h-[350px] bg-gradient-to-tr from-blue-400/15 via-indigo-300/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+
+      {/* Reference Card Container (Exact ClinicBooks reference layout with modern frosted glass) */}
+      <div className="w-full max-w-[500px] rounded-2xl border border-white/70 bg-white/85 backdrop-blur-xl p-6 sm:p-7 shadow-[0_20px_50px_rgba(8,112,184,0.08),0_1px_3px_rgba(0,0,0,0.05)] text-slate-900 transition-all">
         
         {/* Top Reference Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-[#0047ff] animate-pulse" />
-            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#0047ff]">
-              Meridian Growth Partners · Call Guide
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 rounded-md bg-slate-50 border border-slate-200/80 px-2.5 py-0.5 font-mono text-sm font-bold text-ink-950 tabular-nums shadow-2xs">
-            <span>⏱</span> {tick}
-          </div>
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 mb-3">
+          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#0047ff]">
+            MERIDIANBOOKS · CALL GUIDE
+          </span>
+          <span className="font-mono text-xs font-semibold text-slate-600 tabular-nums">
+            {tick}
+          </span>
         </div>
 
         {/* Prospect Title & Details */}
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold tracking-tight text-ink-950">
+        <div className="mb-3.5">
+          <h2 className="text-[19px] font-bold tracking-tight text-slate-900">
             {call.prospect_name || "Unknown prospect"}
           </h2>
-          <p className="text-xs text-slate-500 font-medium mt-1 flex flex-wrap items-center gap-2">
-            <span>{call.prospect_role || "Executive"}</span>
-            <span>·</span>
-            <span className="font-semibold text-ink-800">{call.company_name}</span>
-            <span>·</span>
-            <span className="rounded-full bg-slate-100 px-2 py-0.2 text-[10px] font-mono uppercase text-slate-600 font-bold">
-              {call.call_type}
-            </span>
+          <p className="text-[11.5px] text-slate-500 font-medium mt-0.5">
+            {[call.prospect_role, call.company_name, call.call_type]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
         </div>
 
-        {/* 8-Stage Square Stepper (Matches Reference Screen Exactly) */}
-        <div className="grid grid-cols-8 gap-1.5 my-4">
+        {/* 8-Stage Square Stepper (Exact 1:1 match with ClinicBooks Reference) */}
+        <div className="grid grid-cols-8 gap-1 my-3">
           {stages.map((s) => {
             const now = s.number === stageNo;
             const past = s.number < stageNo;
@@ -217,12 +214,12 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
               <button
                 key={s.key}
                 onClick={() => setStageNo(s.number)}
-                className={`h-9 flex items-center justify-center font-mono text-xs font-bold rounded-lg border transition-all duration-150 ${
+                className={`h-7 flex items-center justify-center font-mono text-[11px] font-bold rounded-xs border transition-all ${
                   now
-                    ? "bg-[#0047ff] text-white border-[#0047ff] shadow-sm shadow-blue-500/25 scale-[1.03]"
+                    ? "bg-[#0047ff] text-white border-[#0047ff] shadow-sm shadow-blue-500/30"
                     : past
-                    ? "bg-slate-100 text-slate-800 border-slate-200 hover:border-slate-400"
-                    : "bg-white text-slate-400 border-slate-200/80 hover:border-slate-300 hover:text-slate-600"
+                    ? "bg-slate-100/90 text-slate-800 border-slate-300/80"
+                    : "bg-white/80 text-slate-400 border-slate-200 hover:border-slate-400"
                 }`}
               >
                 {s.number}
@@ -232,81 +229,76 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
         </div>
 
         {/* Stage Name & Glanceable Purpose */}
-        <div className="mt-5 mb-5 rounded-xl bg-slate-50/70 border border-slate-100 p-4">
-          <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.16em] text-[#0047ff]">
-            Stage {stage.number} of 8
+        <div className="mt-4 mb-4">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+            STAGE {stage.number} OF 8
           </p>
-          <h3 className="text-2xl font-bold tracking-tight text-ink-950 mt-0.5">
+          <h3 className="text-[22px] font-bold tracking-tight text-slate-900 mt-0.5">
             {stage.name}
           </h3>
-          <p className="text-[14px] text-slate-600 mt-1 leading-relaxed">
+          <p className="text-[13px] text-slate-600 mt-1 leading-relaxed">
             {stage.purpose}
           </p>
         </div>
 
-        {/* They May Say */}
-        <div className="mt-5 pt-4 border-t border-slate-100">
-          <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-slate-500 mb-2.5">
-            She may say / They may say
+        {/* SHE MAY SAY / THEY MAY SAY */}
+        <div className="mt-4 pt-3.5 border-t border-slate-200/60">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-2">
+            SHE MAY SAY
           </p>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stage.what_they_say.map((q, i) => (
               <div
                 key={i}
-                className="rounded-lg border border-slate-200/80 bg-slate-50/60 px-3.5 py-2.5 text-[13px] text-slate-700 italic flex items-start gap-2 shadow-2xs"
+                className="rounded-xs border border-slate-200/80 bg-white/70 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-800 leading-snug shadow-2xs"
               >
-                <span className="text-slate-400 font-serif font-bold text-base leading-none">“</span>
-                <span className="flex-1">{q}</span>
-                <span className="text-slate-400 font-serif font-bold text-base leading-none">”</span>
+                “{q}”
               </div>
             ))}
           </div>
         </div>
 
-        {/* What Happened (2x2 Grid with Blue Active Button) */}
-        <div className="mt-5 pt-4 border-t border-slate-100">
-          <div className="flex items-center justify-between mb-2.5">
-            <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-slate-500">
-              What happened
+        {/* WHAT HAPPENED (2x2 Grid with Exact Reference Layout) */}
+        <div className="mt-4 pt-3.5 border-t border-slate-200/60">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+              WHAT HAPPENED
             </p>
-            <span className="font-mono text-[10px] text-slate-400 bg-slate-100 rounded-sm px-1.5 py-0.5">
-              Press 1–4
-            </span>
+            <span className="font-mono text-[9px] text-slate-400 uppercase">Keys 1–4</span>
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             {stage.taps.map((t, i) => {
               const on = tap === t.key;
               return (
                 <button
                   key={t.key}
                   onClick={() => setTap(t.key)}
-                  className={`p-3 rounded-lg border text-left text-[13px] transition-all duration-150 flex items-center justify-between ${
+                  className={`p-3 rounded-xs border text-center text-[12px] font-medium transition-all ${
                     on
-                      ? "bg-[#0047ff] text-white border-[#0047ff] font-semibold shadow-sm shadow-blue-500/20"
-                      : "bg-white text-slate-700 border-slate-200/90 hover:border-slate-400 hover:bg-slate-50 font-medium"
+                      ? "bg-[#0047ff] text-white border-[#0047ff] font-bold shadow-md shadow-blue-500/25"
+                      : "bg-white/80 backdrop-blur-xs text-slate-800 border-slate-300/80 hover:border-slate-500 hover:bg-white"
                   }`}
                 >
-                  <span>{t.label}</span>
-                  {on && <span className="font-mono text-xs">✓</span>}
+                  {t.label}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Their Words */}
-        <div className="mt-5 pt-4 border-t border-slate-100">
+        {/* HER WORDS / THEIR WORDS */}
+        <div className="mt-4 pt-3.5 border-t border-slate-200/60">
           <div className="flex items-center justify-between mb-2">
-            <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-slate-500">
-              Her words / Their words
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+              HER WORDS
             </p>
             <button
-              className="text-xs font-mono font-bold text-white bg-gradient-to-r from-[#0047ff] to-blue-700 px-3 py-1 rounded-md shadow-xs hover:shadow hover:brightness-110 flex items-center gap-1 transition-all"
+              className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline flex items-center gap-1"
               onClick={askCue}
               disabled={cueBusy}
             >
-              <span>⚡</span>
-              {cueBusy ? "Thinking…" : "AI Cue"}
+              <span>✨</span>
+              {cueBusy ? "Thinking…" : "AI cue"}
             </button>
           </div>
           <textarea
@@ -314,34 +306,34 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
             rows={2}
             value={words}
             onChange={(e) => setWords(e.target.value)}
-            placeholder="Type exact words spoken by prospect..."
-            className="w-full rounded-lg border border-slate-200/90 bg-white px-3.5 py-2.5 text-sm text-ink-900 outline-none focus:border-[#0047ff] focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
+            placeholder="accounting for what, we already have a CA who files everything"
+            className="w-full rounded-xs border border-slate-300/90 bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-900 outline-none focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400"
           />
           {cue && (
-            <div className="mt-2.5 rounded-lg border border-blue-200 bg-blue-50/90 p-3 text-xs text-blue-950 flex items-start gap-2 shadow-2xs">
-              <span className="font-mono font-bold text-[#0047ff] uppercase">Cue:</span>
-              <p className="flex-1 font-medium leading-relaxed">{cue.cue}</p>
+            <div className="mt-2 rounded-xs border border-blue-200 bg-blue-50/90 backdrop-blur-xs p-2.5 text-xs text-blue-950 flex items-start gap-2 shadow-2xs">
+              <span className="font-mono font-bold text-[#0047ff] uppercase text-[10px]">Cue:</span>
+              <p className="flex-1 font-medium leading-relaxed text-[11.5px]">{cue.cue}</p>
             </div>
           )}
         </div>
 
-        {err && <p className="mt-3 text-xs text-rose-600 font-mono">{err}</p>}
+        {err && <p className="mt-2.5 text-xs text-rose-600 font-mono">{err}</p>}
 
         {/* Action Buttons (Matches Reference Screen Exactly: Black Next + Outline End) */}
-        <div className="mt-6 pt-4 border-t border-slate-100 flex gap-3">
+        <div className="mt-5 pt-3.5 border-t border-slate-200/60 flex gap-2.5">
           <button
-            className="flex-1 rounded-lg bg-ink-950 hover:bg-black text-white font-mono font-bold text-xs uppercase tracking-wider py-3.5 shadow-sm hover:shadow active:scale-[0.98] transition-all"
+            className="flex-1 rounded-xs bg-[#0b132b] hover:bg-black text-white font-mono font-bold text-xs uppercase tracking-wider py-3 shadow-sm hover:shadow active:scale-[0.98] transition-all"
             onClick={goNext}
             disabled={saving}
           >
-            {saving ? "Saving…" : next ? `Next: ${next.name} →` : "Close call →"}
+            {saving ? "Saving…" : next ? `NEXT: ${next.name.toUpperCase()}` : "CLOSE CALL"}
           </button>
           <button
-            className="px-6 rounded-lg border border-slate-200/90 hover:border-black text-ink-900 font-mono font-bold text-xs uppercase tracking-wider py-3.5 transition-all bg-white hover:bg-slate-50 active:scale-[0.98]"
+            className="px-6 rounded-xs border border-slate-300/90 hover:border-black text-slate-800 font-mono font-bold text-xs uppercase tracking-wider py-3 transition-all bg-white/80 hover:bg-white active:scale-[0.98]"
             onClick={endCall}
             disabled={saving}
           >
-            End call
+            END CALL
           </button>
         </div>
 
@@ -403,15 +395,15 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-slate-900/50 p-6 backdrop-blur-xs"
+      className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-6 backdrop-blur-sm"
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-[580px] rounded-2xl border border-slate-200/90 bg-white p-7 shadow-float text-ink-950"
+        className="w-full max-w-[540px] rounded-2xl border border-white/80 bg-white/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl text-slate-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-baseline justify-between border-b border-slate-100 pb-3.5">
-          <h3 className="text-xl font-bold tracking-tight">Close the call</h3>
+        <div className="flex items-baseline justify-between border-b border-slate-200/60 pb-3">
+          <h3 className="text-lg font-bold tracking-tight">Close the call</h3>
           <span className="font-mono text-xs text-[#0047ff] font-bold uppercase">Stage {stageNo} of 8</span>
         </div>
         <p className="mt-2 text-xs text-slate-600 leading-relaxed">
@@ -419,16 +411,16 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
           the record is written to Supabase.
         </p>
 
-        <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-slate-500 mb-2 mt-5">Outcome</p>
-        <div className="grid grid-cols-2 gap-2">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-2 mt-4">OUTCOME</p>
+        <div className="grid grid-cols-2 gap-1.5">
           {content.outcomes.map((o) => (
             <button
               key={o.key}
               onClick={() => setOutcome(o.key)}
-              className={`rounded-lg border px-3.5 py-2 text-left text-xs transition-all ${
+              className={`rounded-xs border px-3 py-2 text-left text-xs transition-all ${
                 outcome === o.key
-                  ? "border-[#0047ff] bg-[#0047ff] text-white font-semibold shadow-xs"
-                  : "border-slate-200/90 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+                  ? "border-[#0047ff] bg-[#0047ff] text-white font-bold shadow-xs"
+                  : "border-slate-300/80 bg-white/80 text-slate-700 hover:border-slate-500 hover:bg-white"
               }`}
             >
               {o.label}
@@ -436,17 +428,17 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
           ))}
         </div>
 
-        <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-slate-500 mb-1.5 mt-5">Next step</p>
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-1 mt-4">NEXT STEP</p>
         <input
-          className="w-full rounded-lg border border-slate-200/90 bg-white px-3.5 py-2.5 text-xs text-ink-950 outline-none focus:border-[#0047ff] focus:ring-4 focus:ring-blue-500/10"
+          className="w-full rounded-xs border border-slate-300/90 bg-white/90 px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#0047ff]"
           value={nextStep}
           onChange={(e) => setNextStep(e.target.value)}
           placeholder="e.g. Tuesday 14:00 Google Meet with MD"
         />
 
-        <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-slate-500 mb-1.5 mt-3.5">Additional notes</p>
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-1 mt-3">ADDITIONAL NOTES</p>
         <input
-          className="w-full rounded-lg border border-slate-200/90 bg-white px-3.5 py-2.5 text-xs text-ink-950 outline-none focus:border-[#0047ff] focus:ring-4 focus:ring-blue-500/10"
+          className="w-full rounded-xs border border-slate-300/90 bg-white/90 px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#0047ff]"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Optional"
@@ -454,10 +446,10 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
 
         {audit && (
           <div
-            className={`mt-4 rounded-xl border p-3.5 ${
+            className={`mt-4 rounded-xs border p-3 ${
               audit.warning
-                ? "border-rose-200 bg-rose-50/90 text-rose-900"
-                : "border-emerald-200 bg-emerald-50/90 text-emerald-900"
+                ? "border-rose-300 bg-rose-50/90 text-rose-900"
+                : "border-emerald-300 bg-emerald-50/90 text-emerald-900"
             }`}
           >
             <div className="mb-1 flex items-center justify-between">
@@ -472,9 +464,9 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
           </div>
         )}
 
-        {err && <p className="mt-3 text-xs text-rose-600">{err}</p>}
+        {err && <p className="mt-3 text-xs text-rose-600 font-mono">{err}</p>}
 
-        <div className="mt-6 flex justify-end gap-3 pt-3.5 border-t border-slate-100">
+        <div className="mt-6 flex justify-end gap-2.5 pt-3 border-t border-slate-200/60">
           <button className="btn-ghost" onClick={onCancel}>
             Keep call open
           </button>
@@ -490,15 +482,15 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
 function Closed({ call, content, onNew, onFinished }) {
   const outcome = content.outcomes.find((o) => o.key === call.outcome);
   return (
-    <div className="mx-auto max-w-[620px] rounded-2xl border border-slate-200/90 bg-white p-8 sm:p-10 shadow-card text-center">
+    <div className="mx-auto max-w-[540px] rounded-2xl border border-white/80 bg-white/90 backdrop-blur-xl p-8 shadow-card text-center">
       <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#0047ff]">
-        Call closed · {call.company_name}
+        CALL CLOSED · {call.company_name}
       </p>
-      <h1 className="mt-1 text-3xl font-bold tracking-tight text-ink-950">
+      <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
         {call.prospect_name || "Unknown prospect"}
       </h1>
       <div
-        className={`mt-3.5 inline-flex rounded-full border px-4 py-1 font-mono text-xs font-bold uppercase tracking-wider ${
+        className={`mt-3 inline-flex rounded-xs border px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider ${
           outcome?.tone === "good"
             ? "border-emerald-300 bg-emerald-50 text-emerald-800"
             : outcome?.tone === "ok"
@@ -509,36 +501,36 @@ function Closed({ call, content, onNew, onFinished }) {
         {outcome?.label || call.outcome}
       </div>
 
-      <div className="mt-6 rounded-xl border border-slate-200/90 bg-slate-50/70 p-5 text-left">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
-          What a manager reads (CRM Summary)
+      <div className="mt-5 rounded-xs border border-slate-200/80 bg-slate-50/80 p-4 text-left">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+          WHAT A MANAGER READS
         </p>
-        <p className="text-sm leading-relaxed text-ink-900 font-medium">{call.ai_summary}</p>
+        <p className="text-xs leading-relaxed text-slate-800 font-medium">{call.ai_summary}</p>
         {call.next_step && (
-          <div className="mt-3.5 pt-3.5 border-t border-slate-200">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Next step agreed</p>
-            <p className="text-xs text-ink-800 font-semibold">{call.next_step}</p>
+          <div className="mt-3 pt-3 border-t border-slate-200">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">NEXT STEP</p>
+            <p className="text-xs text-slate-900 font-bold">{call.next_step}</p>
           </div>
         )}
         {call.audit_warning && (
-          <div className="mt-3.5 rounded-lg border border-rose-200 bg-rose-50 p-3.5 text-left">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700 mb-1">Audit warning</p>
+          <div className="mt-3 rounded-xs border border-rose-300 bg-rose-50 p-3 text-left">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700 mb-0.5">AUDIT WARNING</p>
             <p className="text-xs text-rose-800 leading-relaxed font-medium">{call.audit_warning}</p>
           </div>
         )}
       </div>
 
-      <p className="mt-5 font-mono text-xs text-slate-500">
-        Duration: <span className="font-bold text-ink-800">{call.duration_seconds}s</span> · reached <span className="font-bold text-[#0047ff]">{call.highest_stage_name}</span> ·{" "}
+      <p className="mt-4 font-mono text-[11.5px] text-slate-500">
+        Duration: <span className="font-bold text-slate-900">{call.duration_seconds}s</span> · reached <span className="font-bold text-[#0047ff]">{call.highest_stage_name}</span> ·{" "}
         {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "no need quote"}
       </p>
 
-      <div className="mt-8 flex justify-center gap-3.5">
+      <div className="mt-6 flex justify-center gap-3">
         <button className="btn-ghost" onClick={onFinished}>
           See it in past calls
         </button>
         <button className="btn-primary" onClick={onNew}>
-          + Next call
+          Next call
         </button>
       </div>
     </div>
