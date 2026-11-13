@@ -81,6 +81,16 @@ class CueBody(BaseModel):
 # Routes
 # --------------------------------------------------------------------------- #
 
+@app.get("/")
+def root() -> dict[str, Any]:
+    return {
+        "service": "Meridian Cold Call Copilot API",
+        "status": "online",
+        "health_check": "/health",
+        "docs": "/docs",
+        "stages": 8
+    }
+
 @app.get("/health")
 def health() -> dict[str, Any]:
     provider, _, model = llm._provider()
