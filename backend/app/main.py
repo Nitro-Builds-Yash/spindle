@@ -29,7 +29,7 @@ load_dotenv()
 
 store, store_kind = build_store()
 
-app = FastAPI(title="Spindle Call Copilot API", version="2.0.0")
+app = FastAPI(title="Spindle Call API", version="2.0.0")
 
 _origins = os.getenv("ALLOWED_ORIGINS", "*")
 app.add_middleware(
@@ -92,7 +92,7 @@ class SimulateBody(BaseModel):
 @app.get("/")
 def root() -> dict[str, Any]:
     return {
-        "service": "Spindle Cold Call Copilot API",
+        "service": "Spindle Call API",
         "status": "online",
         "health_check": "/health",
         "docs": "/docs",
@@ -104,7 +104,7 @@ def health() -> dict[str, Any]:
     provider, _, model = llm._provider()
     return {
         "status": "ok",
-        "service": "spindle-call-copilot",
+        "service": "spindle",
         "storage": store_kind,
         "llm": f"{provider}:{model or 'default'}" if provider else "rules-fallback",
         "stages": len(STAGES),

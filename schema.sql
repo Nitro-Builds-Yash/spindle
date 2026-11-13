@@ -1,5 +1,5 @@
 -- =========================================================
--- Meridian Call Copilot - Supabase Database Setup
+-- Spindle - Supabase Database Setup
 -- Run this ENTIRE block in Supabase > SQL Editor
 -- (Make sure NO partial text is selected before clicking Run)
 -- =========================================================

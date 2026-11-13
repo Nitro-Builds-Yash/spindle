@@ -184,7 +184,7 @@ export default function App() {
         <div className="mx-auto max-w-[1240px] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="font-semibold text-slate-700">Spindle Cold Call Copilot</span>
+            <span className="font-semibold text-slate-700">Spindle</span>
             <span className="text-slate-300">|</span>
             <span>8-Stage Indian B2B Call Guide</span>
           </div>

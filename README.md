@@ -1,4 +1,4 @@
-# Spindle Cold Call Copilot
+# Spindle
 
 **The screen a caller keeps open beside their phone on a cold call.**
 
@@ -13,7 +13,7 @@ from Indian SME manufacturing operations.
 
 | Deliverable | URL | Notes |
 | :--- | :--- | :--- |
-| **GitHub Repository** | [https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot](https://github.com/Nitro-Builds-Yash/spindle-cold-call-copilot) | Active, production-ready codebase |
+| **GitHub Repository** | [https://github.com/Nitro-Builds-Yash/spindle](https://github.com/Nitro-Builds-Yash/spindle) | Active, production-ready codebase |
 | **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call (React + Vite + Tailwind) |
 | **Health Endpoint (Render)** | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | Returns `{"status":"ok","storage":"supabase",...}` (Verified 200 OK) |
 | **Database (Supabase)** | [https://vajznvxzojiinwegtduv.supabase.co](https://vajznvxzojiinwegtduv.supabase.co) | Supabase PostgreSQL free tier with `schema.sql`, 2 tables, 2 analytical views, RLS enabled |
