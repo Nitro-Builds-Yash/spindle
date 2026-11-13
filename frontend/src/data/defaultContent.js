@@ -1,5 +1,5 @@
 export const DEFAULT_CONTENT = {
-  company: "Meridian Growth Partners",
+  company: "Spindle",
   stages: [
     {
       number: 1,
@@ -7,7 +7,7 @@ export const DEFAULT_CONTENT = {
       name: "Opening",
       purpose: "Reach the right person and say who you are. The first ten seconds decide whether this call is worth a minute.",
       what_they_say: [
-        "From where? Meridian? Can you say it again?",
+        "From where? Spindle? Can you say it again?",
         "Prakash Rao ka to 14 saal se ye number nahi hai.",
         "Kannada maatadi. / Marathi, Marathi."
       ],
@@ -30,7 +30,7 @@ export const DEFAULT_CONTENT = {
         "Where did you get my number? I didn't ask for this."
       ],
       taps: [
-        { key: "asked_what_we_do", label: "Asked what Meridian does" },
+        { key: "asked_what_we_do", label: "Asked what we do" },
         { key: "thought_hiring", label: "Thought it's a job / hiring call" },
         { key: "asked_source", label: "Asked where we got number" },
         { key: "understood", label: "Understood purpose" }

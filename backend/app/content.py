@@ -19,7 +19,7 @@ STAGES = [
         "name": "Opening",
         "purpose": "Reach the right person and say who you are. The first ten seconds decide whether this call is worth a minute.",
         "what_they_say": [
-            "From where? Meridian? Can you say it again?",
+            "From where? Spindle? Can you say it again?",
             "Prakash Rao ka to 14 saal se ye number nahi hai.",
             "Kannada maatadi. / Marathi, Marathi.",
         ],
@@ -58,7 +58,7 @@ STAGES = [
             "Where did you get my number? I didn't ask for this.",
         ],
         "taps": [
-            {"key": "asked_what", "label": "Asked what Meridian does", "hints": []},
+            {"key": "asked_what", "label": "Asked what we do", "hints": []},
             {"key": "thought_job", "label": "Thought it's a job / hiring call", "hints": []},
             {
                 "key": "asked_source",
