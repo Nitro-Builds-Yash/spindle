@@ -1,18 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { api } from "./api.js";
 import { DEFAULT_CONTENT } from "./data/defaultContent.js";
+import StartCall from "./views/StartCall.jsx";
 import LiveCall from "./views/LiveCall.jsx";
 import History from "./views/History.jsx";
-import NewCallModal from "./components/NewCallModal.jsx";
 
 const STORAGE_KEY = "meridian.currentCall";
 
 export default function App() {
   const [content, setContent] = useState(DEFAULT_CONTENT);
   const [health, setHealth] = useState(null);
-  const [view, setView] = useState("live");
+  const [view, setView] = useState("start");
   const [callId, setCallId] = useState(() => localStorage.getItem(STORAGE_KEY) || null);
-  const [showNewCall, setShowNewCall] = useState(false);
   const [wakingUp, setWakingUp] = useState(false);
 
   const checkHealth = useCallback(async () => {
@@ -42,22 +41,6 @@ export default function App() {
     const interval = setInterval(checkHealth, 8000);
     return () => clearInterval(interval);
   }, [checkHealth]);
-
-  // Ensure an active call session is ready so Live Call always shows the interface
-  useEffect(() => {
-    if (!callId) {
-      api
-        .startCall({
-          prospect_name: "Ramesh Varma",
-          prospect_role: "Managing Director",
-          company_name: "Sri Balaji Precision",
-          company_kind: "mid-size private manufacturer",
-          call_type: "first call",
-        })
-        .then((res) => openCall(res.call.id))
-        .catch(() => {});
-    }
-  }, [callId, openCall]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -107,59 +90,76 @@ export default function App() {
           </div>
         </div>
 
-        {/* Central Segmented Pill Navigation */}
-        <div className="flex items-center gap-2">
-          <nav className="flex gap-1 rounded-xl bg-slate-100/90 border border-slate-200/80 p-1 shadow-inner">
-            <button
-              onClick={() => setView("live")}
-              className={`flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
-                view === "live"
-                  ? "bg-white text-ink-950 shadow-xs"
-                  : "text-slate-600 hover:text-ink-950"
-              }`}
-            >
-              {callId && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-              Live call
-            </button>
-            <button
-              onClick={() => setView("history")}
-              className={`rounded-lg px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
-                view === "history"
-                  ? "bg-white text-ink-950 shadow-xs"
-                  : "text-slate-600 hover:text-ink-950"
-              }`}
-            >
-              Past calls
-            </button>
-          </nav>
-
-          {/* Quick Action: Start a New Call Dialog */}
+        {/* Central Segmented Pill Navigation: Start call | Live call | Past calls */}
+        <nav className="flex gap-1 rounded-xl bg-slate-100/90 border border-slate-200/80 p-1 shadow-inner">
           <button
-            onClick={() => setShowNewCall(true)}
-            className="hidden sm:flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider shadow-sm transition-all"
-            title="Start a new cold call"
+            onClick={() => setView("start")}
+            className={`rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
+              view === "start"
+                ? "bg-white text-ink-950 shadow-xs"
+                : "text-slate-600 hover:text-ink-950"
+            }`}
           >
-            <span>+</span> New call
+            Start call
           </button>
-        </div>
+          <button
+            onClick={() => {
+              if (callId) {
+                setView("live");
+              } else {
+                api
+                  .startCall({
+                    prospect_name: "Ramesh Varma",
+                    prospect_role: "Managing Director",
+                    company_name: "Sri Balaji Precision",
+                    company_kind: "mid-size private manufacturer",
+                    call_type: "first call",
+                  })
+                  .then((res) => openCall(res.call.id))
+                  .catch(() => setView("start"));
+              }
+            }}
+            className={`flex items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
+              view === "live"
+                ? "bg-white text-ink-950 shadow-xs"
+                : "text-slate-600 hover:text-ink-950"
+            }`}
+          >
+            {callId && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+            Live call
+          </button>
+          <button
+            onClick={() => setView("history")}
+            className={`rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
+              view === "history"
+                ? "bg-white text-ink-950 shadow-xs"
+                : "text-slate-600 hover:text-ink-950"
+            }`}
+          >
+            Past calls
+          </button>
+        </nav>
 
-        {/* Mobile New Call Button */}
-        <button
-          onClick={() => setShowNewCall(true)}
-          className="sm:hidden rounded-lg bg-blue-600 text-white px-2.5 py-1.5 text-xs font-mono font-bold uppercase"
-        >
-          + Call
-        </button>
+        {/* Clean right spacer for balanced navbar alignment */}
+        <div className="w-[80px] sm:w-[120px] hidden sm:block" />
       </header>
 
       {/* Main Container */}
       <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 sm:px-6 pb-20 pt-8">
+        {view === "start" && (
+          <StartCall
+            content={content}
+            hasCall={Boolean(callId)}
+            resume={() => setView("live")}
+            onStart={openCall}
+          />
+        )}
         {view === "live" && (
           <LiveCall
             key={callId}
             callId={callId}
             content={content}
-            onNew={() => setShowNewCall(true)}
+            onNew={() => setView("start")}
             onFinished={finishCall}
             onClear={clearCall}
           />
@@ -168,17 +168,10 @@ export default function App() {
           <History
             content={content}
             onOpen={openCall}
-            onNew={() => setShowNewCall(true)}
+            onNew={() => setView("start")}
           />
         )}
       </main>
-
-      {/* New Call Picker Modal */}
-      <NewCallModal
-        isOpen={showNewCall}
-        onClose={() => setShowNewCall(false)}
-        onStart={openCall}
-      />
     </div>
   );
 }
