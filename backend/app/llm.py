@@ -66,18 +66,27 @@ def _openai_compatible(base: str, model: str, key: str, prompt: str) -> str:
 
 
 def _gemini(model: str, key: str, prompt: str) -> str:
-    r = httpx.post(
-        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-        params={"key": key},
-        json={
-            "system_instruction": {"parts": [{"text": SYSTEM}]},
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 400},
-        },
-        timeout=25.0,
-    )
-    r.raise_for_status()
-    return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+    target_models = [model or "gemini-flash-lite-latest", "gemini-flash-lite-latest", "gemini-3.8-flash"]
+    last_err = None
+    for m in dict.fromkeys(target_models):
+        try:
+            r = httpx.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent",
+                params={"key": key},
+                json={
+                    "system_instruction": {"parts": [{"text": SYSTEM}]},
+                    "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                    "generationConfig": {"temperature": 0.2, "maxOutputTokens": 400},
+                },
+                timeout=25.0,
+            )
+            if r.status_code == 200:
+                return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception as e:
+            last_err = e
+    if last_err:
+        raise last_err
+    raise ValueError("all gemini model candidates failed")
 
 
 def _call_model(prompt: str) -> Optional[str]:
@@ -313,8 +322,8 @@ def summary_fallback(call: dict[str, Any], logs: list[dict[str, Any]], outcome: 
 def audit(call: dict[str, Any], logs: list[dict[str, Any]], outcome: str) -> dict[str, Any]:
     meaning = OUTCOME_BY_KEY.get(outcome, {}).get("meaning", "")
     log_lines = "\n".join(
-        f'- stage {l["stage_number"]} {l["stage_name"]}: {l["what_happened"]} | '
-        f'"{(l["prospect_words"] or "").strip()[:160]}"'
+        f'- stage {l.get("stage_number", "?")} {l.get("stage_name", "")}: {l.get("what_happened", "")} | '
+        f'"{(l.get("prospect_words") or "").strip()[:160]}"'
         for l in logs
     ) or "(nothing logged)"
 
