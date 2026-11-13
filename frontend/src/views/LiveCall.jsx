@@ -306,7 +306,7 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
               disabled={cueBusy}
             >
               <span>⚡</span>
-              {cueBusy ? "Thinking…" : "AI Cue (Gemini)"}
+              {cueBusy ? "Thinking…" : "AI Cue"}
             </button>
           </div>
           <textarea

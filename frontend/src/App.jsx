@@ -118,24 +118,8 @@ export default function App() {
           </button>
         </nav>
 
-        {/* Cloud Infrastructure Health Status */}
-        <div className="hidden sm:flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-slate-50/80 px-3.5 py-1 text-[11px] text-ink-600 font-mono shadow-xs">
-          <span className="relative flex h-2 w-2">
-            {health && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
-            <span
-              className={`relative inline-flex rounded-full h-2 w-2 ${
-                health ? "bg-emerald-500" : "bg-blue-500 animate-pulse"
-              }`}
-            />
-          </span>
-          <span className="font-semibold text-ink-700">
-            {health
-              ? `${health.storage} · ${health.llm}`
-              : wakingUp
-              ? "Waking up server..."
-              : "Connecting..."}
-          </span>
-        </div>
+        {/* Clean right spacer for balanced navbar alignment */}
+        <div className="w-[120px] hidden sm:block" />
       </header>
 
       {/* Main Container */}
