@@ -13,9 +13,10 @@ from Meridian Growth Partners.
 
 | Deliverable | URL | Notes |
 | :--- | :--- | :--- |
-| **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call |
-| **Health Endpoint (Render)** | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | Returns `{"status":"ok", ...}` (Verified 200 OK) |
-| **LLM Provider & Model** | **Google Gemini 2.0 Flash** *(via Google AI Studio free tier)* | Server-side only via Render environment variables. Zero browser leaks. |
+| **Live Web App (Vercel)** | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | Live surface caller looks at mid-call (React + Vite + Tailwind) |
+| **Health Endpoint (Render)** | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | Returns `{"status":"ok","storage":"supabase",...}` (Verified 200 OK) |
+| **Database (Supabase)** | [https://vajznvxzojiinwegtduv.supabase.co](https://vajznvxzojiinwegtduv.supabase.co) | Supabase PostgreSQL free tier with `schema.sql`, 2 tables, 2 analytical views, RLS enabled |
+| **LLM Provider & Model** | **Google Gemini Flash Lite** (`gemini-flash-lite-latest`) *(via Google AI Studio free key)* | Server-side only via Render backend. Zero browser key leaks. |
 
 > **LLM Feature Rationale (Grounded in the 100 Transcripts):**  
 > We analyzed all 100 calls (`T001`–`T100`) and found that **13% were left completely `not_logged`**, while several calls had logged outcomes directly contradicting what the prospect actually said (e.g., `T010` & `T099` mislogged as `agreed_to_receive_report` when the person gave a referral or thought it was a job call; `T066` & `T013` mislogged as `not_interested` or `do_not_call` when the person had left the company years ago; `T084` mislogged as `do_not_call` after agreeing to a Thursday call; and `T020` mislogging a polite decline as `do_not_call`).  
