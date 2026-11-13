@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# Never publish the transcripts or any key. Checked with `git check-ignore -v`.
+# ---------------------------------------------------------------------------
+cold-call-transcripts-100/
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+backend/data/
+
+# Node
+node_modules/
+frontend/dist/
+.vite/
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local notes
+*.local.md

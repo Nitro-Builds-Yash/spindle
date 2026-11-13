@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-ink text-[#e9ebee] font-sans antialiased;
+    background-image: radial-gradient(
+      900px 500px at 15% -8%,
+      #14181e 0%,
+      transparent 60%
+    );
+  }
+  ::selection {
+    @apply bg-accent/30;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-[10px] font-semibold uppercase tracking-[0.16em] text-accent;
+  }
+  .label {
+    @apply text-[10px] font-semibold uppercase tracking-[0.14em] text-faint;
+  }
+  .card {
+    @apply rounded-xl2 border border-line bg-panel;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-default;
+  }
+  .btn-primary {
+    @apply btn bg-accent font-semibold text-[#1d1405] hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply btn border border-line text-[#e9ebee] hover:border-[#363d47] hover:bg-panel;
+  }
+  .btn-link {
+    @apply text-xs text-accent underline decoration-accent/40 underline-offset-2 hover:decoration-accent;
+  }
+  .input {
+    @apply w-full rounded-lg border border-line bg-[#0a0d10] px-3 py-2.5 text-sm text-[#e9ebee] outline-none placeholder:text-[#4c535e] focus:border-accent/50 focus:ring-2 focus:ring-accent/10;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full border border-line px-2.5 py-0.5 text-[11px] text-muted;
+  }
+  .badge-good {
+    @apply border-good/30 bg-good/[0.07] text-good;
+  }
+  .badge-ok {
+    @apply border-ok/25 bg-ok/[0.07] text-ok;
+  }
+  .badge-bad {
+    @apply border-bad/25 bg-bad/[0.06] text-bad;
+  }
+  .badge-live {
+    @apply border-accent/35 bg-accent/10 text-accent;
+  }
+}
