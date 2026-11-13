@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { api } from "../api.js";
+import {
+  speakText,
+  stopSpeaking,
+  createSpeechRecognizer,
+} from "../utils/speech.js";
 
 const DEFAULT_STAGE_DIALOGUES = {
   1: {
@@ -76,7 +81,53 @@ export default function PhoneSimulator({
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState(null);
+  const [isCallerSpeaking, setIsCallerSpeaking] = useState(false);
   const scrollRef = useRef(null);
+  const recognizerRef = useRef(null);
+
+  function speakProspect(text, idx) {
+    if (speakingIndex === idx) {
+      stopSpeaking();
+      setSpeakingIndex(null);
+      return;
+    }
+    setSpeakingIndex(idx);
+    speakText(text, {
+      onEnd: () => setSpeakingIndex(null),
+      onError: () => setSpeakingIndex(null),
+      rate: 1.0,
+    });
+  }
+
+  function toggleCallerSpeech() {
+    if (isCallerSpeaking) {
+      if (recognizerRef.current) {
+        try {
+          recognizerRef.current.stop();
+        } catch {}
+      }
+      setIsCallerSpeaking(false);
+      return;
+    }
+    const recognizer = createSpeechRecognizer({
+      onStart: () => setIsCallerSpeaking(true),
+      onResult: (transcript) => {
+        setInput((prev) => (prev ? `${prev.trim()} ${transcript}` : transcript));
+      },
+      onEnd: () => setIsCallerSpeaking(false),
+      onError: () => setIsCallerSpeaking(false),
+    });
+    if (recognizer) {
+      recognizerRef.current = recognizer;
+      try {
+        recognizer.start();
+      } catch {
+        setIsCallerSpeaking(false);
+      }
+    }
+  }
 
   // Auto-advance prospect dialogue when stage changes
   const tickRef = useRef(tick);
@@ -200,9 +251,21 @@ export default function PhoneSimulator({
 
       {/* Simulator Description Banner */}
       <div className="bg-slate-50 border-b border-slate-200/80 px-3.5 py-2 flex items-center justify-between text-xs text-slate-700">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-          <span className="font-mono text-[11px] font-semibold text-slate-800">Gemini Flash Lite & Transcripts</span>
+          <span className="font-mono text-[11px] font-semibold text-slate-800">Gemini Flash Lite</span>
+          <button
+            type="button"
+            onClick={() => setVoiceEnabled(!voiceEnabled)}
+            className={`flex items-center gap-1 font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-xs border transition-all ${
+              voiceEnabled
+                ? "bg-emerald-50 text-emerald-700 border-emerald-300 shadow-2xs"
+                : "bg-white text-slate-500 border-slate-300 hover:text-slate-800"
+            }`}
+            title="Toggle automated speech for Ramesh Varma's replies"
+          >
+            <span>{voiceEnabled ? "🔊 Voice: ON" : "🔇 Voice: OFF"}</span>
+          </button>
         </div>
         <span className="font-mono text-[10px] text-[#0047ff] font-bold bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-sm">
           Stage {stageNo}/8
@@ -247,16 +310,30 @@ export default function PhoneSimulator({
                 <p className="font-medium text-[12px]">{m.text}</p>
               </div>
 
-              {/* One-click quote inserter into THEIR WORDS */}
+              {/* One-click quote inserter into THEIR WORDS & Audio Replay */}
               {isProspect && (
-                <button
-                  type="button"
-                  onClick={() => onInsertWords(m.text)}
-                  className="mt-1 flex items-center gap-1 font-mono text-[10px] font-bold text-[#0047ff] hover:underline px-1"
-                  title="Insert this exact quote into 'Their Words' box"
-                >
-                  <span>↳</span> Insert into "Their Words"
-                </button>
+                <div className="mt-1 flex items-center gap-3 px-1">
+                  <button
+                    type="button"
+                    onClick={() => onInsertWords(m.text)}
+                    className="flex items-center gap-1 font-mono text-[10px] font-bold text-[#0047ff] hover:underline"
+                    title="Insert this exact quote into 'Their Words' box"
+                  >
+                    <span>↳</span> Insert into "Their Words"
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => speakProspect(m.text, i)}
+                    className={`flex items-center gap-1 font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded-xs transition-all ${
+                      speakingIndex === i
+                        ? "bg-blue-600 text-white animate-pulse"
+                        : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+                    }`}
+                    title={speakingIndex === i ? "Speaking... click to stop" : "Hear Ramesh speak this line"}
+                  >
+                    <span>{speakingIndex === i ? "🔊 Playing…" : "🔊 Hear audio"}</span>
+                  </button>
+                </div>
               )}
             </div>
           );
@@ -293,7 +370,7 @@ export default function PhoneSimulator({
         </div>
       </div>
 
-      {/* Chat Input Box */}
+      {/* Chat Input Box with Voice Dictation */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -301,10 +378,22 @@ export default function PhoneSimulator({
         }}
         className="flex items-center gap-2 border-t border-slate-200/80 bg-white p-2.5"
       >
+        <button
+          type="button"
+          onClick={toggleCallerSpeech}
+          className={`rounded-lg p-2 transition-all border shrink-0 ${
+            isCallerSpeaking
+              ? "bg-rose-500 text-white animate-pulse border-rose-600 shadow-xs"
+              : "bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-300"
+          }`}
+          title={isCallerSpeaking ? "Listening... click to stop" : "Speak your message into microphone (Speech-to-Text)"}
+        >
+          <span className="text-xs">{isCallerSpeaking ? "🔴" : "🎤"}</span>
+        </button>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type what you say on call..."
+          placeholder={isCallerSpeaking ? "Listening... speak now" : "Type or click 🎤 to speak..."}
           className="flex-1 rounded-lg border border-slate-300/90 bg-slate-50/50 px-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[#0047ff] focus:bg-white"
           disabled={busy}
         />

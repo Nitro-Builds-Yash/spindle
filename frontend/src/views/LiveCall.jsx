@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api.js";
 import PhoneSimulator from "../components/PhoneSimulator.jsx";
+import {
+  speakText,
+  stopSpeaking,
+  createSpeechRecognizer,
+  isSpeechRecognitionSupported,
+} from "../utils/speech.js";
 
 function clock(startedAt) {
   if (!startedAt) return "00:00";
@@ -38,7 +44,55 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
   const [closing, setClosing] = useState(false);
   const [closed, setClosed] = useState(null);
   const [showSim, setShowSim] = useState(true);
+  const [isListening, setIsListening] = useState(false);
+  const [isWhispering, setIsWhispering] = useState(false);
   const wordsRef = useRef(null);
+  const recognizerRef = useRef(null);
+
+  function toggleDictation() {
+    if (isListening) {
+      if (recognizerRef.current) {
+        try {
+          recognizerRef.current.stop();
+        } catch {}
+      }
+      setIsListening(false);
+      return;
+    }
+    const recognizer = createSpeechRecognizer({
+      onStart: () => setIsListening(true),
+      onResult: (transcript) => {
+        setWords((prev) => (prev ? `${prev.trim()} ${transcript}` : transcript));
+      },
+      onEnd: () => setIsListening(false),
+      onError: () => setIsListening(false),
+    });
+    if (recognizer) {
+      recognizerRef.current = recognizer;
+      try {
+        recognizer.start();
+      } catch {
+        setIsListening(false);
+      }
+    } else {
+      alert("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
+    }
+  }
+
+  function handleWhisperCue() {
+    if (isWhispering) {
+      stopSpeaking();
+      setIsWhispering(false);
+      return;
+    }
+    if (!cue?.cue) return;
+    setIsWhispering(true);
+    speakText(cue.cue, {
+      onEnd: () => setIsWhispering(false),
+      onError: () => setIsWhispering(false),
+      rate: 1.05,
+    });
+  }
 
   const stages = content.stages;
   const stage = useMemo(
@@ -337,9 +391,24 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
         {/* THEIR WORDS */}
         <div className="mt-4 pt-3.5 border-t border-slate-200/60">
           <div className="flex items-center justify-between mb-2">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-              THEIR WORDS
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                THEIR WORDS
+              </p>
+              {/* Hands-free Voice Dictation Button */}
+              <button
+                type="button"
+                onClick={toggleDictation}
+                className={`flex items-center gap-1 rounded-xs px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider transition-all shadow-2xs ${
+                  isListening
+                    ? "bg-rose-500 text-white animate-pulse border border-rose-600"
+                    : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300"
+                }`}
+                title={isListening ? "Listening... click to stop" : "Speak to dictate prospect's quote hands-free"}
+              >
+                <span>{isListening ? "🔴 Listening…" : "🎤 Dictate"}</span>
+              </button>
+            </div>
             <button
               className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline flex items-center gap-1"
               onClick={askCue}
@@ -359,8 +428,12 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             rows={2}
             value={words}
             onChange={(e) => setWords(e.target.value)}
-            placeholder="Type or click prospect quotes above..."
-            className="w-full rounded-xs border border-slate-300/90 bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-900 outline-none focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400 font-sans"
+            placeholder="Type, click quotes above, or click 🎤 Dictate to speak..."
+            className={`w-full rounded-xs border bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-900 outline-none transition-all placeholder:text-slate-400 font-sans ${
+              isListening
+                ? "border-rose-400 ring-2 ring-rose-500/20 bg-rose-50/20"
+                : "border-slate-300/90 focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15"
+            }`}
           />
           {cue && (
             <div className="mt-2.5 rounded-lg border border-blue-200/90 bg-gradient-to-r from-blue-50/95 to-indigo-50/90 backdrop-blur-xs p-3 text-xs text-blue-950 shadow-2xs">
@@ -369,9 +442,23 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
                   <span className="h-1.5 w-1.5 rounded-full bg-[#0047ff]"></span>
                   Spoken AI Cue
                 </span>
-                <span className="font-mono text-[9px] text-blue-700 font-semibold bg-white/90 border border-blue-200 px-1.5 py-0.2 rounded-xs">
-                  ⚡ Gemini Flash Lite
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleWhisperCue}
+                    className={`flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-xs transition-all ${
+                      isWhispering
+                        ? "bg-blue-600 text-white animate-pulse"
+                        : "bg-white text-blue-700 hover:bg-blue-100 border border-blue-200"
+                    }`}
+                    title={isWhispering ? "Whispering into ear... click to stop" : "Whisper cue into earpiece via Text-to-Speech"}
+                  >
+                    <span>{isWhispering ? "🔊 Whispering…" : "🔊 Whisper to Ear"}</span>
+                  </button>
+                  <span className="font-mono text-[9px] text-blue-700 font-semibold bg-white/90 border border-blue-200 px-1.5 py-0.2 rounded-xs">
+                    ⚡ Gemini Flash Lite
+                  </span>
+                </div>
               </div>
               <p className="font-medium text-slate-900 leading-relaxed text-[12px] pl-2.5 border-l-2 border-[#0047ff]">
                 “{cue.cue}”
