@@ -43,6 +43,7 @@ export const api = {
       body: JSON.stringify(body),
     }),
   cue: (body) => call("/api/ai/cue", { method: "POST", body: JSON.stringify(body) }),
+  simulate: (body) => call("/api/ai/simulate", { method: "POST", body: JSON.stringify(body) }),
   audit: (id, body) =>
     call(`/api/calls/${id}/audit`, { method: "POST", body: JSON.stringify(body) }),
   close: (id, body) =>

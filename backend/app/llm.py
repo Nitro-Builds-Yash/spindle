@@ -355,3 +355,71 @@ def audit(call: dict[str, Any], logs: list[dict[str, Any]], outcome: str) -> dic
     if not summary:
         summary = summary_fallback(call, logs, outcome)
     return {"warning": warning, "summary": summary[:240], "source": "llm"}
+
+
+SIMULATE_PROMPT = """You are roleplaying as {prospect}, Managing Director at {company} (mid-size Indian precision manufacturing plant).
+A cold caller from Meridian Growth Partners has you on the phone.
+Current Stage: {stage_number} - {stage_name}
+The caller just said to you:
+"{caller_message}"
+
+Respond as {prospect}.
+Persona:
+- Pragmatic, busy, slightly skeptical Indian SME owner.
+- Uses natural Indian business phrasing (e.g. "We already have trusted vendors", "I am on the shop floor", "Send on WhatsApp", "Our CA/production head handles this").
+- Keep your response brief (1-2 sentences).
+- If the caller is respectful and concrete, give them a realistic opening or mention a common headache (like rework, CNC scrap rates, or delayed vendor supplies).
+
+Answer in JSON:
+{{"reply": "<what you say>", "reaction": "<skeptical|curious|busy|open>", "suggested_words": "<key phrase caller can note>"}}
+"""
+
+STAGE_FALLBACK_REPLIES = {
+    1: "Haan, Ramesh Varma speaking. Kaun baat kar rahe hain?",
+    2: "Meridian? Look, I'm on the machine shop floor right now. Is this a sales call? Where did you get this number?",
+    3: "Look, everyone is selling something. I can give you exactly two minutes. What do you people do?",
+    4: "Right now our rework is touching 4.5% on the CNC line. Delivery schedules are slipping because of rework.",
+    5: "Everyone claims they can optimize throughput. Our machinists have been here 15 years. How would an outsider fix it?",
+    6: "You worked with IndoTech in Pune? Hmm, their stamping plant is similar size to ours. Did their scrap actually drop?",
+    7: "Fine. Send your one-pager on WhatsApp first. Then call me Thursday 4 PM, I will give you 15 minutes.",
+    8: "Yes, send it to this WhatsApp number. Don't spam me with emails. Speak to you Thursday.",
+}
+
+
+def simulate_prospect_reply(
+    stage_number: int,
+    caller_message: str,
+    prospect_name: str = "Ramesh Varma",
+    company_name: str = "Sri Balaji Precision",
+) -> dict[str, Any]:
+    stage = STAGES_BY_NUMBER.get(stage_number, STAGES_BY_NUMBER[1])
+    prompt = SIMULATE_PROMPT.format(
+        prospect=prospect_name,
+        company=company_name,
+        stage_number=stage_number,
+        stage_name=stage["name"],
+        caller_message=caller_message.strip(),
+    )
+    raw = _call_model(prompt)
+    if raw:
+        try:
+            data = _parse_json(raw)
+            reply = str(data.get("reply") or "").strip()
+            if reply:
+                return {
+                    "reply": reply,
+                    "reaction": data.get("reaction") or "skeptical",
+                    "suggested_words": data.get("suggested_words") or reply,
+                    "source": "llm",
+                }
+        except Exception:
+            pass
+
+    fallback_text = STAGE_FALLBACK_REPLIES.get(stage_number, "Tell me what this is regarding.")
+    return {
+        "reply": fallback_text,
+        "reaction": "busy",
+        "suggested_words": fallback_text,
+        "source": "transcripts",
+    }
+

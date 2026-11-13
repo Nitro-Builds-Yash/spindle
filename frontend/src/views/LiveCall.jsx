@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api.js";
+import PhoneSimulator from "../components/PhoneSimulator.jsx";
 
 function clock(startedAt) {
   if (!startedAt) return "00:00";
@@ -36,6 +37,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
   const [tick, setTick] = useState("00:00");
   const [closing, setClosing] = useState(false);
   const [closed, setClosed] = useState(null);
+  const [showSim, setShowSim] = useState(true);
   const wordsRef = useRef(null);
 
   const stages = content.stages;
@@ -177,22 +179,36 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-2 sm:py-6 relative">
+    <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6 py-2 sm:py-6 relative">
       
       {/* Subtle Background Glow Orbs for Glassmorphism */}
-      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[550px] h-[350px] bg-gradient-to-tr from-blue-400/15 via-indigo-300/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[750px] h-[400px] bg-gradient-to-tr from-blue-400/15 via-indigo-300/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* Reference Card Container (Exact ClinicBooks reference layout with modern frosted glass) */}
-      <div className="w-full max-w-[500px] rounded-2xl border border-white/70 bg-white/85 backdrop-blur-xl p-6 sm:p-7 shadow-[0_20px_50px_rgba(8,112,184,0.08),0_1px_3px_rgba(0,0,0,0.05)] text-slate-900 transition-all">
+      <div className="w-full max-w-[500px] rounded-2xl border border-white/70 bg-white/85 backdrop-blur-xl p-6 sm:p-7 shadow-[0_20px_50px_rgba(8,112,184,0.08),0_1px_3px_rgba(0,0,0,0.05)] text-slate-900 transition-all shrink-0">
         
         {/* Top Reference Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 mb-3">
           <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#0047ff]">
             MERIDIAN GROWTH PARTNERS · CALL GUIDE
           </span>
-          <span className="font-mono text-xs font-semibold text-slate-600 tabular-nums">
-            {tick}
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowSim(!showSim)}
+              className={`rounded-xs px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider transition-all ${
+                showSim
+                  ? "bg-blue-50 text-[#0047ff] border border-blue-200/90 shadow-2xs"
+                  : "bg-slate-100 text-slate-500 hover:text-slate-800 border border-slate-200"
+              }`}
+              title="Toggle Simulated Prospect Phone Chatbot"
+            >
+              Sim Phone {showSim ? "ON" : "OFF"}
+            </button>
+            <span className="font-mono text-xs font-semibold text-slate-600 tabular-nums">
+              {tick}
+            </span>
+          </div>
         </div>
 
         {/* Prospect Title & Details */}
@@ -339,6 +355,20 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
         </div>
 
       </div>
+
+      {/* Side Companion Chatbot Phone Simulator */}
+      {showSim && (
+        <PhoneSimulator
+          stageNo={stageNo}
+          call={call}
+          tick={tick}
+          onInsertWords={(quote) => {
+            setWords(quote);
+            if (wordsRef.current) wordsRef.current.focus();
+          }}
+          onClose={() => setShowSim(false)}
+        />
+      )}
 
       {closing && (
         <CloseModal

@@ -77,6 +77,14 @@ class CueBody(BaseModel):
     call_id: Optional[str] = None
 
 
+class SimulateBody(BaseModel):
+    stage_number: int = Field(1, ge=1, le=8)
+    caller_message: str = Field(..., max_length=2000)
+    prospect_name: str = Field("Ramesh Varma", max_length=120)
+    company_name: str = Field("Sri Balaji Precision", max_length=160)
+    call_id: Optional[str] = None
+
+
 # --------------------------------------------------------------------------- #
 # Routes
 # --------------------------------------------------------------------------- #
@@ -232,6 +240,16 @@ def ai_cue(body: CueBody) -> dict[str, Any]:
             f'stage {l["stage_number"]}: {l["what_happened"]}' for l in logs[-4:]
         )
     return llm.cue(body.stage_number, body.prospect_words, context)
+
+
+@app.post("/api/ai/simulate")
+def simulate_reply(body: SimulateBody) -> dict[str, Any]:
+    return llm.simulate_prospect_reply(
+        stage_number=body.stage_number,
+        caller_message=body.caller_message,
+        prospect_name=body.prospect_name,
+        company_name=body.company_name,
+    )
 
 
 @app.get("/api/stats")
