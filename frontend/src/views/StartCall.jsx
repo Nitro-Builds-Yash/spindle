@@ -76,19 +76,26 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
           caller types nothing on the call except one tap and the prospect's own words.
         </p>
 
-        {/* 1-Click Instant Live Call Launcher */}
-        <div className="mt-5 rounded-2xl border border-blue-200/90 bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-white p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0047ff] flex items-center gap-1.5">
-              <span>⚡</span> 1-Click Live Call Launcher
+        {/* Quick Start Call Session */}
+        <div className="mt-5 rounded-xl border border-slate-200/90 bg-white p-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-[#0047ff] border border-blue-200/80 shrink-0 mt-0.5">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
             </div>
-            <p className="text-xs text-slate-600 mt-1">
-              Launch the live 8-stage screen directly with Ramesh Varma (Sri Balaji Precision).
-            </p>
+            <div>
+              <div className="text-xs font-mono font-bold uppercase tracking-wider text-ink-950">
+                Simulate Call Session
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Start an interactive 8-stage call with Ramesh Varma (Sri Balaji Precision).
+              </p>
+            </div>
           </div>
           <button
             type="button"
-            className="btn-blue py-2.5 px-5 rounded-xl shadow-md text-xs shrink-0"
+            className="btn-blue py-2 px-4.5 rounded-lg shadow-sm text-xs shrink-0"
             onClick={() => {
               setBusy(true);
               api
@@ -105,7 +112,7 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
             }}
             disabled={busy}
           >
-            {busy ? "Opening..." : "▶ Open Live Call Screen"}
+            {busy ? "Opening..." : "Start Call Guide →"}
           </button>
         </div>
 

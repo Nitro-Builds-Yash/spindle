@@ -206,7 +206,7 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
         </div>
 
         {/* 8-Stage Square Stepper (Exact 1:1 match with ClinicBooks Reference) */}
-        <div className="grid grid-cols-8 gap-1 my-3">
+        <div className="grid grid-cols-8 gap-1.5 my-3">
           {stages.map((s) => {
             const now = s.number === stageNo;
             const past = s.number < stageNo;
@@ -214,11 +214,11 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
               <button
                 key={s.key}
                 onClick={() => setStageNo(s.number)}
-                className={`h-7 flex items-center justify-center font-mono text-[11px] font-bold rounded-xs border transition-all ${
+                className={`h-8 flex items-center justify-center font-mono text-xs font-bold rounded-xs border transition-all ${
                   now
                     ? "bg-[#0047ff] text-white border-[#0047ff] shadow-sm shadow-blue-500/30"
                     : past
-                    ? "bg-slate-100/90 text-slate-800 border-slate-300/80"
+                    ? "bg-[#0b132b] text-white border-[#0b132b]"
                     : "bg-white/80 text-slate-400 border-slate-200 hover:border-slate-400"
                 }`}
               >
@@ -293,12 +293,11 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
               THEIR WORDS
             </p>
             <button
-              className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline flex items-center gap-1"
+              className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline"
               onClick={askCue}
               disabled={cueBusy}
             >
-              <span>✨</span>
-              {cueBusy ? "Thinking…" : "AI cue"}
+              {cueBusy ? "Thinking…" : "Ask AI cue"}
             </button>
           </div>
           <textarea
