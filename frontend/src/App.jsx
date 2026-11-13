@@ -60,6 +60,11 @@ export default function App() {
     setView("history");
   }, []);
 
+  const clearCall = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCallId(null);
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f8fafc] text-ink-900">
       {/* Top Banner if Render backend is cold-starting */}
@@ -144,12 +149,23 @@ export default function App() {
             key={callId}
             callId={callId}
             content={content}
-            onNew={() => setView("start")}
+            onNew={() => {
+              clearCall();
+              setView("start");
+            }}
             onFinished={finishCall}
+            onClear={clearCall}
           />
         )}
         {view === "history" && (
-          <History content={content} onOpen={openCall} onNew={() => setView("start")} />
+          <History
+            content={content}
+            onOpen={openCall}
+            onNew={() => {
+              clearCall();
+              setView("start");
+            }}
+          />
         )}
       </main>
     </div>
