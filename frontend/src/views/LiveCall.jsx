@@ -186,7 +186,7 @@ export default function LiveCall({ callId, content, onNew, onFinished }) {
         {/* Top Reference Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 mb-3">
           <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#0047ff]">
-            MERIDIANBOOKS · CALL GUIDE
+            MERIDIAN GROWTH PARTNERS · CALL GUIDE
           </span>
           <span className="font-mono text-xs font-semibold text-slate-600 tabular-nums">
             {tick}

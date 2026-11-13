@@ -80,16 +80,8 @@ export default function App() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#0047ff] to-blue-700 text-white shadow-sm shadow-blue-500/25 font-mono text-sm font-bold">
             M
           </div>
-          <div className="leading-tight">
-            <div className="text-[13.5px] font-bold tracking-tight text-ink-950 flex items-center gap-2">
-              Meridian Growth Partners
-              <span className="rounded-full bg-blue-50 border border-blue-200/80 px-2 py-0.2 text-[9.5px] font-mono font-bold text-[#0047ff] uppercase">
-                Copilot
-              </span>
-            </div>
-            <div className="text-[10.5px] font-mono uppercase tracking-[0.16em] text-ink-500">
-              Forward Deployed Engineer Surface
-            </div>
+          <div className="text-[14px] font-bold tracking-tight text-ink-950">
+            Meridian Growth Partners
           </div>
         </div>
 
