@@ -44,9 +44,9 @@ Cold calling Indian manufacturing managing directors (MDs, Promoters, Plant Head
 
 Spindle solves this with a **zero-distraction 8-stage interface**:
 1. **One Tap:** Fast classification of what happened at each stage (happy path pre-selected; 1-4 hotkeys supported).
-2. **One Box:** Verbatim capture of the prospect's own words ("Their Words").
-3. **Sub-second LLM Assistance:** Powered server-side by **Google Gemini Flash Lite** for mid-call spoken cues and an end-of-call **Outcome Consistency Audit** that catches human misloggings before writing to PostgreSQL.
-4. **Interactive Phone Simulator:** Real-time side companion roleplaying as **Ramesh Varma** (MD, Sri Balaji Precision) for realistic call practice and 1-click quote insertion.
+2. **One Box & Hands-Free Voice Dictation (`🎤`):** Verbatim capture of the prospect's own words ("Their Words") with browser-native Speech-to-Text so callers never have to type while listening.
+3. **Sub-second LLM Assistance & Audio Whisper (`🔊`):** Powered server-side by **Google Gemini Flash Lite** for mid-call spoken cues with an earpiece audio whisper option and an end-of-call **Outcome Consistency Audit** that catches human misloggings before writing to PostgreSQL.
+4. **Interactive Phone Simulator with Spoken Voice:** Real-time side companion roleplaying as **Ramesh Varma** (MD, Sri Balaji Precision) with Indian English speech synthesis for realistic call practice and 1-click quote insertion.
 
 ---
 
@@ -164,9 +164,9 @@ flowchart TD
 - **8-Stage Stepper:** Highlights current stage, progress, and stage objective in one concise sentence.
 - **They May Say (3 Quotes):** Real prospect phrases extracted from transcripts to ensure the caller is never caught off guard. Clicking any quote instantly fills "Their Words".
 - **What Happened (2x2 Taps):** 4 mutually exclusive outcomes with keyboard shortcut indicators `[1]`–`[4]`.
-- **Their Words (Verbatim Box):** Dedicated input for capturing exact prospect quotes (mandatory at Stage 5).
-- **AI Mid-Call Assist:** One-click button returning **one spoken sentence** (<20 words) tailored to the prospect's exact phrase.
-- **Interactive Phone Simulator:** Real-time side companion with active audio wave visualizer, conversational memory, and quick pitch buttons.
+- **Their Words (Verbatim Box + 🎤 Voice Dictation):** Dedicated input for capturing exact prospect quotes (mandatory at Stage 5) with hands-free microphone dictation.
+- **AI Mid-Call Assist + 🔊 Audio Whisper:** One-click button returning **one spoken sentence** (<20 words) tailored to the prospect's exact phrase, with a 1-click audio whisper directly into the caller's headset.
+- **Interactive Phone Simulator with 🔊 Voice:** Real-time side companion with active audio wave visualizer, spoken prospect dialogue, conversational memory, and quick pitch buttons.
 
 <p align="center">
   <img src="docs/shot-live.png" alt="Live Call Screen" width="850" style="border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
