@@ -79,6 +79,9 @@ export default function PhoneSimulator({
   const scrollRef = useRef(null);
 
   // Auto-advance prospect dialogue when stage changes
+  const tickRef = useRef(tick);
+  tickRef.current = tick;
+
   const prevStage = useRef(stageNo);
   useEffect(() => {
     if (stageNo !== prevStage.current) {
@@ -90,13 +93,13 @@ export default function PhoneSimulator({
           {
             sender: "prospect",
             text: stageData.prospect,
-            time: tick,
+            time: tickRef.current,
             stageTag: `Stage ${stageNo}`,
           },
         ]);
       }
     }
-  }, [stageNo, tick]);
+  }, [stageNo]);
 
   useEffect(() => {
     if (scrollRef.current) {

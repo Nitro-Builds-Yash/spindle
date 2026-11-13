@@ -55,8 +55,6 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       const no = Number(data.call.highest_stage_reached) || 1;
       setStageNo(no);
       if (data.call.status !== "in_progress") {
-        if (onClear) onClear();
-        localStorage.removeItem("spindle.currentCall");
         setClosed({ outcome: data.call.outcome, summary: data.call.ai_summary });
       }
     } catch (e) {
@@ -430,7 +428,6 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             setLogs(data.stage_logs || []);
             setClosed({ outcome: data.call.outcome, summary: data.call.ai_summary });
             setClosing(false);
-            if (onClear) onClear();
           }}
         />
       )}

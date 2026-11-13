@@ -60,6 +60,12 @@ export default function App() {
     setView("history");
   }, []);
 
+  const startNewCall = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCallId(null);
+    setView("start");
+  }, []);
+
   const clearCall = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setCallId(null);
@@ -166,7 +172,7 @@ export default function App() {
               key={callId}
               callId={callId}
               content={content}
-              onNew={() => setView("start")}
+              onNew={startNewCall}
               onFinished={finishCall}
               onClear={clearCall}
             />
