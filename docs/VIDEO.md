@@ -83,7 +83,7 @@ questions are already in the message. If you type it:
 ```
 Tarun, I registered for the Forward Deployed Engineer task on Friday.
 Repo: https://github.com/Nitro-Builds-Yash/spindle
-App: https://meridian-cold-call-copilot.vercel.app
+App: https://spindle-call.vercel.app
 Health: https://<api>.onrender.com/health
 
 Six minutes: <drive link>

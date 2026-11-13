@@ -3,7 +3,7 @@
 # ⚡ Spindle
 ### The Real-Time Screen Beside the Phone for B2B Cold Calls
 
-[![Live Web App](https://img.shields.io/badge/Live%20App-Vercel-black?style=for-the-badge&logo=vercel)](https://meridian-cold-call-copilot.vercel.app)
+[![Live Web App](https://img.shields.io/badge/Live%20App-Vercel-black?style=for-the-badge&logo=vercel)](https://spindle-call.vercel.app)
 [![API Health](https://img.shields.io/badge/Backend%20API-Render%20(Online)-46e3b7?style=for-the-badge&logo=render)](https://call-copilot-api.onrender.com/health)
 [![Database](https://img.shields.io/badge/Database-Supabase%20Postgres-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com)
 [![LLM Provider](https://img.shields.io/badge/LLM-Google%20Gemini%20Flash%20Lite-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev)
@@ -14,7 +14,7 @@
   <i>DeepThought CultureTech Ventures Pvt Ltd · Sainikpuri, Hyderabad</i>
 </p>
 
-[🚀 **Launch Live Application**](https://meridian-cold-call-copilot.vercel.app) • [📡 **Inspect API Health**](https://call-copilot-api.onrender.com/health) • [🗄️ **View Database Schema**](schema.sql) • [🎥 **Watch 6-Min Walkthrough Video**](docs/VIDEO.md)
+[🚀 **Launch Live Application**](https://spindle-call.vercel.app) • [📡 **Inspect API Health**](https://call-copilot-api.onrender.com/health) • [🗄️ **View Database Schema**](schema.sql) • [🎥 **Watch 6-Min Walkthrough Video**](docs/VIDEO.md)
 
 ---
 
@@ -38,7 +38,7 @@ Spindle solves this with a **zero-distraction 8-stage interface**:
 
 | Deliverable | Platform & Tier | Direct URL | Verified Status |
 | :--- | :--- | :--- | :---: |
-| **Live Web App** | **Vercel** *(Free Tier)* | [https://meridian-cold-call-copilot.vercel.app](https://meridian-cold-call-copilot.vercel.app) | `200 OK` · Active |
+| **Live Web App** | **Vercel** *(Free Tier)* | [https://spindle-call.vercel.app](https://spindle-call.vercel.app) | `200 OK` · Active |
 | **Backend API Health** | **Render** *(Free Web Service)* | [https://call-copilot-api.onrender.com/health](https://call-copilot-api.onrender.com/health) | `200 OK` · Active |
 | **PostgreSQL Database** | **Supabase** *(Free Cloud Tier)* | `vajznvxzojiinwegtduv.supabase.co` | `Connected` · Active |
 | **Active LLM Provider** | **Google AI Studio** *(Free Tier)* | `gemini-flash-lite-latest` | `Active` · Server-side |
@@ -61,7 +61,7 @@ Spindle was not designed in the abstract—it was built from deep empirical anal
    • Unlogged Calls:        13% abandoned with zero logged outcome
    • Decision-maker Away:   31% India arm of MNCs ("HQ / US decides")
    • Gatekeeper / Left:     13% reached wrong person or person had left
-   • Immediate Question:    23% asked "What is this regarding / what is Meridian/Spindle?"
+   • Immediate Question:    23% asked "What is this regarding / who is Spindle?"
    • Vague Brush-off:       41% requested "Send it on WhatsApp or email"
 ```
 
