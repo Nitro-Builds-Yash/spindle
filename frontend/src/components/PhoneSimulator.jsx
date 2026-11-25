@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { api } from "../api.js";
+import { api } from "../api";
 import {
   speakText,
   stopSpeaking,
@@ -8,10 +8,10 @@ import {
 
 const DEFAULT_STAGE_DIALOGUES = {
   1: {
-    prospect: "Haanji, Ramesh Varma speaking. Kaun baat kar rahe hain?",
+    prospect: "Haanji, {name} speaking. Kaun baat kar rahe hain?",
     prompts: [
-      "Hello Ramesh ji, this is Athota from Spindle.",
-      "Ramesh ji, am I speaking with the Managing Director of Sri Balaji Precision?",
+      "Hello {first} ji, this is Athota from Spindle.",
+      "{first} ji, am I speaking with the {role} of {company}?",
     ],
   },
   2: {
@@ -59,11 +59,25 @@ const DEFAULT_STAGE_DIALOGUES = {
   8: {
     prospect: "Yes, send it to this WhatsApp number. Don't spam me with emails. Speak to you Thursday.",
     prompts: [
-      "Thank you Ramesh ji, WhatsApp note sent. Have a productive shift.",
+      "Thank you {first} ji, WhatsApp note sent. Have a productive shift.",
       "Confirmed. Thursday 4:00 PM on the calendar. Goodbye.",
     ],
   },
 };
+
+/** Fill {name} / {first} / {role} / {company} in a script line from the call. */
+function fill(text, call) {
+  const name = call?.prospect_name?.trim() || "the prospect";
+  return String(text)
+    .replaceAll("{name}", name)
+    .replaceAll("{first}", name.split(/\s+/)[0])
+    .replaceAll("{role}", call?.prospect_role?.trim() || "person in charge")
+    .replaceAll("{company}", call?.company_name?.trim() || "your company");
+}
+
+function initials(name) {
+  return (name || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() || "").join("") || "?";
+}
 
 export default function PhoneSimulator({
   stageNo,
@@ -75,7 +89,7 @@ export default function PhoneSimulator({
   const [messages, setMessages] = useState([
     {
       sender: "prospect",
-      text: "Haanji, Ramesh Varma speaking. Kaun baat kar rahe hain?",
+      text: "Haanji, {name} speaking. Kaun baat kar rahe hain?",
       time: "00:03",
     },
   ]);
@@ -171,8 +185,8 @@ export default function PhoneSimulator({
       const res = await api.simulate({
         stage_number: stageNo,
         caller_message: callerText,
-        prospect_name: call?.prospect_name || "Ramesh Varma",
-        company_name: call?.company_name || "Sri Balaji Precision",
+        prospect_name: call?.prospect_name || "the prospect",
+        company_name: call?.company_name || "their company",
       });
 
       setMessages((prev) => [
@@ -204,7 +218,7 @@ export default function PhoneSimulator({
     }
   }
 
-  const currentPrompts = DEFAULT_STAGE_DIALOGUES[stageNo]?.prompts || [];
+  const currentPrompts = (DEFAULT_STAGE_DIALOGUES[stageNo]?.prompts || []).map((p) => fill(p, call));
 
   return (
     <aside className="w-full lg:w-[380px] rounded-xl2 border border-steel-200 bg-white shadow-card flex flex-col h-[680px] overflow-hidden text-ink-900">
@@ -212,14 +226,14 @@ export default function PhoneSimulator({
       <div className="flex items-center justify-between bg-navy-900 px-4 py-3.5 text-white">
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy-500 text-sm font-bold">
-            RV
+            {initials(call?.prospect_name)}
           </div>
           <div className="min-w-0">
             <div className="text-[15px] font-semibold truncate">
-              {call?.prospect_name || "Ramesh Varma"}
+              {call?.prospect_name || "Prospect"}
             </div>
             <p className="text-sm text-navy-200 truncate">
-              {call?.company_name || "Sri Balaji Precision"}
+              {call?.company_name || ""}
             </p>
           </div>
         </div>
@@ -246,7 +260,7 @@ export default function PhoneSimulator({
           onClick={() => setVoiceEnabled(!voiceEnabled)}
           aria-pressed={voiceEnabled}
           className="font-semibold text-navy hover:underline"
-          title="Read Ramesh Varma's replies aloud"
+          title={`Read ${call?.prospect_name || "the prospect"}'s replies aloud`}
         >
           {voiceEnabled ? "Mute voice" : "Turn on voice"}
         </button>
@@ -268,7 +282,7 @@ export default function PhoneSimulator({
             >
               <div className="flex items-center gap-1.5 mb-1 px-1">
                 <span className="tnum text-xs font-bold text-steel-400">
-                  {isProspect ? "Ramesh Varma" : "You"}
+                  {isProspect ? call?.prospect_name || "Prospect" : "You"}
                 </span>
                 <span className="tnum text-xs text-steel-400">
                   {m.time}
@@ -287,7 +301,7 @@ export default function PhoneSimulator({
                     : "bg-navy text-white rounded-tr-xs"
                 }`}
               >
-                <p className="font-medium text-[12px]">{m.text}</p>
+                <p className="text-[14px] leading-snug">{fill(m.text, call)}</p>
               </div>
 
               {/* One-click quote inserter into Their words & Audio Replay */}
@@ -295,7 +309,7 @@ export default function PhoneSimulator({
                 <div className="mt-1 flex items-center gap-3 px-1">
                   <button
                     type="button"
-                    onClick={() => onInsertWords(m.text)}
+                    onClick={() => onInsertWords(fill(m.text, call))}
                     className="flex items-center gap-1 tnum text-xs font-bold text-navy hover:underline"
                     title="Insert this exact quote into 'Their Words' box"
                   >
@@ -303,13 +317,13 @@ export default function PhoneSimulator({
                   </button>
                   <button
                     type="button"
-                    onClick={() => speakProspect(m.text, i)}
+                    onClick={() => speakProspect(fill(m.text, call), i)}
                     className={`flex items-center gap-1 tnum text-xs font-semibold px-1.5 py-0.5 rounded-xs transition-all ${
                       speakingIndex === i
                         ? "bg-navy-600 text-white animate-pulse"
                         : "text-ink-500 hover:text-ink-800 hover:bg-steel-100"
                     }`}
-                    title={speakingIndex === i ? "Speaking... click to stop" : "Hear Ramesh speak this line"}
+                    title={speakingIndex === i ? "Speaking… click to stop" : "Hear this line"}
                   >
                     <span>{speakingIndex === i ? "🔊 Playing…" : "🔊 Hear audio"}</span>
                   </button>
@@ -325,7 +339,7 @@ export default function PhoneSimulator({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-navy-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-navy-500"></span>
             </span>
-            <span>Ramesh is responding…</span>
+            <span>{(call?.prospect_name || "Prospect").split(" ")[0]} is replying…</span>
           </div>
         )}
       </div>

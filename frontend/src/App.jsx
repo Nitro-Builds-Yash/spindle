@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { api } from "./api.js";
+import { api } from "./api";
 import { DEFAULT_CONTENT } from "./data/defaultContent.js";
 import StartCall from "./views/StartCall.jsx";
 import LiveCall from "./views/LiveCall.jsx";

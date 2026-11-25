@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { api } from "../api.js";
+import { api } from "../api";
+import FollowUps from "../components/FollowUps.jsx";
+
+const PAGE = 100;
 
 function when(iso) {
   if (!iso) return "";
@@ -26,6 +29,32 @@ export default function History({ content, onOpen, onNew }) {
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  async function loadMore() {
+    setLoadingMore(true);
+    try {
+      const d = await api.listCalls(PAGE, calls.length);
+      setCalls((prev) => [...prev, ...d.calls.filter((c) => !prev.some((p) => p.id === c.id))]);
+      setHasMore(d.calls.length === PAGE);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
+  async function callAgain(f) {
+    const { call } = await api.startCall({
+      prospect_name: f.prospect_name,
+      prospect_role: f.prospect_role,
+      company_name: f.company_name,
+      company_kind: f.company_kind,
+      call_type: "follow-up",
+    });
+    onOpen(call.id);
+  }
 
   useEffect(() => {
     if (!openId) {
@@ -47,8 +76,11 @@ export default function History({ content, onOpen, onNew }) {
 
   useEffect(() => {
     api
-      .listCalls()
-      .then((d) => setCalls(d.calls))
+      .listCalls(PAGE)
+      .then((d) => {
+        setCalls(d.calls);
+        setHasMore(d.calls.length === PAGE);
+      })
       .catch((e) => setErr(e.message));
     api.stats().then(setStats).catch(() => {});
   }, []);
@@ -121,11 +153,15 @@ export default function History({ content, onOpen, onNew }) {
         </div>
       </div>
 
+      <FollowUps onCallAgain={callAgain} />
+
       {/* Numbers band */}
       <div className="grid grid-cols-1 sm:grid-cols-[170px_230px_1fr] overflow-hidden rounded-xl2 bg-navy-900 text-white shadow-float">
         <div className="flex flex-col justify-end p-6 border-b sm:border-b-0 sm:border-r border-navy-700">
           <span className="display tnum text-[56px] font-extrabold leading-none">{stats?.calls ?? calls.length}</span>
-          <span className="mt-3 text-sm font-semibold text-navy-200">Calls logged</span>
+          <span className="mt-3 text-sm font-semibold text-navy-200">
+            Calls logged{stats?.abandoned ? <span className="block font-normal text-navy-300">{stats.abandoned} abandoned</span> : null}
+          </span>
         </div>
         <div className="flex flex-col justify-end p-6 border-b sm:border-b-0 sm:border-r border-navy-700">
           <span className="display tnum text-[56px] font-extrabold leading-none text-signal">
@@ -184,6 +220,7 @@ export default function History({ content, onOpen, onNew }) {
           {filteredCalls.map((c) => {
             const outcome = outcomeByKey[c.outcome];
             const live = c.status === "in_progress";
+            const abandoned = (c.audit_warning || "").startsWith("Abandoned");
             const reached = Number(c.highest_stage_reached) || 1;
             return (
               <li key={c.id}>
@@ -199,7 +236,8 @@ export default function History({ content, onOpen, onNew }) {
                         {c.company_name ? <span className="font-normal text-ink-600">, {c.company_name}</span> : null}
                       </span>
                       {live && <span className="badge badge-live">In progress</span>}
-                      {!live && outcome && <span className={toneClass[outcome.tone] || "badge"}>{outcome.label}</span>}
+                      {!live && abandoned && <span className="badge">Abandoned</span>}
+                      {!live && !abandoned && outcome && <span className={toneClass[outcome.tone] || "badge"}>{outcome.label}</span>}
                     </div>
                     <p className="text-sm text-ink-500 mt-1 truncate">
                       {c.next_step || c.ai_summary || "Nothing noted on this call."}
@@ -226,6 +264,12 @@ export default function History({ content, onOpen, onNew }) {
         </ul>
       )}
 
+      {hasMore && !filterQuery && (
+        <button className="btn-ghost self-center" onClick={loadMore} disabled={loadingMore}>
+          {loadingMore ? "Loading…" : "Show older calls"}
+        </button>
+      )}
+
       {(selectedDetail || selected) && (
         <Drawer
           call={selectedDetail || selected}
@@ -246,7 +290,7 @@ export default function History({ content, onOpen, onNew }) {
   );
 }
 
-function Drawer({ call, loading, content, onClose, onResume, when, tapLabel, stageName, outcome }) {
+function Drawer({ call, loading, onClose, onResume, when, tapLabel, stageName, outcome }) {
   return (
     <div className="fixed inset-0 z-50" onClick={onClose}>
       <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-xs" />

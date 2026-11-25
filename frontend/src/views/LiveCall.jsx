@@ -1,33 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api } from "../api.js";
+import { api, ApiError, onOutboxChange, pendingFor } from "../api";
 import PhoneSimulator from "../components/PhoneSimulator.jsx";
+import CloseModal from "../components/live/CloseModal.jsx";
+import CallSummary from "../components/live/CallSummary.jsx";
+import StageRail from "../components/live/StageRail.jsx";
+import TapGrid from "../components/live/TapGrid.jsx";
+import { clock } from "../lib/call.js";
 import {
   speakText,
   stopSpeaking,
   createSpeechRecognizer,
-  isSpeechRecognitionSupported,
 } from "../utils/speech.js";
 
-function clock(startedAt) {
-  if (!startedAt) return "00:00";
-  const s = Math.max(0, Math.floor((Date.now() - new Date(startedAt)) / 1000));
-  return `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`;
-}
-
-/** The outcome the taps already imply, used as the modal's first guess. */
-function suggestOutcome(logs) {
-  const tap = (n) => logs.find((l) => Number(l.stage_number) === n)?.what_happened;
-  if (tap(7) === "named_time") return "next_step_agreed";
-  if (tap(7) === "report_only") return "agreed_to_receive_report";
-  if (tap(7) === "vague_yes") return "interested";
-  if (tap(7) === "referred") return "follow_up";
-  if (tap(1) === "switchboard") return "follow_up";
-  if (tap(1) === "wrong_person") return "wrong_person";
-  if (tap(1) === "language") return "call_again";
-  if (tap(3) === "call_later" || tap(3) === "busy") return "follow_up";
-  if (tap(3) === "whatsapp_first") return "agreed_to_receive_report";
-  if (tap(5) === "everything_fine") return "not_interested";
-  return "not_logged";
+/** Server logs plus taps still waiting in the outbox (marked pending). */
+function mergePending(logs, callId) {
+  const out = logs.filter((l) => !pendingFor(callId).some((p) => p.stage_number === Number(l.stage_number)));
+  for (const p of pendingFor(callId)) out.push({ ...p, call_id: callId, pending: true });
+  return out.sort((a, b) => Number(a.stage_number) - Number(b.stage_number));
 }
 
 export default function LiveCall({ callId, content, onNew, onFinished, onClear }) {
@@ -48,6 +37,9 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
   const [isWhispering, setIsWhispering] = useState(false);
   const wordsRef = useRef(null);
   const recognizerRef = useRef(null);
+  const heardRef = useRef("");
+  const [pending, setPending] = useState(() => pendingFor(callId).length);
+  useEffect(() => onOutboxChange(() => setPending(pendingFor(callId).length)), [callId]);
 
   function toggleDictation() {
     if (isListening) {
@@ -60,11 +52,19 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       return;
     }
     const recognizer = createSpeechRecognizer({
-      onStart: () => setIsListening(true),
+      onStart: () => {
+        heardRef.current = "";
+        setIsListening(true);
+      },
       onResult: (transcript) => {
+        heardRef.current = `${heardRef.current} ${transcript}`.trim();
         setWords((prev) => (prev ? `${prev.trim()} ${transcript}` : transcript));
       },
-      onEnd: () => setIsListening(false),
+      onEnd: () => {
+        setIsListening(false);
+        // What they said is in: get the next line without another tap.
+        if (heardRef.current) askCue(`${wordsRef.current?.value || heardRef.current}`);
+      },
       onError: () => setIsListening(false),
     });
     if (recognizer) {
@@ -105,13 +105,16 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
     try {
       const data = await api.getCall(callId);
       setCall(data.call);
-      setLogs(data.stage_logs || []);
+      setLogs(mergePending(data.stage_logs || [], callId));
       const no = Number(data.call.highest_stage_reached) || 1;
       setStageNo(no);
       if (data.call.status !== "in_progress") {
         setClosed({ outcome: data.call.outcome, summary: data.call.ai_summary });
       }
     } catch (e) {
+      // The saved call no longer exists (deleted, or a different database):
+      // forget it instead of showing a dead screen.
+      if (e instanceof ApiError && e.status === 404) return onClear?.();
       setErr(e.message);
     }
   }, [callId, onClear]);
@@ -146,12 +149,12 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
     return () => window.removeEventListener("keydown", onKey);
   }, [stage, closing]);
 
-  async function askCue() {
+  async function askCue(text) {
     setCueBusy(true);
     try {
       const res = await api.cue({
         stage_number: stageNo,
-        prospect_words: words,
+        prospect_words: typeof text === "string" ? text : words,
         call_id: callId,
       });
       setCue(res);
@@ -167,12 +170,18 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       setErr("Tap what happened. The tap is the record.");
       return false;
     }
-    const res = await api.saveStage(callId, {
+    const body = {
       stage_number: stageNo,
       what_happened: tap,
       prospect_words: words,
       ai_suggestion: cue?.cue || "",
-    });
+    };
+    const res = await api.saveStage(callId, body);
+    if (res?.queued) {
+      // Offline: keep going; the tap is on this device and syncs later.
+      setLogs((prev) => mergePending(prev, callId));
+      return true;
+    }
     if (res?.stage_logs) {
       setLogs(res.stage_logs);
     }
@@ -227,7 +236,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
 
   if (closed) {
     return (
-      <Closed
+      <CallSummary
         call={call}
         content={content}
         onNew={onNew}
@@ -266,51 +275,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             </div>
           </div>
 
-          {/* Stage rail */}
-          <ol className="relative mt-6 grid grid-cols-8" aria-label="Call stages">
-            <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] rounded-full bg-navy-700" aria-hidden />
-            <span
-              className="absolute left-[6.25%] top-[13px] h-[3px] rounded-full bg-gradient-to-r from-navy-300 to-signal transition-[width] duration-500"
-              style={{ width: `${((stageNo - 1) / 7) * 87.5}%` }}
-              aria-hidden
-            />
-            {stages.map((s) => {
-              const now = s.number === stageNo;
-              const past = s.number < stageNo;
-              return (
-                <li key={s.key} className="relative flex flex-col items-center">
-                  <button
-                    type="button"
-                    onClick={() => setStageNo(s.number)}
-                    aria-current={now ? "step" : undefined}
-                    title={s.name}
-                    className={`tnum relative z-10 flex h-[29px] w-[29px] items-center justify-center rounded-full text-[13px] font-bold transition-all duration-200 ${
-                      now
-                        ? "scale-110 bg-signal text-ink-950 ring-4 ring-signal/25 shadow-[0_0_18px_rgba(242,169,0,0.55)]"
-                        : past
-                        ? "bg-navy-300 text-navy-900 hover:bg-white"
-                        : "bg-navy-900 text-navy-300 border-2 border-navy-600 hover:border-navy-300"
-                    }`}
-                  >
-                    {past ? (
-                      <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                        <path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      s.number
-                    )}
-                  </button>
-                  <span
-                    className={`mt-2 px-0.5 text-center text-[11px] leading-tight ${
-                      now ? "font-bold text-white whitespace-nowrap" : "hidden sm:block text-navy-300"
-                    }`}
-                  >
-                    {s.name}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
+          <StageRail stages={stages} stageNo={stageNo} onPick={setStageNo} />
         </div>
 
         <div className="flex items-center justify-between gap-2 text-sm -mt-2 mb-5">
@@ -330,6 +295,13 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             </button>
           </div>
         </div>
+
+        {pending > 0 && (
+          <div role="status" className="mb-4 rounded-lg2 border border-signal bg-signal-soft px-4 py-2.5 text-sm text-ink-900">
+            You're offline. {pending === 1 ? "1 tap is" : `${pending} taps are`} saved on this device
+            and will send when the connection is back. Keep going.
+          </div>
+        )}
 
         {/* Stage name & purpose */}
         <div key={stage.key} className="mb-5 border-l-[3px] border-signal pl-4 motion-safe:animate-[stageIn_220ms_ease-out]">
@@ -375,33 +347,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             </p>
             <span className="tnum text-xs text-steel-400">Keys 1–4</span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {stage.taps.map((t, i) => {
-              const on = tap === t.key;
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => setTap(t.key)}
-                  className={`relative min-h-[56px] p-3 pr-7 rounded-lg2 border text-left text-[14px] font-medium leading-snug transition-colors group ${
-                    on
-                      ? "bg-navy text-white border-navy font-semibold shadow-[inset_4px_0_0_#F2A900]"
-                      : "bg-white text-ink-800 border-steel-300 hover:border-ink-500"
-                  }`}
-                >
-                  <span
-                    className={`absolute top-1.5 right-1.5 tnum text-xs px-1 rounded-2xs transition-all ${
-                      on
-                        ? "text-navy-100 bg-navy-700/60"
-                        : "text-steel-400 bg-steel-100 group-hover:text-ink-600 group-hover:bg-steel-200"
-                    }`}
-                  >
-                    {i + 1}
-                  </span>
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
+          <TapGrid taps={stage.taps} value={tap} onChange={setTap} />
         </div>
 
         {/* Their words */}
@@ -538,226 +484,3 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
   );
 }
 
-function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
-  const [outcome, setOutcome] = useState(() => suggestOutcome(logs));
-  const [nextStep, setNextStep] = useState("");
-  const [note, setNote] = useState("");
-  const [audit, setAudit] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-
-  useEffect(() => {
-    function onKeyDown(e) {
-      if (e.key === "Escape") {
-        onCancel();
-      }
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onCancel]);
-
-  useEffect(() => {
-    let live = true;
-    const t = setTimeout(() => {
-      api
-        .audit(callId, { outcome, next_step: nextStep })
-        .then((r) => live && setAudit(r))
-        .catch(() => {});
-    }, 350);
-    return () => {
-      live = false;
-      clearTimeout(t);
-    };
-  }, [callId, outcome, nextStep]);
-
-  async function submit() {
-    setBusy(true);
-    setErr("");
-    try {
-      const data = await api.close(callId, { outcome, next_step: nextStep, note });
-      onClosed(data);
-    } catch (e) {
-      setErr(e.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-6 backdrop-blur-sm"
-      onClick={onCancel}
-    >
-      <div
-        className="w-full max-w-[540px] rounded-2xl border border-white/80 bg-white/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl text-ink-900"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-steel-200/60 pb-3">
-          <div className="flex items-center gap-3">
-            <h3 className="text-lg font-bold tracking-tight">Close the call</h3>
-            <span className="tnum text-xs text-navy font-bold">Stage {stageNo} of 8</span>
-          </div>
-          <button
-            onClick={onCancel}
-            className="rounded-lg p-1 text-steel-400 hover:bg-steel-100 hover:text-ink-700 transition-all"
-            title="Close without saving (Esc)"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <p className="mt-2 text-sm text-ink-600 leading-relaxed">
-          You choose the outcome. Spindle checks it against what you tapped before saving.
-        </p>
-
-        <p className="tnum text-xs font-bold text-steel-400 mb-2 mt-4">Outcome</p>
-        <div className="grid grid-cols-2 gap-1.5">
-          {content.outcomes.map((o) => (
-            <button
-              key={o.key}
-              onClick={() => setOutcome(o.key)}
-              className={`rounded-xs border px-3 py-2 text-left text-xs transition-all ${
-                outcome === o.key
-                  ? "border-navy bg-navy text-white font-bold shadow-xs"
-                  : "border-steel-300/80 bg-white/80 text-ink-700 hover:border-ink-500 hover:bg-white"
-              }`}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
-
-        <p className="tnum text-xs font-bold text-steel-400 mb-1 mt-4">Next step</p>
-        <input
-          className="w-full rounded-xs border border-steel-300/90 bg-white/90 px-3 py-2 text-xs text-ink-900 outline-none focus:border-navy"
-          value={nextStep}
-          onChange={(e) => setNextStep(e.target.value)}
-          placeholder="e.g. Tuesday 14:00 Google Meet with MD"
-        />
-
-        <p className="tnum text-xs font-bold text-steel-400 mb-1 mt-3">Notes</p>
-        <input
-          className="w-full rounded-xs border border-steel-300/90 bg-white/90 px-3 py-2 text-xs text-ink-900 outline-none focus:border-navy"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Optional"
-        />
-
-        {audit && (
-          <div
-            className={`mt-4 rounded-xs border p-3 ${
-              audit.warning
-                ? "border-rose-300 bg-rose-50/90 text-rose-900"
-                : "border-emerald-300 bg-emerald-50/90 text-emerald-900"
-            }`}
-          >
-            <div className="mb-1 flex items-center justify-between">
-              <span className={`tnum text-xs font-bold ${audit.warning ?"text-rose-700" : "text-emerald-700"}`}>
-                {audit.warning ? "Audit: this does not match" : "Audit: consistent"}
-              </span>
-              <span className="tnum text-xs text-ink-500">{audit.source}</span>
-            </div>
-            <p className="text-xs leading-relaxed font-medium">
-              {audit.warning || audit.summary}
-            </p>
-          </div>
-        )}
-
-        {err && <p className="mt-3 text-xs text-rose-600 tnum">{err}</p>}
-
-        <div className="mt-6 flex justify-end gap-2.5 pt-3 border-t border-steel-200/60">
-          <button className="btn-ghost" onClick={onCancel}>
-            Keep call open
-          </button>
-          <button className="btn-primary" onClick={submit} disabled={busy}>
-            {busy ? "Saving…" : "Save and close"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Closed({ call, content, onNew, onFinished }) {
-  const outcome = content.outcomes.find((o) => o.key === call.outcome);
-
-  useEffect(() => {
-    localStorage.removeItem("spindle.currentCall");
-  }, []);
-
-  useEffect(() => {
-    function onKeyDown(e) {
-      if (e.key === "Escape") {
-        onNew();
-      }
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onNew]);
-
-  return (
-    <div className="relative mx-auto max-w-[540px] rounded-2xl border border-white/80 bg-white/90 backdrop-blur-xl p-8 shadow-card text-center">
-      <button
-        onClick={onNew}
-        className="absolute top-4 right-4 rounded-lg p-1.5 text-steel-400 hover:bg-steel-100 hover:text-ink-700 transition-all"
-        title="Close & Start new call (Esc)"
-      >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
-      <p className="tnum text-xs font-bold text-navy">
-        CALL CLOSED · {call.company_name}
-      </p>
-      <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink-900">
-        {call.prospect_name || "Unknown prospect"}
-      </h1>
-      <div
-        className={`mt-3 inline-flex rounded-xs border px-3 py-1 tnum text-xs font-bold ${
-          outcome?.tone === "good"
-            ? "border-emerald-300 bg-emerald-50 text-emerald-800"
-            : outcome?.tone === "ok"
-            ? "border-navy-300 bg-navy-50 text-navy"
-            : "border-rose-300 bg-rose-50 text-rose-800"
-        }`}
-      >
-        {outcome?.label || call.outcome}
-      </div>
-
-      <div className="mt-5 rounded-xs border border-steel-200/80 bg-steel-50/80 p-4 text-left">
-        <p className="tnum text-xs font-bold text-steel-400 mb-1">
-          WHAT A MANAGER READS
-        </p>
-        <p className="text-xs leading-relaxed text-ink-800 font-medium">{call.ai_summary}</p>
-        {call.next_step && (
-          <div className="mt-3 pt-3 border-t border-steel-200">
-            <p className="tnum text-xs font-bold text-steel-400 mb-0.5">Next step</p>
-            <p className="text-xs text-ink-900 font-bold">{call.next_step}</p>
-          </div>
-        )}
-        {call.audit_warning && (
-          <div className="mt-3 rounded-xs border border-rose-300 bg-rose-50 p-3 text-left">
-            <p className="tnum text-xs font-bold text-rose-700 mb-0.5">Audit warning</p>
-            <p className="text-xs text-rose-800 leading-relaxed font-medium">{call.audit_warning}</p>
-          </div>
-        )}
-      </div>
-
-      <p className="mt-4 tnum text-[11.5px] text-ink-500">
-        Duration: <span className="font-bold text-ink-900">{call.duration_seconds}s</span> · reached <span className="font-bold text-navy">{call.highest_stage_name}</span> ·{" "}
-        {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "no need quote"}
-      </p>
-
-      <div className="mt-6 flex justify-center gap-3">
-        <button className="btn-ghost" onClick={onFinished}>
-          See it in past calls
-        </button>
-        <button className="btn-primary" onClick={onNew}>
-          + Next Call
-        </button>
-      </div>
-    </div>
-  );
-}

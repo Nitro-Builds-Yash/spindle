@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { api } from "../api.js";
+import { api } from "../api";
+import CallList from "../components/CallList.jsx";
 
 const KINDS = [
   "mid-size private company",
@@ -215,7 +216,9 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
         </form>
       </section>
 
-      <aside className="space-y-6">
+      <aside className="space-y-8">
+        <CallList onStart={onStart} />
+
         <div>
           <h2 className="text-lg font-bold text-ink-950">The eight stages</h2>
           <ol className="mt-3 border-t border-steel-200">
