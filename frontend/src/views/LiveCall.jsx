@@ -11,7 +11,7 @@ import {
 function clock(startedAt) {
   if (!startedAt) return "00:00";
   const s = Math.max(0, Math.floor((Date.now() - new Date(startedAt)) / 1000));
-  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+  return `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`;
 }
 
 /** The outcome the taps already imply, used as the modal's first guess. */
@@ -215,7 +215,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
 
   if (err && !call) {
     return (
-      <div className="grid place-items-center gap-4 py-24 text-slate-500 font-mono text-sm">
+      <div className="grid place-items-center gap-4 py-24 text-ink-500 tnum text-sm">
         <p>{err}</p>
         <button className="btn-primary" onClick={onNew}>
           Start a new call
@@ -223,7 +223,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       </div>
     );
   }
-  if (!call) return <div className="py-24 text-center text-slate-500 font-mono text-sm">Loading call…</div>;
+  if (!call) return <div className="py-24 text-center text-ink-500 tnum text-sm">Loading call…</div>;
 
   if (closed) {
     return (
@@ -239,99 +239,100 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
   return (
     <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6 py-2 sm:py-6 relative">
       
-      {/* Subtle Background Glow Orbs for Glassmorphism */}
-      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[750px] h-[400px] bg-gradient-to-tr from-blue-400/15 via-indigo-300/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+      {/* Call guide panel */}
+      <div className="w-full max-w-[520px] rounded-xl2 border border-steel-200 bg-white p-6 sm:p-7 shadow-card text-ink-900 shrink-0">
 
-      {/* Reference Card Container (Exact ClinicBooks reference layout with modern frosted glass) */}
-      <div className="w-full max-w-[500px] rounded-2xl border border-white/70 bg-white/85 backdrop-blur-xl p-6 sm:p-7 shadow-[0_20px_50px_rgba(8,112,184,0.08),0_1px_3px_rgba(0,0,0,0.05)] text-slate-900 transition-all shrink-0">
-        
-        {/* Top Reference Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 mb-3">
-          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#0047ff]">
-            SPINDLE · CALL GUIDE
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onNew}
-              className="rounded-xs px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all"
-              title="Start a new cold call"
-            >
-              + New Call
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowSim(!showSim)}
-              className={`rounded-xs px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider transition-all ${
-                showSim
-                  ? "bg-blue-50 text-[#0047ff] border border-blue-200/90 shadow-2xs"
-                  : "bg-slate-100 text-slate-500 hover:text-slate-800 border border-slate-200"
-              }`}
-              title="Toggle Simulated Prospect Phone Chatbot"
-            >
-              Sim Phone {showSim ? "ON" : "OFF"}
-            </button>
-            <span className="font-mono text-xs font-semibold text-slate-600 tabular-nums">
-              {tick}
-            </span>
+        {/* Prospect + call controls */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-[22px] font-bold leading-tight text-ink-950 truncate">
+              {call.prospect_name || "Unknown prospect"}
+            </h2>
+            <p className="text-sm text-ink-500 mt-1">
+              {[call.prospect_role, call.company_name].filter(Boolean).join(", ")}
+              {call.call_type ? <span className="text-ink-400"> ({call.call_type})</span> : null}
+            </p>
           </div>
+          <span
+            className="tnum shrink-0 rounded-full bg-signal px-3 py-1 text-sm font-bold text-ink-950"
+            title="Time on this call"
+            aria-label={`Call time ${tick}`}
+          >
+            {tick}
+          </span>
+        </div>
+        <div className="mt-3 flex items-center gap-2 text-sm">
+          <button type="button" onClick={onNew} className="font-semibold text-navy hover:underline">
+            New call
+          </button>
+          <span className="text-steel-300" aria-hidden>|</span>
+          <button
+            type="button"
+            onClick={() => setShowSim(!showSim)}
+            className="font-semibold text-ink-600 hover:text-ink-900"
+            aria-pressed={showSim}
+          >
+            {showSim ? "Hide practice phone" : "Show practice phone"}
+          </button>
         </div>
 
-        {/* Prospect Title & Details */}
-        <div className="mb-3.5">
-          <h2 className="text-[19px] font-bold tracking-tight text-slate-900">
-            {call.prospect_name || "Unknown prospect"}
-          </h2>
-          <p className="text-[11.5px] text-slate-500 font-medium mt-0.5">
-            {[call.prospect_role, call.company_name, call.call_type]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-        </div>
-
-        {/* 8-Stage Square Stepper (Exact 1:1 match with ClinicBooks Reference) */}
-        <div className="grid grid-cols-8 gap-1.5 my-3">
+        {/* Stage rail: the call as one thread, eight stops */}
+        <ol className="relative mt-6 mb-2 grid grid-cols-8" aria-label="Call stages">
+          <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] rounded-full bg-steel-200" aria-hidden />
+          <span
+            className="absolute left-[6.25%] top-[13px] h-[3px] rounded-full bg-navy transition-[width] duration-300"
+            style={{ width: `${((stageNo - 1) / 7) * 87.5}%` }}
+            aria-hidden
+          />
           {stages.map((s) => {
             const now = s.number === stageNo;
             const past = s.number < stageNo;
             return (
-              <button
-                key={s.key}
-                onClick={() => setStageNo(s.number)}
-                className={`h-8 flex items-center justify-center font-mono text-xs font-bold rounded-xs border transition-all ${
-                  now
-                    ? "bg-[#0047ff] text-white border-[#0047ff] shadow-sm shadow-blue-500/30"
-                    : past
-                    ? "bg-[#0b132b] text-white border-[#0b132b]"
-                    : "bg-white/80 text-slate-400 border-slate-200 hover:border-slate-400"
-                }`}
-              >
-                {s.number}
-              </button>
+              <li key={s.key} className="relative flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={() => setStageNo(s.number)}
+                  aria-current={now ? "step" : undefined}
+                  title={s.name}
+                  className={`tnum relative z-10 flex h-[29px] w-[29px] items-center justify-center rounded-full text-[13px] font-bold transition-colors ${
+                    now
+                      ? "bg-signal text-ink-950 ring-4 ring-signal/25"
+                      : past
+                      ? "bg-navy text-white hover:bg-navy-700"
+                      : "bg-white text-ink-500 border-2 border-steel-300 hover:border-ink-500"
+                  }`}
+                >
+                  {s.number}
+                </button>
+                <span
+                  className={`mt-1.5 px-0.5 text-center text-[11px] leading-tight ${
+                    now ? "font-bold text-ink-950 whitespace-nowrap" : "hidden sm:block text-ink-500"
+                  }`}
+                >
+                  {s.name}
+                </span>
+              </li>
             );
           })}
-        </div>
+        </ol>
 
-        {/* Stage Name & Glanceable Purpose */}
-        <div className="mt-4 mb-4">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-            STAGE {stage.number} OF 8
-          </p>
-          <h3 className="text-[22px] font-bold tracking-tight text-slate-900 mt-0.5">
+        {/* Stage name & purpose */}
+        <div className="mt-6 mb-5 border-l-[3px] border-signal pl-4">
+          <h3 className="text-[26px] font-bold leading-tight text-ink-950">
             {stage.name}
           </h3>
-          <p className="text-[13px] text-slate-600 mt-1 leading-relaxed">
+          <p className="text-[15px] text-ink-700 mt-1.5 leading-relaxed max-w-[60ch]">
             {stage.purpose}
           </p>
         </div>
 
-        {/* THEY MAY SAY */}
-        <div className="mt-4 pt-3.5 border-t border-slate-200/60">
+        {/* They may say */}
+        <div className="mt-4 pt-3.5 border-t border-steel-200/60">
           <div className="flex items-center justify-between mb-2">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-              THEY MAY SAY
+            <p className="label">
+              They may say
             </p>
-            <span className="font-mono text-[9px] text-slate-400">Click to insert</span>
+            <span className="text-xs text-ink-400">Tap one to use it</span>
           </div>
           <div className="space-y-1.5">
             {stage.what_they_say.map((q, i) => (
@@ -342,7 +343,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
                   setWords(q);
                   if (wordsRef.current) wordsRef.current.focus();
                 }}
-                className="w-full text-left rounded-xs border border-slate-200/80 bg-white/70 hover:bg-blue-50/50 hover:border-blue-300 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-800 leading-snug shadow-2xs transition-all cursor-pointer group"
+                className="w-full text-left rounded-lg2 border border-steel-200 bg-steel-50 hover:bg-white hover:border-navy-300 px-3.5 py-2.5 text-[14px] text-ink-800 leading-snug transition-colors cursor-pointer"
                 title="Click to insert this quote into 'Their Words'"
               >
                 <span>“{q}”</span>
@@ -351,13 +352,13 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
           </div>
         </div>
 
-        {/* WHAT HAPPENED (2x2 Grid with Exact Reference Layout) */}
-        <div className="mt-4 pt-3.5 border-t border-slate-200/60">
+        {/* What happened (2x2 Grid with Exact Reference Layout) */}
+        <div className="mt-4 pt-3.5 border-t border-steel-200/60">
           <div className="flex items-center justify-between mb-2">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-              WHAT HAPPENED
+            <p className="label">
+              What happened
             </p>
-            <span className="font-mono text-[9px] text-slate-400 uppercase">Keys 1–4</span>
+            <span className="tnum text-xs text-steel-400">Keys 1–4</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {stage.taps.map((t, i) => {
@@ -366,17 +367,17 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
                 <button
                   key={t.key}
                   onClick={() => setTap(t.key)}
-                  className={`relative p-3 rounded-xs border text-center text-[12px] font-medium transition-all group ${
+                  className={`relative min-h-[56px] p-3 pr-7 rounded-lg2 border text-left text-[14px] font-medium leading-snug transition-colors group ${
                     on
-                      ? "bg-[#0047ff] text-white border-[#0047ff] font-bold shadow-md shadow-blue-500/25"
-                      : "bg-white/80 backdrop-blur-xs text-slate-800 border-slate-300/80 hover:border-slate-500 hover:bg-white"
+                      ? "bg-navy text-white border-navy font-semibold"
+                      : "bg-white text-ink-800 border-steel-300 hover:border-ink-500"
                   }`}
                 >
                   <span
-                    className={`absolute top-1.5 right-1.5 font-mono text-[9px] px-1 rounded-2xs transition-all ${
+                    className={`absolute top-1.5 right-1.5 tnum text-xs px-1 rounded-2xs transition-all ${
                       on
-                        ? "text-blue-100 bg-blue-700/60"
-                        : "text-slate-400 bg-slate-100 group-hover:text-slate-600 group-hover:bg-slate-200"
+                        ? "text-navy-100 bg-navy-700/60"
+                        : "text-steel-400 bg-steel-100 group-hover:text-ink-600 group-hover:bg-steel-200"
                     }`}
                   >
                     {i + 1}
@@ -388,21 +389,21 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
           </div>
         </div>
 
-        {/* THEIR WORDS */}
-        <div className="mt-4 pt-3.5 border-t border-slate-200/60">
+        {/* Their words */}
+        <div className="mt-4 pt-3.5 border-t border-steel-200/60">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                THEIR WORDS
+              <p className="label">
+                Their words
               </p>
               {/* Hands-free Voice Dictation Button */}
               <button
                 type="button"
                 onClick={toggleDictation}
-                className={`flex items-center gap-1 rounded-xs px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider transition-all shadow-2xs ${
+                className={`flex items-center gap-1 rounded-xs px-2 py-0.5 tnum text-xs font-bold transition-all shadow-2xs ${
                   isListening
                     ? "bg-rose-500 text-white animate-pulse border border-rose-600"
-                    : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300"
+                    : "bg-steel-100 hover:bg-steel-200 text-ink-700 border border-steel-300"
                 }`}
                 title={isListening ? "Listening... click to stop" : "Speak to dictate prospect's quote hands-free"}
               >
@@ -410,14 +411,14 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
               </button>
             </div>
             <button
-              className="text-[11px] font-mono font-bold text-[#0047ff] hover:underline flex items-center gap-1"
+              className="text-xs tnum font-bold text-navy hover:underline flex items-center gap-1"
               onClick={askCue}
               disabled={cueBusy}
             >
               {cueBusy && (
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0047ff]"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-navy-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-navy"></span>
                 </span>
               )}
               {cueBusy ? "Gemini is thinking…" : "⚡ Ask AI cue"}
@@ -429,61 +430,61 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             value={words}
             onChange={(e) => setWords(e.target.value)}
             placeholder="Type, click quotes above, or click 🎤 Dictate to speak..."
-            className={`w-full rounded-xs border bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-slate-900 outline-none transition-all placeholder:text-slate-400 font-sans ${
+            className={`w-full rounded-xs border bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-ink-900 outline-none transition-all placeholder:text-steel-400 font-sans ${
               isListening
                 ? "border-rose-400 ring-2 ring-rose-500/20 bg-rose-50/20"
-                : "border-slate-300/90 focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15"
+                : "border-steel-300/90 focus:border-navy focus:ring-2 focus:ring-navy-500/15"
             }`}
           />
           {cue && (
-            <div className="mt-2.5 rounded-lg border border-blue-200/90 bg-gradient-to-r from-blue-50/95 to-indigo-50/90 backdrop-blur-xs p-3 text-xs text-blue-950 shadow-2xs">
+            <div className="mt-2.5 rounded-lg border border-navy-200/90 bg-gradient-to-r from-navy-50/95 to-indigo-50/90 backdrop-blur-xs p-3 text-xs text-navy-950 shadow-2xs">
               <div className="flex items-center justify-between mb-1">
-                <span className="font-mono font-bold text-[#0047ff] uppercase text-[10px] flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#0047ff]"></span>
+                <span className="tnum font-bold text-navy text-xs flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-navy"></span>
                   Spoken AI Cue
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={handleWhisperCue}
-                    className={`flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-xs transition-all ${
+                    className={`flex items-center gap-1 tnum text-xs font-bold px-1.5 py-0.5 rounded-xs transition-all ${
                       isWhispering
-                        ? "bg-blue-600 text-white animate-pulse"
-                        : "bg-white text-blue-700 hover:bg-blue-100 border border-blue-200"
+                        ? "bg-navy-600 text-white animate-pulse"
+                        : "bg-white text-navy-700 hover:bg-navy-100 border border-navy-200"
                     }`}
                     title={isWhispering ? "Whispering into ear... click to stop" : "Whisper cue into earpiece via Text-to-Speech"}
                   >
                     <span>{isWhispering ? "🔊 Whispering…" : "🔊 Whisper to Ear"}</span>
                   </button>
-                  <span className="font-mono text-[9px] text-blue-700 font-semibold bg-white/90 border border-blue-200 px-1.5 py-0.2 rounded-xs">
+                  <span className="tnum text-xs text-navy-700 font-semibold bg-white/90 border border-navy-200 px-1.5 py-0.2 rounded-xs">
                     ⚡ Gemini Flash Lite
                   </span>
                 </div>
               </div>
-              <p className="font-medium text-slate-900 leading-relaxed text-[12px] pl-2.5 border-l-2 border-[#0047ff]">
+              <p className="font-medium text-ink-900 leading-relaxed text-[12px] pl-2.5 border-l-2 border-navy">
                 “{cue.cue}”
               </p>
             </div>
           )}
         </div>
 
-        {err && <p className="mt-2.5 text-xs text-rose-600 font-mono">{err}</p>}
+        {err && <p className="mt-2.5 text-xs text-rose-600 tnum">{err}</p>}
 
-        {/* Action Buttons (Matches Reference Screen Exactly: Black Next + Outline End) */}
-        <div className="mt-5 pt-3.5 border-t border-slate-200/60 flex gap-2.5">
+        {/* Actions */}
+        <div className="mt-5 pt-3.5 border-t border-steel-200/60 flex gap-2.5">
           <button
-            className="flex-1 rounded-xs bg-[#0b132b] hover:bg-black text-white font-mono font-bold text-xs uppercase tracking-wider py-3 shadow-sm hover:shadow active:scale-[0.98] transition-all"
+            className="btn-primary flex-1 py-3.5 text-[15px]"
             onClick={goNext}
             disabled={saving}
           >
-            {saving ? "Saving…" : next ? `NEXT: ${next.name.toUpperCase()}` : "CLOSE CALL"}
+            {saving ? "Saving…" : next ? `Next: ${next.name}` : "Close the call"}
           </button>
           <button
-            className="px-6 rounded-xs border border-slate-300/90 hover:border-black text-slate-800 font-mono font-bold text-xs uppercase tracking-wider py-3 transition-all bg-white/80 hover:bg-white active:scale-[0.98]"
+            className="btn-ghost px-5 py-3.5 text-[15px] text-stop hover:border-stop"
             onClick={endCall}
             disabled={saving}
           >
-            END CALL
+            End call
           </button>
         </div>
 
@@ -569,21 +570,21 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-6 backdrop-blur-sm"
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-[540px] rounded-2xl border border-white/80 bg-white/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl text-slate-900"
+        className="w-full max-w-[540px] rounded-2xl border border-white/80 bg-white/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl text-ink-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
+        <div className="flex items-center justify-between border-b border-steel-200/60 pb-3">
           <div className="flex items-center gap-3">
             <h3 className="text-lg font-bold tracking-tight">Close the call</h3>
-            <span className="font-mono text-xs text-[#0047ff] font-bold uppercase">Stage {stageNo} of 8</span>
+            <span className="tnum text-xs text-navy font-bold">Stage {stageNo} of 8</span>
           </div>
           <button
             onClick={onCancel}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all"
+            className="rounded-lg p-1 text-steel-400 hover:bg-steel-100 hover:text-ink-700 transition-all"
             title="Close without saving (Esc)"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -591,12 +592,11 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
             </svg>
           </button>
         </div>
-        <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-          The outcome is the caller's word. The audit checks it against the taps before
-          the record is written to Supabase.
+        <p className="mt-2 text-sm text-ink-600 leading-relaxed">
+          You choose the outcome. Spindle checks it against what you tapped before saving.
         </p>
 
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-2 mt-4">OUTCOME</p>
+        <p className="tnum text-xs font-bold text-steel-400 mb-2 mt-4">Outcome</p>
         <div className="grid grid-cols-2 gap-1.5">
           {content.outcomes.map((o) => (
             <button
@@ -604,8 +604,8 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
               onClick={() => setOutcome(o.key)}
               className={`rounded-xs border px-3 py-2 text-left text-xs transition-all ${
                 outcome === o.key
-                  ? "border-[#0047ff] bg-[#0047ff] text-white font-bold shadow-xs"
-                  : "border-slate-300/80 bg-white/80 text-slate-700 hover:border-slate-500 hover:bg-white"
+                  ? "border-navy bg-navy text-white font-bold shadow-xs"
+                  : "border-steel-300/80 bg-white/80 text-ink-700 hover:border-ink-500 hover:bg-white"
               }`}
             >
               {o.label}
@@ -613,17 +613,17 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
           ))}
         </div>
 
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-1 mt-4">NEXT STEP</p>
+        <p className="tnum text-xs font-bold text-steel-400 mb-1 mt-4">Next step</p>
         <input
-          className="w-full rounded-xs border border-slate-300/90 bg-white/90 px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#0047ff]"
+          className="w-full rounded-xs border border-steel-300/90 bg-white/90 px-3 py-2 text-xs text-ink-900 outline-none focus:border-navy"
           value={nextStep}
           onChange={(e) => setNextStep(e.target.value)}
           placeholder="e.g. Tuesday 14:00 Google Meet with MD"
         />
 
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 mb-1 mt-3">ADDITIONAL NOTES</p>
+        <p className="tnum text-xs font-bold text-steel-400 mb-1 mt-3">Notes</p>
         <input
-          className="w-full rounded-xs border border-slate-300/90 bg-white/90 px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#0047ff]"
+          className="w-full rounded-xs border border-steel-300/90 bg-white/90 px-3 py-2 text-xs text-ink-900 outline-none focus:border-navy"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Optional"
@@ -638,10 +638,10 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
             }`}
           >
             <div className="mb-1 flex items-center justify-between">
-              <span className={`font-mono text-xs font-bold uppercase tracking-wider ${audit.warning ? "text-rose-700" : "text-emerald-700"}`}>
+              <span className={`tnum text-xs font-bold ${audit.warning ?"text-rose-700" : "text-emerald-700"}`}>
                 {audit.warning ? "Audit: this does not match" : "Audit: consistent"}
               </span>
-              <span className="font-mono text-[10px] text-slate-500">{audit.source}</span>
+              <span className="tnum text-xs text-ink-500">{audit.source}</span>
             </div>
             <p className="text-xs leading-relaxed font-medium">
               {audit.warning || audit.summary}
@@ -649,9 +649,9 @@ function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
           </div>
         )}
 
-        {err && <p className="mt-3 text-xs text-rose-600 font-mono">{err}</p>}
+        {err && <p className="mt-3 text-xs text-rose-600 tnum">{err}</p>}
 
-        <div className="mt-6 flex justify-end gap-2.5 pt-3 border-t border-slate-200/60">
+        <div className="mt-6 flex justify-end gap-2.5 pt-3 border-t border-steel-200/60">
           <button className="btn-ghost" onClick={onCancel}>
             Keep call open
           </button>
@@ -685,7 +685,7 @@ function Closed({ call, content, onNew, onFinished }) {
     <div className="relative mx-auto max-w-[540px] rounded-2xl border border-white/80 bg-white/90 backdrop-blur-xl p-8 shadow-card text-center">
       <button
         onClick={onNew}
-        className="absolute top-4 right-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all"
+        className="absolute top-4 right-4 rounded-lg p-1.5 text-steel-400 hover:bg-steel-100 hover:text-ink-700 transition-all"
         title="Close & Start new call (Esc)"
       >
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -693,45 +693,45 @@ function Closed({ call, content, onNew, onFinished }) {
         </svg>
       </button>
 
-      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#0047ff]">
+      <p className="tnum text-xs font-bold text-navy">
         CALL CLOSED · {call.company_name}
       </p>
-      <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+      <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink-900">
         {call.prospect_name || "Unknown prospect"}
       </h1>
       <div
-        className={`mt-3 inline-flex rounded-xs border px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider ${
+        className={`mt-3 inline-flex rounded-xs border px-3 py-1 tnum text-xs font-bold ${
           outcome?.tone === "good"
             ? "border-emerald-300 bg-emerald-50 text-emerald-800"
             : outcome?.tone === "ok"
-            ? "border-blue-300 bg-blue-50 text-[#0047ff]"
+            ? "border-navy-300 bg-navy-50 text-navy"
             : "border-rose-300 bg-rose-50 text-rose-800"
         }`}
       >
         {outcome?.label || call.outcome}
       </div>
 
-      <div className="mt-5 rounded-xs border border-slate-200/80 bg-slate-50/80 p-4 text-left">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+      <div className="mt-5 rounded-xs border border-steel-200/80 bg-steel-50/80 p-4 text-left">
+        <p className="tnum text-xs font-bold text-steel-400 mb-1">
           WHAT A MANAGER READS
         </p>
-        <p className="text-xs leading-relaxed text-slate-800 font-medium">{call.ai_summary}</p>
+        <p className="text-xs leading-relaxed text-ink-800 font-medium">{call.ai_summary}</p>
         {call.next_step && (
-          <div className="mt-3 pt-3 border-t border-slate-200">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">NEXT STEP</p>
-            <p className="text-xs text-slate-900 font-bold">{call.next_step}</p>
+          <div className="mt-3 pt-3 border-t border-steel-200">
+            <p className="tnum text-xs font-bold text-steel-400 mb-0.5">Next step</p>
+            <p className="text-xs text-ink-900 font-bold">{call.next_step}</p>
           </div>
         )}
         {call.audit_warning && (
           <div className="mt-3 rounded-xs border border-rose-300 bg-rose-50 p-3 text-left">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700 mb-0.5">AUDIT WARNING</p>
+            <p className="tnum text-xs font-bold text-rose-700 mb-0.5">Audit warning</p>
             <p className="text-xs text-rose-800 leading-relaxed font-medium">{call.audit_warning}</p>
           </div>
         )}
       </div>
 
-      <p className="mt-4 font-mono text-[11.5px] text-slate-500">
-        Duration: <span className="font-bold text-slate-900">{call.duration_seconds}s</span> · reached <span className="font-bold text-[#0047ff]">{call.highest_stage_name}</span> ·{" "}
+      <p className="mt-4 tnum text-[11.5px] text-ink-500">
+        Duration: <span className="font-bold text-ink-900">{call.duration_seconds}s</span> · reached <span className="font-bold text-navy">{call.highest_stage_name}</span> ·{" "}
         {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "no need quote"}
       </p>
 

@@ -207,75 +207,55 @@ export default function PhoneSimulator({
   const currentPrompts = DEFAULT_STAGE_DIALOGUES[stageNo]?.prompts || [];
 
   return (
-    <aside className="w-full lg:w-[380px] rounded-2xl border border-slate-200/90 bg-white/95 backdrop-blur-xl shadow-xl flex flex-col h-[680px] overflow-hidden text-slate-900 transition-all">
-      {/* Phone Header */}
-      <div className="flex items-center justify-between border-b border-slate-200/80 bg-slate-900 px-4 py-3 text-white">
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 font-mono text-xs font-bold text-white shadow-inner">
+    <aside className="w-full lg:w-[380px] rounded-xl2 border border-steel-200 bg-white shadow-card flex flex-col h-[680px] overflow-hidden text-ink-900">
+      {/* Phone header */}
+      <div className="flex items-center justify-between bg-navy-900 px-4 py-3.5 text-white">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy-500 text-sm font-bold">
             RV
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold tracking-tight">
-                {call?.prospect_name || "Ramesh Varma"}
-              </span>
-              <div className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-mono font-bold uppercase text-emerald-400">
-                <span>Active Call</span>
-                <span className="flex items-end gap-0.5 h-2">
-                  <span className="w-0.5 h-full bg-emerald-400 animate-pulse"></span>
-                  <span className="w-0.5 h-2/3 bg-emerald-400 animate-pulse delay-75"></span>
-                  <span className="w-0.5 h-4/5 bg-emerald-400 animate-pulse delay-150"></span>
-                </span>
-              </div>
+          <div className="min-w-0">
+            <div className="text-[15px] font-semibold truncate">
+              {call?.prospect_name || "Ramesh Varma"}
             </div>
-            <p className="text-[10px] text-slate-400 font-medium">
-              {call?.company_name || "Sri Balaji Precision"} · {tick}
+            <p className="text-sm text-navy-200 truncate">
+              {call?.company_name || "Sri Balaji Precision"}
             </p>
           </div>
         </div>
-
-        <button
-          onClick={onClose}
-          className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
-          title="Hide Simulator"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Simulator Description Banner */}
-      <div className="bg-slate-50 border-b border-slate-200/80 px-3.5 py-2 flex items-center justify-between text-xs text-slate-700">
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-          <span className="font-mono text-[11px] font-semibold text-slate-800">Gemini Flash Lite</span>
+          <span className="tnum text-sm font-semibold text-signal">{tick}</span>
           <button
-            type="button"
-            onClick={() => setVoiceEnabled(!voiceEnabled)}
-            className={`flex items-center gap-1 font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-xs border transition-all ${
-              voiceEnabled
-                ? "bg-emerald-50 text-emerald-700 border-emerald-300 shadow-2xs"
-                : "bg-white text-slate-500 border-slate-300 hover:text-slate-800"
-            }`}
-            title="Toggle automated speech for Ramesh Varma's replies"
+            onClick={onClose}
+            className="rounded-md p-1.5 text-navy-200 hover:bg-navy-700 hover:text-white transition-colors"
+            title="Hide practice phone"
+            aria-label="Hide practice phone"
           >
-            <span>{voiceEnabled ? "🔊 Voice: ON" : "🔇 Voice: OFF"}</span>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
-        <span className="font-mono text-[10px] text-[#0047ff] font-bold bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-sm">
-          Stage {stageNo}/8
-        </span>
+      </div>
+
+      {/* Practice phone status */}
+      <div className="border-b border-steel-200 px-4 py-2 flex items-center justify-between text-sm text-ink-600">
+        <span>Practice phone, stage {stageNo} of 8</span>
+        <button
+          type="button"
+          onClick={() => setVoiceEnabled(!voiceEnabled)}
+          aria-pressed={voiceEnabled}
+          className="font-semibold text-navy hover:underline"
+          title="Read Ramesh Varma's replies aloud"
+        >
+          {voiceEnabled ? "Mute voice" : "Turn on voice"}
+        </button>
       </div>
 
       {/* Chat Messages Feed */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-slate-50/60 to-white text-xs"
+        className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-steel-50/60 to-white text-xs"
       >
         {messages.map((m, i) => {
           const isProspect = m.sender === "prospect";
@@ -283,18 +263,18 @@ export default function PhoneSimulator({
             <div
               key={i}
               className={`flex flex-col ${
-                isProspect ? "items-start" : "items-end"
+                isProspect ?"items-start" : "items-end"
               }`}
             >
               <div className="flex items-center gap-1.5 mb-1 px-1">
-                <span className="font-mono text-[9px] font-bold uppercase text-slate-400">
-                  {isProspect ? "Ramesh Varma (Prospect)" : "You (Caller)"}
+                <span className="tnum text-xs font-bold text-steel-400">
+                  {isProspect ? "Ramesh Varma" : "You"}
                 </span>
-                <span className="font-mono text-[9px] text-slate-400">
+                <span className="tnum text-xs text-steel-400">
                   {m.time}
                 </span>
                 {m.stageTag && (
-                  <span className="font-mono text-[9px] text-[#0047ff] font-bold">
+                  <span className="tnum text-xs text-navy font-bold">
                     [{m.stageTag}]
                   </span>
                 )}
@@ -303,31 +283,31 @@ export default function PhoneSimulator({
               <div
                 className={`max-w-[88%] rounded-xl p-3 leading-relaxed shadow-2xs ${
                   isProspect
-                    ? "bg-white border border-slate-200/90 text-slate-900 rounded-tl-xs"
-                    : "bg-[#0b132b] text-white rounded-tr-xs"
+                    ? "bg-white border border-steel-200/90 text-ink-900 rounded-tl-xs"
+                    : "bg-navy text-white rounded-tr-xs"
                 }`}
               >
                 <p className="font-medium text-[12px]">{m.text}</p>
               </div>
 
-              {/* One-click quote inserter into THEIR WORDS & Audio Replay */}
+              {/* One-click quote inserter into Their words & Audio Replay */}
               {isProspect && (
                 <div className="mt-1 flex items-center gap-3 px-1">
                   <button
                     type="button"
                     onClick={() => onInsertWords(m.text)}
-                    className="flex items-center gap-1 font-mono text-[10px] font-bold text-[#0047ff] hover:underline"
+                    className="flex items-center gap-1 tnum text-xs font-bold text-navy hover:underline"
                     title="Insert this exact quote into 'Their Words' box"
                   >
-                    <span>↳</span> Insert into "Their Words"
+                    Use as their words
                   </button>
                   <button
                     type="button"
                     onClick={() => speakProspect(m.text, i)}
-                    className={`flex items-center gap-1 font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded-xs transition-all ${
+                    className={`flex items-center gap-1 tnum text-xs font-semibold px-1.5 py-0.5 rounded-xs transition-all ${
                       speakingIndex === i
-                        ? "bg-blue-600 text-white animate-pulse"
-                        : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+                        ? "bg-navy-600 text-white animate-pulse"
+                        : "text-ink-500 hover:text-ink-800 hover:bg-steel-100"
                     }`}
                     title={speakingIndex === i ? "Speaking... click to stop" : "Hear Ramesh speak this line"}
                   >
@@ -340,10 +320,10 @@ export default function PhoneSimulator({
         })}
 
         {busy && (
-          <div className="flex items-center gap-2 text-slate-400 font-mono text-[11px] p-2">
+          <div className="flex items-center gap-2 text-steel-400 tnum text-xs p-2">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-navy-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-navy-500"></span>
             </span>
             <span>Ramesh is responding…</span>
           </div>
@@ -351,9 +331,9 @@ export default function PhoneSimulator({
       </div>
 
       {/* Stage-Matched Quick Pitch Pills */}
-      <div className="border-t border-slate-200/80 bg-slate-50/70 p-2.5">
-        <p className="font-mono text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
-          Quick Pitch (Stage {stageNo})
+      <div className="border-t border-steel-200/80 bg-steel-50/70 p-2.5">
+        <p className="tnum text-xs font-bold text-steel-400 mb-1.5 px-1">
+          Lines you could say
         </p>
         <div className="space-y-1">
           {currentPrompts.map((p, idx) => (
@@ -361,7 +341,7 @@ export default function PhoneSimulator({
               key={idx}
               onClick={() => sendMessage(p)}
               disabled={busy}
-              className="w-full text-left rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-slate-800 hover:border-[#0047ff] hover:bg-blue-50/40 transition-all line-clamp-1 truncate"
+              className="w-full text-left rounded-lg border border-steel-200 bg-white px-2.5 py-1.5 text-xs font-medium text-ink-800 hover:border-navy hover:bg-navy-50/40 transition-all line-clamp-1 truncate"
               title={p}
             >
               “{p}”
@@ -376,7 +356,7 @@ export default function PhoneSimulator({
           e.preventDefault();
           sendMessage();
         }}
-        className="flex items-center gap-2 border-t border-slate-200/80 bg-white p-2.5"
+        className="flex items-center gap-2 border-t border-steel-200/80 bg-white p-2.5"
       >
         <button
           type="button"
@@ -384,7 +364,7 @@ export default function PhoneSimulator({
           className={`rounded-lg p-2 transition-all border shrink-0 ${
             isCallerSpeaking
               ? "bg-rose-500 text-white animate-pulse border-rose-600 shadow-xs"
-              : "bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-300"
+              : "bg-steel-50 hover:bg-steel-100 text-ink-600 border-steel-300"
           }`}
           title={isCallerSpeaking ? "Listening... click to stop" : "Speak your message into microphone (Speech-to-Text)"}
         >
@@ -394,13 +374,13 @@ export default function PhoneSimulator({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={isCallerSpeaking ? "Listening... speak now" : "Type or click 🎤 to speak..."}
-          className="flex-1 rounded-lg border border-slate-300/90 bg-slate-50/50 px-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[#0047ff] focus:bg-white"
+          className="flex-1 rounded-lg border border-steel-300/90 bg-steel-50/50 px-3 py-1.5 text-xs text-ink-900 outline-none focus:border-navy focus:bg-white"
           disabled={busy}
         />
         <button
           type="submit"
           disabled={busy || !input.trim()}
-          className="rounded-lg bg-[#0047ff] hover:bg-blue-600 disabled:opacity-50 text-white font-mono text-xs font-bold px-3 py-1.5 shadow-sm transition-all shrink-0"
+          className="rounded-lg bg-navy hover:bg-navy-600 disabled:opacity-50 text-white tnum text-xs font-bold px-3 py-1.5 shadow-sm transition-all shrink-0"
         >
           Send
         </button>
