@@ -78,6 +78,32 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
           and type the prospect's own words.
         </p>
 
+        {/* The call, drawn as its eight stops; fills once on load */}
+        <div className="mt-8 rounded-xl2 bg-navy-900 px-6 pt-6 pb-5 shadow-float" aria-hidden>
+          <div className="relative grid grid-cols-8">
+            <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] rounded-full bg-navy-700" />
+            <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] origin-left rounded-full bg-gradient-to-r from-navy-300 via-navy-300 to-signal motion-safe:animate-[railFill_1.8s_cubic-bezier(.6,0,.2,1)_both]" />
+            {content.stages.map((st, i) => (
+              <div key={st.key} className="relative flex flex-col items-center">
+                <span
+                  className={`tnum relative z-10 flex h-[29px] w-[29px] items-center justify-center rounded-full text-[13px] font-bold ${
+                    i === 7
+                      ? "bg-signal text-ink-950 shadow-[0_0_18px_rgba(242,169,0,0.55)]"
+                      : "bg-navy-300 text-navy-900"
+                  }`}
+                  style={{ animation: `nodeOn ${0.35 + i * 0.2}s ease-out both` }}
+                >
+                  {st.number}
+                </span>
+                <span className="mt-2 hidden sm:block text-center text-[11px] leading-tight text-navy-200">{st.name}</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 border-t border-navy-700 pt-3 text-sm text-navy-200">
+            The average call in the transcripts lasts 93.5 seconds. Spindle keeps you on the right stage for all of it.
+          </p>
+        </div>
+
         {/* Quick Start Call Session */}
         <div className="mt-7 rounded-xl2 border border-steel-200 bg-white px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">

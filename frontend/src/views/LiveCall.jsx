@@ -240,84 +240,99 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
     <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6 py-2 sm:py-6 relative">
       
       {/* Call guide panel */}
-      <div className="w-full max-w-[520px] rounded-xl2 border border-steel-200 bg-white p-6 sm:p-7 shadow-card text-ink-900 shrink-0">
+      <div className="w-full max-w-[520px] rounded-xl2 border border-steel-200 bg-white p-6 sm:p-7 shadow-float text-ink-900 shrink-0">
 
-        {/* Prospect + call controls */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h2 className="text-[22px] font-bold leading-tight text-ink-950 truncate">
-              {call.prospect_name || "Unknown prospect"}
-            </h2>
-            <p className="text-sm text-ink-500 mt-1">
-              {[call.prospect_role, call.company_name].filter(Boolean).join(", ")}
-              {call.call_type ? <span className="text-ink-400"> ({call.call_type})</span> : null}
-            </p>
-          </div>
-          <span
-            className="tnum shrink-0 rounded-full bg-signal px-3 py-1 text-sm font-bold text-ink-950"
-            title="Time on this call"
-            aria-label={`Call time ${tick}`}
-          >
-            {tick}
-          </span>
-        </div>
-        <div className="mt-3 flex items-center gap-2 text-sm">
-          <button type="button" onClick={onNew} className="font-semibold text-navy hover:underline">
-            New call
-          </button>
-          <span className="text-steel-300" aria-hidden>|</span>
-          <button
-            type="button"
-            onClick={() => setShowSim(!showSim)}
-            className="font-semibold text-ink-600 hover:text-ink-900"
-            aria-pressed={showSim}
-          >
-            {showSim ? "Hide practice phone" : "Show practice phone"}
-          </button>
-        </div>
-
-        {/* Stage rail: the call as one thread, eight stops */}
-        <ol className="relative mt-6 mb-2 grid grid-cols-8" aria-label="Call stages">
-          <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] rounded-full bg-steel-200" aria-hidden />
-          <span
-            className="absolute left-[6.25%] top-[13px] h-[3px] rounded-full bg-navy transition-[width] duration-300"
-            style={{ width: `${((stageNo - 1) / 7) * 87.5}%` }}
-            aria-hidden
-          />
-          {stages.map((s) => {
-            const now = s.number === stageNo;
-            const past = s.number < stageNo;
-            return (
-              <li key={s.key} className="relative flex flex-col items-center">
-                <button
-                  type="button"
-                  onClick={() => setStageNo(s.number)}
-                  aria-current={now ? "step" : undefined}
-                  title={s.name}
-                  className={`tnum relative z-10 flex h-[29px] w-[29px] items-center justify-center rounded-full text-[13px] font-bold transition-colors ${
-                    now
-                      ? "bg-signal text-ink-950 ring-4 ring-signal/25"
-                      : past
-                      ? "bg-navy text-white hover:bg-navy-700"
-                      : "bg-white text-ink-500 border-2 border-steel-300 hover:border-ink-500"
-                  }`}
-                >
-                  {s.number}
-                </button>
-                <span
-                  className={`mt-1.5 px-0.5 text-center text-[11px] leading-tight ${
-                    now ? "font-bold text-ink-950 whitespace-nowrap" : "hidden sm:block text-ink-500"
-                  }`}
-                >
-                  {s.name}
+        {/* Instrument header: who, how long, where in the call */}
+        <div className="-mx-6 -mt-6 sm:-mx-7 sm:-mt-7 mb-6 rounded-t-xl2 bg-navy-900 px-6 sm:px-7 pt-6 pb-5 text-white bg-[radial-gradient(120%_140%_at_100%_0%,rgba(242,169,0,0.10),transparent_45%)]">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-[24px] font-extrabold leading-tight truncate">
+                {call.prospect_name || "Unknown prospect"}
+              </h2>
+              <p className="text-sm text-navy-200 mt-1">
+                {[call.prospect_role, call.company_name].filter(Boolean).join(", ")}
+                {call.call_type ? <span className="text-navy-300"> ({call.call_type})</span> : null}
+              </p>
+            </div>
+            <div className="shrink-0 text-right" aria-label={`Call time ${tick}`}>
+              <div className="display tnum text-[30px] font-extrabold leading-none text-signal">{tick}</div>
+              <div className="mt-1 flex items-center justify-end gap-1.5 text-xs text-navy-200">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-signal opacity-60 motion-safe:animate-ping" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-signal" />
                 </span>
-              </li>
-            );
-          })}
-        </ol>
+                On call
+              </div>
+            </div>
+          </div>
+
+          {/* Stage rail */}
+          <ol className="relative mt-6 grid grid-cols-8" aria-label="Call stages">
+            <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] rounded-full bg-navy-700" aria-hidden />
+            <span
+              className="absolute left-[6.25%] top-[13px] h-[3px] rounded-full bg-gradient-to-r from-navy-300 to-signal transition-[width] duration-500"
+              style={{ width: `${((stageNo - 1) / 7) * 87.5}%` }}
+              aria-hidden
+            />
+            {stages.map((s) => {
+              const now = s.number === stageNo;
+              const past = s.number < stageNo;
+              return (
+                <li key={s.key} className="relative flex flex-col items-center">
+                  <button
+                    type="button"
+                    onClick={() => setStageNo(s.number)}
+                    aria-current={now ? "step" : undefined}
+                    title={s.name}
+                    className={`tnum relative z-10 flex h-[29px] w-[29px] items-center justify-center rounded-full text-[13px] font-bold transition-all duration-200 ${
+                      now
+                        ? "scale-110 bg-signal text-ink-950 ring-4 ring-signal/25 shadow-[0_0_18px_rgba(242,169,0,0.55)]"
+                        : past
+                        ? "bg-navy-300 text-navy-900 hover:bg-white"
+                        : "bg-navy-900 text-navy-300 border-2 border-navy-600 hover:border-navy-300"
+                    }`}
+                  >
+                    {past ? (
+                      <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                        <path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      s.number
+                    )}
+                  </button>
+                  <span
+                    className={`mt-2 px-0.5 text-center text-[11px] leading-tight ${
+                      now ? "font-bold text-white whitespace-nowrap" : "hidden sm:block text-navy-300"
+                    }`}
+                  >
+                    {s.name}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+
+        <div className="flex items-center justify-between gap-2 text-sm -mt-2 mb-5">
+          <span className="tnum text-ink-500">Stage {stage.number} of 8</span>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={onNew} className="font-semibold text-navy hover:underline">
+              New call
+            </button>
+            <span className="text-steel-300" aria-hidden>|</span>
+            <button
+              type="button"
+              onClick={() => setShowSim(!showSim)}
+              className="font-semibold text-ink-600 hover:text-ink-900"
+              aria-pressed={showSim}
+            >
+              {showSim ? "Hide practice phone" : "Show practice phone"}
+            </button>
+          </div>
+        </div>
 
         {/* Stage name & purpose */}
-        <div className="mt-6 mb-5 border-l-[3px] border-signal pl-4">
+        <div key={stage.key} className="mb-5 border-l-[3px] border-signal pl-4 motion-safe:animate-[stageIn_220ms_ease-out]">
           <h3 className="text-[26px] font-bold leading-tight text-ink-950">
             {stage.name}
           </h3>
@@ -369,7 +384,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
                   onClick={() => setTap(t.key)}
                   className={`relative min-h-[56px] p-3 pr-7 rounded-lg2 border text-left text-[14px] font-medium leading-snug transition-colors group ${
                     on
-                      ? "bg-navy text-white border-navy font-semibold"
+                      ? "bg-navy text-white border-navy font-semibold shadow-[inset_4px_0_0_#F2A900]"
                       : "bg-white text-ink-800 border-steel-300 hover:border-ink-500"
                   }`}
                 >

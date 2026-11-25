@@ -72,7 +72,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-steel-100 text-ink-900">
+    <div className="flex min-h-screen flex-col text-ink-900">
       {/* Top Banner if Render backend is cold-starting */}
       {wakingUp && !health && (
         <div className="bg-navy-50/90 border-b border-navy-200/80 px-4 py-2 text-center text-xs text-navy-900 flex items-center justify-center gap-2.5 backdrop-blur-xs">

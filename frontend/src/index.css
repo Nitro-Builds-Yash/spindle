@@ -6,6 +6,11 @@
   html, body, #root { min-height: 100%; }
   body {
     @apply bg-steel-100 text-ink-900 font-sans antialiased;
+    /* faint blueprint grid */
+    background-image:
+      linear-gradient(rgba(31,58,95,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(31,58,95,0.045) 1px, transparent 1px);
+    background-size: 28px 28px;
     font-feature-settings: "tnum" 1, "ss01" 1;
   }
   h1, h2, h3, .display {
@@ -42,3 +47,8 @@
   .badge-live { @apply border-signal bg-signal-soft text-signal-ink; }
   .tnum { font-variant-numeric: tabular-nums; }
 }
+
+@keyframes stageIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes railFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes nodeOn { 0%, 55% { opacity: .25; transform: scale(.7); } 100% { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { [style*="nodeOn"] { animation: none !important; } }

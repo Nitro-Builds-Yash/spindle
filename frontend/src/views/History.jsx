@@ -121,31 +121,29 @@ export default function History({ content, onOpen, onNew }) {
         </div>
       </div>
 
-      {/* Analytics Snapshot Bar */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[170px_230px_1fr]">
-        <div className="card flex flex-col justify-end p-5">
-          <span className="display tnum text-5xl font-extrabold text-ink-950 leading-none">{stats?.calls ?? calls.length}</span>
-          <span className="label mt-3">Calls logged</span>
+      {/* Numbers band */}
+      <div className="grid grid-cols-1 sm:grid-cols-[170px_230px_1fr] overflow-hidden rounded-xl2 bg-navy-900 text-white shadow-float">
+        <div className="flex flex-col justify-end p-6 border-b sm:border-b-0 sm:border-r border-navy-700">
+          <span className="display tnum text-[56px] font-extrabold leading-none">{stats?.calls ?? calls.length}</span>
+          <span className="mt-3 text-sm font-semibold text-navy-200">Calls logged</span>
         </div>
-        <div className="card flex flex-col justify-end p-5">
-          <span className="display tnum text-5xl font-extrabold text-ink-950 leading-none">
+        <div className="flex flex-col justify-end p-6 border-b sm:border-b-0 sm:border-r border-navy-700">
+          <span className="display tnum text-[56px] font-extrabold leading-none text-signal">
             {Math.round((stats?.connect_rate || 0) * 100)}%
           </span>
-          <span className="label mt-3">Reached the right person</span>
+          <span className="mt-3 text-sm font-semibold text-navy-200">Reached the right person</span>
         </div>
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-1">
-            <span className="label">Stage where each call ended</span>
-          </div>
+        <div className="p-6">
+          <span className="text-sm font-semibold text-navy-200">Stage where each call ended</span>
           <div className="mt-3 grid grid-cols-8 items-end gap-2">
             {Object.entries(byStage).map(([n, c]) => (
               <div key={n} className="grid h-[112px] grid-rows-[16px_1fr_18px] items-end justify-items-center gap-1">
-                <span className="tnum text-xs text-ink-500 font-bold">{c || ""}</span>
+                <span className="tnum text-xs font-bold text-white">{c || ""}</span>
                 <div
-                  className="w-full max-w-[28px] self-end rounded-t-[3px] bg-navy"
+                  className={`w-full max-w-[28px] self-end rounded-t-[3px] ${c === peak && c ? "bg-signal" : "bg-navy-300"}`}
                   style={{ height: `${c ? Math.max(10, (c / peak) * 100) : 0}%` }}
                 />
-                <span className="tnum text-xs text-ink-500 font-semibold border-t border-steel-200 w-full text-center pt-1">{n}</span>
+                <span className="tnum w-full border-t border-navy-700 pt-1 text-center text-xs font-semibold text-navy-200">{n}</span>
               </div>
             ))}
           </div>
