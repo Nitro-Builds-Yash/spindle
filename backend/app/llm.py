@@ -11,10 +11,14 @@ from __future__ import annotations
 
 import json
 import os
+import logging
 import re
+import time
 from typing import Any, Optional
 
 import httpx
+
+log = logging.getLogger("spindle.llm")
 
 from .content import (
     OUTCOME_BY_KEY,
@@ -46,7 +50,21 @@ def _parse_json(text: str) -> dict[str, Any]:
     return json.loads(text[start : end + 1])
 
 
-def _openai_compatible(base: str, model: str, key: str, prompt: str) -> str:
+# Hard ceiling for one model answer, across every attempt. A live call cannot
+# wait longer than this for a cue; past it the rules fallback answers instead.
+def _budget() -> float:
+    try:
+        return max(0.5, float(os.getenv("LLM_TIMEOUT_SECONDS", "4")))
+    except ValueError:
+        return 4.0
+
+
+# Last model failure, surfaced on /health so a bad key does not look like
+# "rules mode by design".
+last_error: Optional[str] = None
+
+
+def _openai_compatible(base: str, model: str, key: str, prompt: str, timeout: float) -> str:
     r = httpx.post(
         f"{base}/chat/completions",
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
@@ -59,59 +77,68 @@ def _openai_compatible(base: str, model: str, key: str, prompt: str) -> str:
                 {"role": "user", "content": prompt},
             ],
         },
-        timeout=25.0,
+        timeout=timeout,
     )
     r.raise_for_status()
     return r.json()["choices"][0]["message"]["content"]
 
 
-def _gemini(model: str, key: str, prompt: str) -> str:
-    target_models = [model or "gemini-flash-lite-latest", "gemini-flash-lite-latest", "gemini-3.8-flash"]
-    last_err = None
-    for m in dict.fromkeys(target_models):
+GEMINI_FALLBACK_MODEL = "gemini-flash-lite-latest"
+
+
+def _gemini(model: str, key: str, prompt: str, deadline: float) -> str:
+    """Try the configured model, then one known-good fallback, within the deadline."""
+    errors: list[str] = []
+    for m in dict.fromkeys([model or GEMINI_FALLBACK_MODEL, GEMINI_FALLBACK_MODEL]):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0.1:
+            errors.append("deadline reached")
+            break
         try:
             r = httpx.post(
                 f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent",
-                params={"key": key},
+                headers={"x-goog-api-key": key},
                 json={
                     "system_instruction": {"parts": [{"text": SYSTEM}]},
                     "contents": [{"role": "user", "parts": [{"text": prompt}]}],
                     "generationConfig": {"temperature": 0.2, "maxOutputTokens": 400},
                 },
-                timeout=25.0,
+                timeout=remaining,
             )
             if r.status_code == 200:
                 return r.json()["candidates"][0]["content"]["parts"][0]["text"]
-        except Exception as e:
-            last_err = e
-    if last_err:
-        raise last_err
-    raise ValueError("all gemini model candidates failed")
+            errors.append(f"{m}: HTTP {r.status_code} {r.text[:160]}")
+        except Exception as e:  # noqa: BLE001
+            errors.append(f"{m}: {type(e).__name__}: {e}")
+    raise RuntimeError("; ".join(errors) or "gemini failed")
 
 
 def _call_model(prompt: str) -> Optional[str]:
+    global last_error
     provider, key, model = _provider()
     if not provider or not key:
         return None
+    deadline = time.monotonic() + _budget()
     try:
         if provider == "gemini":
-            return _gemini(model or "gemini-2.0-flash", key, prompt)
-        if provider == "cerebras":
-            return _openai_compatible(
-                "https://api.cerebras.ai/v1", model or "llama-3.3-70b", key, prompt
-            )
-        if provider == "mistral":
-            return _openai_compatible(
-                "https://api.mistral.ai/v1", model or "mistral-small-latest", key, prompt
-            )
-        if provider == "openai":
-            return _openai_compatible(
-                "https://api.openai.com/v1", model or "gpt-4o-mini", key, prompt
-            )
-    except Exception:
-        # A dead model must not take a live call down with it.
+            out = _gemini(model, key, prompt, deadline)
+        else:
+            bases = {
+                "cerebras": ("https://api.cerebras.ai/v1", "llama-3.3-70b"),
+                "mistral": ("https://api.mistral.ai/v1", "mistral-small-latest"),
+                "openai": ("https://api.openai.com/v1", "gpt-4o-mini"),
+            }
+            if provider not in bases:
+                raise ValueError(f"unknown LLM_PROVIDER {provider!r}")
+            base, default_model = bases[provider]
+            out = _openai_compatible(base, model or default_model, key, prompt, _budget())
+        last_error = None
+        return out
+    except Exception as e:  # noqa: BLE001
+        # A dead model must not take a live call down with it - but say why.
+        last_error = f"{type(e).__name__}: {e}"[:300]
+        log.warning("LLM call failed, using rules fallback: %s", last_error)
         return None
-    return None
 
 
 # --------------------------------------------------------------------------- #

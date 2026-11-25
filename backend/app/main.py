@@ -8,12 +8,13 @@ from __future__ import annotations
 
 import csv
 import io
+import hmac
 import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
@@ -34,14 +35,41 @@ store, store_kind = build_store()
 
 app = FastAPI(title="Spindle Call API", version="2.0.0")
 
-_origins = os.getenv("ALLOWED_ORIGINS", "*")
+# CORS: never default to "*". Locally the Vite dev server is allowed; in
+# production ALLOWED_ORIGINS must name the deployed frontend.
+DEV_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173"
+_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", DEV_ORIGINS).split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in _origins.split(",")] if _origins else ["*"],
+    allow_origins=_origins,
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
+
+
+def require_token(authorization: str = Header("")) -> None:
+    """Shared access token. Off when SPINDLE_ACCESS_TOKEN is unset (local dev).
+
+    The token is typed in by the caller and kept in the browser, never built into
+    the frontend bundle, so a public Vercel URL does not leak it.
+    """
+    expected = os.getenv("SPINDLE_ACCESS_TOKEN", "").strip()
+    if not expected:
+        return
+    given = authorization.removeprefix("Bearer ").strip()
+    if not hmac.compare_digest(given.encode(), expected.encode()):
+        raise HTTPException(status_code=401, detail="access token required")
+
+
+protected = [Depends(require_token)]
+
+
+def _csv_safe(value: Any) -> Any:
+    """Stop spreadsheet apps executing cell text as a formula (CSV injection)."""
+    if isinstance(value, str) and value[:1] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + value
+    return value
 
 
 # --------------------------------------------------------------------------- #
@@ -110,9 +138,23 @@ def health() -> dict[str, Any]:
         "service": "spindle",
         "storage": store_kind,
         "llm": f"{provider}:{model or 'default'}" if provider else "rules-fallback",
+        "llm_last_error": llm.last_error,
+        "auth": bool(os.getenv("SPINDLE_ACCESS_TOKEN", "").strip()),
+        "warnings": _health_warnings(),
         "stages": len(STAGES),
         "time": now_iso(),
     }
+
+
+def _health_warnings() -> list[str]:
+    w = []
+    if store_kind == "sqlite" and os.getenv("RENDER"):
+        w.append("SQLite on Render is wiped on every restart; set SUPABASE_URL and SUPABASE_KEY.")
+    if not os.getenv("SPINDLE_ACCESS_TOKEN", "").strip():
+        w.append("SPINDLE_ACCESS_TOKEN is not set; the API is open to anyone with the URL.")
+    if llm.last_error:
+        w.append("Last LLM call failed; cues are coming from the rules fallback.")
+    return w
 
 
 @app.get("/api/content")
@@ -120,13 +162,13 @@ def content() -> dict[str, Any]:
     return {"stages": STAGES, "outcomes": OUTCOMES}
 
 
-@app.post("/api/calls", status_code=201)
+@app.post("/api/calls", status_code=201, dependencies=protected)
 def start_call(body: NewCall) -> dict[str, Any]:
     call = store.create_call(body.model_dump())
     return {"call": _shape(call), "stage_logs": []}
 
 
-@app.get("/api/calls")
+@app.get("/api/calls", dependencies=protected)
 def list_calls(limit: int = 100) -> dict[str, Any]:
     calls = store.list_calls(max(1, min(limit, 500)))
     for c in calls:
@@ -134,7 +176,7 @@ def list_calls(limit: int = 100) -> dict[str, Any]:
     return {"calls": calls}
 
 
-@app.get("/api/calls/export.csv")
+@app.get("/api/calls/export.csv", dependencies=protected)
 def export_calls_csv() -> Response:
     """Enterprise CSV export for CRM synchronization."""
     calls = store.list_calls(500)
@@ -147,14 +189,14 @@ def export_calls_csv() -> Response:
         "stage5_need_quote", "ai_summary", "audit_warning"
     ])
     for c in calls:
-        writer.writerow([
+        writer.writerow([_csv_safe(v) for v in [
             c.get("id"), c.get("started_at"), c.get("prospect_name"),
             c.get("company_name"), c.get("prospect_role"), c.get("company_kind"),
             c.get("call_type"), c.get("status"), c.get("highest_stage_reached"),
             c.get("highest_stage_name"), c.get("duration_seconds"), c.get("outcome"),
             c.get("next_step"), c.get("stage5_need_quote"), c.get("ai_summary"),
             c.get("audit_warning")
-        ])
+        ]])
     return Response(
         content=output.getvalue(),
         media_type="text/csv",
@@ -162,13 +204,13 @@ def export_calls_csv() -> Response:
     )
 
 
-@app.get("/api/calls/{call_id}")
+@app.get("/api/calls/{call_id}", dependencies=protected)
 def get_call(call_id: str) -> dict[str, Any]:
     call = _require(call_id)
     return {"call": call, "stage_logs": store.logs_for(call_id)}
 
 
-@app.post("/api/calls/{call_id}/stage-log")
+@app.post("/api/calls/{call_id}/stage-log", dependencies=protected)
 def save_stage(call_id: str, body: StageLog) -> dict[str, Any]:
     call = _require(call_id)
     if call["status"] != "in_progress":
@@ -202,7 +244,7 @@ def save_stage(call_id: str, body: StageLog) -> dict[str, Any]:
     }
 
 
-@app.post("/api/calls/{call_id}/audit")
+@app.post("/api/calls/{call_id}/audit", dependencies=protected)
 def audit_before_close(call_id: str, body: AuditBody) -> dict[str, Any]:
     """Run the consistency check without closing. The modal calls this first."""
     call = _require(call_id)
@@ -214,7 +256,7 @@ def audit_before_close(call_id: str, body: AuditBody) -> dict[str, Any]:
     return result
 
 
-@app.post("/api/calls/{call_id}/close")
+@app.post("/api/calls/{call_id}/close", dependencies=protected)
 def close_call(call_id: str, body: CloseBody) -> dict[str, Any]:
     call = _require(call_id)
     if call["status"] != "in_progress":
@@ -262,7 +304,7 @@ def close_call(call_id: str, body: CloseBody) -> dict[str, Any]:
     }
 
 
-@app.post("/api/ai/cue")
+@app.post("/api/ai/cue", dependencies=protected)
 def ai_cue(body: CueBody) -> dict[str, Any]:
     context = ""
     if body.call_id:
@@ -273,7 +315,7 @@ def ai_cue(body: CueBody) -> dict[str, Any]:
     return llm.cue(body.stage_number, body.prospect_words, context)
 
 
-@app.post("/api/ai/simulate")
+@app.post("/api/ai/simulate", dependencies=protected)
 def simulate_reply(body: SimulateBody) -> dict[str, Any]:
     return llm.simulate_prospect_reply(
         stage_number=body.stage_number,
@@ -283,7 +325,7 @@ def simulate_reply(body: SimulateBody) -> dict[str, Any]:
     )
 
 
-@app.get("/api/stats")
+@app.get("/api/stats", dependencies=protected)
 def stats() -> dict[str, Any]:
     calls = store.list_calls(500)
     closed = [c for c in calls if c["status"] != "in_progress"]

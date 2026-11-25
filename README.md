@@ -205,24 +205,28 @@ flowchart TD
 
 ## 🤖 The LLM Architecture: Why Google Gemini Flash Lite?
 
-Spindle integrates **Google Gemini Flash Lite** (`gemini-flash-lite-latest`) via the official Google GenAI SDK:
+Spindle calls **Google Gemini Flash Lite** (`gemini-flash-lite-latest`) over its REST API with `httpx` (no SDK), and can also use Cerebras, Mistral or OpenAI via `LLM_PROVIDER`:
 
-1. **Sub-second Response Times:** Ultra-low latency is required so caller flow is never interrupted mid-conversation.
-2. **Deterministic Rules Fallback:** If the LLM key is absent, throttled, or unreachable, Spindle smoothly switches to an in-memory deterministic rule engine (`rules-fallback`). The UI explicitly tags answers with `source: rules` or `source: llm` for full transparency.
-3. **Zero Browser Leakage:** API keys are secured exclusively in the Render backend environment. No client-side exposure.
+1. **Bounded latency:** every AI answer has a hard ceiling (`LLM_TIMEOUT_SECONDS`, default 4 s) across all attempts, so a slow provider can never freeze a live call.
+2. **Deterministic Rules Fallback:** if the key is absent, throttled, slow or unreachable, Spindle answers from a rule engine. Responses are tagged `source: rules` or `source: llm`, and `/health` shows `llm_last_error` so a bad key is visible instead of silently looking like rules mode.
+3. **Zero Browser Leakage:** API keys live only in the Render backend environment and are sent in a header, never in the URL.
 
 ```python
-# Server-side Gemini invocation in backend/app/llm.py
-client = genai.Client(api_key=api_key)
-response = client.models.generate_content(
-    model="gemini-flash-lite-latest",
-    contents=prompt,
-    config=types.GenerateContentConfig(
-        max_output_tokens=80,
-        temperature=0.2,  # Low temperature for precise consistency evaluation
-    ),
+# backend/app/llm.py (simplified)
+r = httpx.post(
+    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+    headers={"x-goog-api-key": key},
+    json={..., "generationConfig": {"temperature": 0.2, "maxOutputTokens": 400}},
+    timeout=remaining_budget,   # shrinks with each attempt
 )
 ```
+
+## 🔒 Security
+
+- **Access token:** set `SPINDLE_ACCESS_TOKEN` on the backend (the Render blueprint generates one). Every `/api/*` route except `/api/content` then requires `Authorization: Bearer <token>`. Callers type the token into the app once; it is kept in their browser and never built into the frontend bundle. `/health` stays public for uptime checks.
+- **CORS:** `ALLOWED_ORIGINS` no longer defaults to `*`. Unset, only the local Vite dev server is allowed; in production set it to your Vercel URL.
+- **CSV export:** cells starting with `=`, `+`, `-` or `@` are prefixed with `'` so spreadsheet apps never execute them as formulas.
+- **Health warnings:** `/health` lists misconfigurations, e.g. SQLite on Render (wiped on every restart) or a missing access token.
 
 ---
 

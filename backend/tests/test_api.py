@@ -152,3 +152,81 @@ def test_not_found_call():
     """Verify 404 behavior for invalid call IDs."""
     response = client.get("/api/calls/non_existent_call_id_12345")
     assert response.status_code == 404
+
+
+# --------------------------------------------------------------------------- #
+# Hardening: auth, CSV injection, LLM deadline / failure reporting
+# --------------------------------------------------------------------------- #
+
+def test_access_token_enforced(monkeypatch):
+    monkeypatch.setenv("SPINDLE_ACCESS_TOKEN", "s3cret")
+    assert client.get("/api/calls").status_code == 401
+    assert client.get("/api/calls", headers={"Authorization": "Bearer nope"}).status_code == 401
+    ok = client.get("/api/calls", headers={"Authorization": "Bearer s3cret"})
+    assert ok.status_code == 200
+    # Health and static content stay public so uptime checks keep working.
+    assert client.get("/health").status_code == 200
+    assert client.get("/api/content").status_code == 200
+    assert client.get("/health").json()["auth"] is True
+
+
+def test_open_when_no_token(monkeypatch):
+    monkeypatch.delenv("SPINDLE_ACCESS_TOKEN", raising=False)
+    assert client.get("/api/calls").status_code == 200
+    assert any("SPINDLE_ACCESS_TOKEN" in w for w in client.get("/health").json()["warnings"])
+
+
+def test_csv_export_escapes_formulas():
+    client.post("/api/calls", json={"prospect_name": '=HYPERLINK("http://x")', "company_name": "@evil"})
+    body = client.get("/api/calls/export.csv").text
+    assert ",=HYPERLINK" not in body and ',"=HYPERLINK' not in body
+    assert "'=HYPERLINK" in body
+    assert ",'@evil," in body
+
+
+def test_cors_not_wildcard_by_default():
+    r = client.options(
+        "/api/calls",
+        headers={"Origin": "https://attacker.example", "Access-Control-Request-Method": "GET"},
+    )
+    assert r.headers.get("access-control-allow-origin") not in ("*", "https://attacker.example")
+
+
+def test_llm_failure_falls_back_and_is_reported(monkeypatch):
+    import httpx
+    from app import llm
+
+    def boom(*a, **k):
+        raise httpx.ConnectTimeout("simulated timeout")
+
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("LLM_API_KEY", "fake")
+    monkeypatch.setattr(llm.httpx, "post", boom)
+    r = client.post("/api/ai/cue", json={"stage_number": 6, "prospect_words": "we have big four"})
+    assert r.status_code == 200 and r.json()["source"] == "rules"
+    health = client.get("/health").json()
+    assert "ConnectTimeout" in health["llm_last_error"]
+    assert any("LLM" in w for w in health["warnings"])
+
+
+def test_llm_respects_deadline(monkeypatch):
+    import time
+    from app import llm
+
+    calls = []
+
+    def slow(*a, **k):
+        calls.append(k["timeout"])
+        time.sleep(0.6)
+        raise RuntimeError("slow")
+
+    monkeypatch.setenv("LLM_TIMEOUT_SECONDS", "0.5")
+    monkeypatch.setattr(llm.httpx, "post", slow)
+    start = time.monotonic()
+    try:
+        llm._gemini("m1", "k", "p", time.monotonic() + llm._budget())
+    except RuntimeError:
+        pass
+    # Only one attempt fits in the budget, and its timeout is capped by it.
+    assert len(calls) == 1 and calls[0] <= 0.5
+    assert time.monotonic() - start < 1.0

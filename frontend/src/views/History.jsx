@@ -81,44 +81,13 @@ export default function History({ content, onOpen, onNew }) {
   if (err) return <div className="py-20 text-center text-rose-600 font-mono text-sm">{err}</div>;
   if (!calls) return <div className="py-20 text-center text-slate-500 font-mono text-sm">Loading past calls…</div>;
 
-  const exportCSV = () => {
-    if (!calls || calls.length === 0) return;
-    const headers = [
-      "ID",
-      "Date",
-      "Prospect Name",
-      "Company",
-      "Role",
-      "Highest Stage",
-      "Duration (s)",
-      "Outcome",
-      "Next Step",
-      "Stage 5 Need Quote",
-      "AI Summary",
-    ];
-    const rows = calls.map((c) => [
-      c.id,
-      c.started_at,
-      `"${(c.prospect_name || "").replace(/"/g, '""')}"`,
-      `"${(c.company_name || "").replace(/"/g, '""')}"`,
-      `"${(c.prospect_role || "").replace(/"/g, '""')}"`,
-      c.highest_stage_name || c.highest_stage_reached,
-      c.duration_seconds || 0,
-      c.outcome || "",
-      `"${(c.next_step || "").replace(/"/g, '""')}"`,
-      `"${(c.stage5_need_quote || "").replace(/"/g, '""')}"`,
-      `"${(c.ai_summary || "").replace(/"/g, '""')}"`,
-    ]);
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `spindle-calls-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const exportCSV = async () => {
+    // Server export: one source of truth, formula-escaped, and sends the token.
+    try {
+      await api.exportCsv();
+    } catch (e) {
+      alert(`Export failed: ${e.message}`);
+    }
   };
 
   const selected = calls.find((c) => c.id === openId);

@@ -11,12 +11,45 @@ const BASE = (
   (isLocal ? "http://127.0.0.1:8000" : DEFAULT_REMOTE_BACKEND)
 ).replace(/\/$/, "");
 
-async function call(path, options = {}) {
-  const url = `${BASE}${path}`;
-  const res = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
+// Shared access token (server: SPINDLE_ACCESS_TOKEN). Typed in once by the
+// caller and kept in this browser only; it is never built into the bundle.
+const TOKEN_KEY = "spindle_access_token";
+
+function getToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function setToken(token) {
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    /* storage unavailable: token lasts for this request only */
+  }
+}
+
+async function call(path, options = {}, retried = false, tokenOverride) {
+  const token = tokenOverride ?? getToken();
+  const res = await fetch(`${BASE}${path}`, {
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
   });
+  if (res.status === 401 && !retried && typeof window !== "undefined") {
+    const entered = window.prompt("Enter the Spindle access token");
+    if (entered && entered.trim()) {
+      setToken(entered.trim());
+      return call(path, options, true, entered.trim());
+    }
+  }
+  if (res.status === 401) setToken("");
   if (!res.ok) {
     let detail = res.statusText;
     try {
@@ -26,27 +59,42 @@ async function call(path, options = {}) {
     }
     throw new Error(detail);
   }
-  return res.json();
+  return res;
+}
+
+async function callJson(path, options) {
+  return (await call(path, options)).json();
 }
 
 export const api = {
   base: BASE,
-  health: () => call("/health"),
-  content: () => call("/api/content"),
+  health: () => callJson("/health"),
+  content: () => callJson("/api/content"),
   startCall: (body) =>
-    call("/api/calls", { method: "POST", body: JSON.stringify(body) }),
-  listCalls: () => call("/api/calls"),
-  getCall: (id) => call(`/api/calls/${id}`),
+    callJson("/api/calls", { method: "POST", body: JSON.stringify(body) }),
+  listCalls: () => callJson("/api/calls"),
+  getCall: (id) => callJson(`/api/calls/${id}`),
   saveStage: (id, body) =>
-    call(`/api/calls/${id}/stage-log`, {
+    callJson(`/api/calls/${id}/stage-log`, {
       method: "POST",
       body: JSON.stringify(body),
     }),
-  cue: (body) => call("/api/ai/cue", { method: "POST", body: JSON.stringify(body) }),
-  simulate: (body) => call("/api/ai/simulate", { method: "POST", body: JSON.stringify(body) }),
+  cue: (body) => callJson("/api/ai/cue", { method: "POST", body: JSON.stringify(body) }),
+  simulate: (body) => callJson("/api/ai/simulate", { method: "POST", body: JSON.stringify(body) }),
   audit: (id, body) =>
-    call(`/api/calls/${id}/audit`, { method: "POST", body: JSON.stringify(body) }),
+    callJson(`/api/calls/${id}/audit`, { method: "POST", body: JSON.stringify(body) }),
   close: (id, body) =>
-    call(`/api/calls/${id}/close`, { method: "POST", body: JSON.stringify(body) }),
-  stats: () => call("/api/stats"),
+    callJson(`/api/calls/${id}/close`, { method: "POST", body: JSON.stringify(body) }),
+  stats: () => callJson("/api/stats"),
+  // Authenticated CSV download (a plain link could not send the token).
+  exportCsv: async () => {
+    const blob = await (await call("/api/calls/export.csv")).blob();
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement("a"), {
+      href: url,
+      download: "spindle-calls.csv",
+    });
+    a.click();
+    URL.revokeObjectURL(url);
+  },
 };
