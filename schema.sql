@@ -24,7 +24,9 @@ CREATE TABLE IF NOT EXISTS public.calls (
     next_step TEXT,
     stage5_need_quote TEXT,
     ai_summary TEXT,
-    audit_warning TEXT
+    audit_warning TEXT,
+    follow_up_at TIMESTAMPTZ,
+    follow_up_done BOOLEAN NOT NULL DEFAULT false
 );
 
 -- 2. Call Stage Logs Table
@@ -43,6 +45,8 @@ CREATE TABLE IF NOT EXISTS public.call_stage_logs (
 -- 3. Indexes for fast dashboard sorting & lookups
 CREATE INDEX IF NOT EXISTS idx_calls_started_at ON public.calls(started_at DESC);
 CREATE INDEX IF NOT EXISTS idx_stage_logs_call_id ON public.call_stage_logs(call_id);
+CREATE INDEX IF NOT EXISTS idx_calls_follow_up ON public.calls(follow_up_at)
+  WHERE follow_up_at IS NOT NULL AND follow_up_done = false;
 
 -- 4. Enable RLS and add allow-all service access policies
 ALTER TABLE public.calls ENABLE ROW LEVEL SECURITY;

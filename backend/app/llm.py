@@ -20,6 +20,13 @@ import httpx
 
 log = logging.getLogger("spindle.llm")
 
+# One pooled client for every model call: reuses TLS connections instead of a
+# fresh handshake per cue (~100-300 ms saved each time).
+_http = httpx.Client(
+    limits=httpx.Limits(max_connections=20, max_keepalive_connections=10, keepalive_expiry=60),
+    http2=False,
+)
+
 from .content import (
     OUTCOME_BY_KEY,
     POSITIVE_OUTCOMES,
@@ -65,7 +72,7 @@ last_error: Optional[str] = None
 
 
 def _openai_compatible(base: str, model: str, key: str, prompt: str, timeout: float) -> str:
-    r = httpx.post(
+    r = _http.post(
         f"{base}/chat/completions",
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
         json={
@@ -95,7 +102,7 @@ def _gemini(model: str, key: str, prompt: str, deadline: float) -> str:
             errors.append("deadline reached")
             break
         try:
-            r = httpx.post(
+            r = _http.post(
                 f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent",
                 headers={"x-goog-api-key": key},
                 json={
