@@ -18,7 +18,7 @@ flowchart LR
 
 ### Core Design Goals
 1. **Zero Cognitive Friction:** Indian SME calls average **93.5 seconds**. Callers cannot look away or type complex entries. One tap logs the stage; one box captures quotes.
-2. **Sub-second Response:** Model interventions (AI Cue) return in under 500ms to preserve human conversation tempo.
+2. **Bounded Response Time:** AI Cue calls have a hard ceiling (`LLM_TIMEOUT_SECONDS`, default 4 s, across all retries); past it the rules fallback answers, so the conversation tempo is never held hostage by a provider.
 3. **Audit Trail Integrity:** Prevents CRM corruption caused by human outcome mislogging (`T010`, `T099`, `T066`, `T084`).
 
 ---
@@ -45,7 +45,7 @@ The call follows an 8-stage state machine derived from Reading 1 and verified ag
 - **Analytical Views:**
   - `v_stage_dropoff`: Computes live aggregate count of calls ending at stages 1 through 8.
   - `v_outcome_distribution`: Real-time breakdown of outcomes across positive, neutral, and negative buckets.
-- **Security:** Row Level Security (RLS) is active; queries utilize service-role authentication proxying through FastAPI to prevent credential exposure in client code.
+- **Security:** Row Level Security (RLS) is active; queries utilize service-role authentication proxying through FastAPI to prevent credential exposure in client code. Because the service role bypasses RLS, the API itself is gated by a shared access token (`SPINDLE_ACCESS_TOKEN`) and a strict CORS allow-list.
 
 ---
 
@@ -53,8 +53,8 @@ The call follows an 8-stage state machine derived from Reading 1 and verified ag
 
 - **Provider:** Google Gemini via Google AI Studio free tier.
 - **Active Model:** `gemini-flash-lite-latest`.
-- **Latency Optimization:** Temperature locked at `0.2` and `max_output_tokens=80` for deterministic, sub-second spoken cues.
-- **Fail-Safe Mechanism:** If network errors or quota limits occur, the system falls back to deterministic rule-based evaluation without crashing. The client transparently reflects `source: "llm"` or `source: "rules"`.
+- **Latency Optimization:** Temperature locked at `0.2`, `maxOutputTokens=400`, and a single shared deadline for the configured model plus one known-good fallback model.
+- **Fail-Safe Mechanism:** If network errors, quota limits or the deadline occur, the failure is logged and exposed as `llm_last_error` on `/health`, and the system falls back to deterministic rule-based evaluation without crashing. The client transparently reflects `source: "llm"` or `source: "rules"`.
 
 ---
 

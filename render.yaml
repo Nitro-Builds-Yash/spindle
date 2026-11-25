@@ -22,5 +22,9 @@ services:
         sync: false
       - key: SUPABASE_KEY
         sync: false          # service_role key
+      - key: LLM_TIMEOUT_SECONDS
+        value: "4"
+      - key: SPINDLE_ACCESS_TOKEN
+        generateValue: true  # share it with callers; they enter it once in the app
       - key: ALLOWED_ORIGINS
         sync: false          # https://<your-app>.vercel.app
