@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { DEFAULT_CONTENT } from "../data/defaultContent.js";
 import { suggestOutcome } from "../lib/call.js";
 import { engineAvailable, getEngine } from "../lib/engine.js";
@@ -19,7 +20,7 @@ describe.runIf(built)("Rust engine (WebAssembly)", () => {
   let engine;
   beforeAll(async () => {
     const mod = await Object.values(pkg)[0]();
-    const wasm = readFileSync(new URL("../engine/pkg/spindle_engine_bg.wasm", import.meta.url));
+    const wasm = readFileSync(resolve(process.cwd(), "src/engine/pkg/spindle_engine_bg.wasm"));
     mod.initSync({ module: wasm });
     engine = new mod.Engine(JSON.stringify(DEFAULT_CONTENT));
   });
