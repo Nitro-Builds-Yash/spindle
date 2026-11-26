@@ -293,6 +293,10 @@ def audit_before_close(call_id: str, body: AuditBody) -> dict[str, Any]:
     _check_outcome(body.outcome)
     preview = dict(call)
     preview["next_step"] = body.next_step
+    # The call is still open, so its stored duration is 0: use time so far.
+    started = _parse_dt(call.get("started_at"))
+    if started:
+        preview["duration_seconds"] = max(0, int((datetime.now(timezone.utc) - started).total_seconds()))
     logs = store.logs_for(call_id)
     result = llm.audit(preview, logs, body.outcome)
     return result

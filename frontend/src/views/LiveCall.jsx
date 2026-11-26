@@ -19,7 +19,7 @@ function mergePending(logs, callId) {
   return out.sort((a, b) => Number(a.stage_number) - Number(b.stage_number));
 }
 
-export default function LiveCall({ callId, content, onNew, onFinished, onClear }) {
+export default function LiveCall({ callId, content, onNew, onFinished, onClear, onEnded }) {
   const [call, setCall] = useState(null);
   const [logs, setLogs] = useState([]);
   const [stageNo, setStageNo] = useState(1);
@@ -110,6 +110,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       setStageNo(no);
       if (data.call.status !== "in_progress") {
         setClosed({ outcome: data.call.outcome, summary: data.call.ai_summary });
+        onEnded?.();
       }
     } catch (e) {
       // The saved call no longer exists (deleted, or a different database):
@@ -117,7 +118,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
       if (e instanceof ApiError && e.status === 404) return onClear?.();
       setErr(e.message);
     }
-  }, [callId, onClear]);
+  }, [callId, onClear, onEnded]);
 
   useEffect(() => {
     if (callId) load();
@@ -275,7 +276,12 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             </div>
           </div>
 
-          <StageRail stages={stages} stageNo={stageNo} onPick={setStageNo} />
+          <StageRail
+            stages={stages}
+            stageNo={stageNo}
+            onPick={setStageNo}
+            logged={new Set(logs.map((l) => Number(l.stage_number)))}
+          />
         </div>
 
         <div className="flex items-center justify-between gap-2 text-sm -mt-2 mb-5">
@@ -477,6 +483,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear }
             setLogs(data.stage_logs || []);
             setClosed({ outcome: data.call.outcome, summary: data.call.ai_summary });
             setClosing(false);
+            onEnded?.();
           }}
         />
       )}

@@ -338,3 +338,33 @@ def test_supabase_store_chunks_and_pages():
     assert max(seen_log_queries) <= 80                       # URL stays short
     store.update_call  # follow-up fields are stripped when the column is missing
     assert store.follow_ups() == []
+
+
+# --------------------------------------------------------------------------- #
+# Bug fixes: practice-phone name, live audit duration, empty next step
+# --------------------------------------------------------------------------- #
+
+def test_practice_phone_uses_the_real_prospect_name(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    r = client.post("/api/ai/simulate", json={
+        "stage_number": 1, "caller_message": "Hello", "prospect_name": "Meera Iyer", "company_name": "Iyer Polymers"})
+    assert "Meera Iyer" in r.json()["reply"] and "Ramesh" not in r.json()["reply"]
+
+
+def test_pre_close_audit_uses_time_so_far(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    cid = _new_call()
+    main_mod.store.update_call(cid, {"started_at": "2020-01-01T00:00:00+00:00"})
+    for n, tap in [(1, "right_person"), (5, "named_need"), (7, "named_time")]:
+        client.post(f"/api/calls/{cid}/stage-log", json={"stage_number": n, "what_happened": tap, "prospect_words": "need help"})
+    r = client.post(f"/api/calls/{cid}/audit", json={"outcome": "next_step_agreed", "next_step": "Thu 4pm call"})
+    assert "0 seconds" not in (r.json().get("warning") or "")
+
+
+def test_next_step_agreed_without_next_step_is_flagged(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    cid = _new_call()
+    for n, tap in [(1, "right_person"), (7, "named_time")]:
+        client.post(f"/api/calls/{cid}/stage-log", json={"stage_number": n, "what_happened": tap})
+    r = client.post(f"/api/calls/{cid}/audit", json={"outcome": "next_step_agreed", "next_step": ""})
+    assert "no next step" in r.json()["warning"]

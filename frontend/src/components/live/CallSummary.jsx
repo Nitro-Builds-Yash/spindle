@@ -1,83 +1,69 @@
 import React, { useEffect } from "react";
 
+const TONE = { good: "badge badge-good", ok: "badge badge-ok", bad: "badge badge-bad" };
+
+function duration(s) {
+  const n = Number(s) || 0;
+  return n >= 60 ? `${Math.floor(n / 60)} min ${n % 60} s` : `${n} s`;
+}
+
+/** Shown once a call is saved: what was recorded, and where to go next. */
 export default function CallSummary({ call, content, onNew, onFinished }) {
   const outcome = content.outcomes.find((o) => o.key === call.outcome);
 
   useEffect(() => {
-    localStorage.removeItem("spindle.currentCall");
-  }, []);
-
-  useEffect(() => {
     function onKeyDown(e) {
-      if (e.key === "Escape") {
-        onNew();
-      }
+      if (e.key === "Escape") onNew();
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onNew]);
 
   return (
-    <div className="relative mx-auto max-w-[540px] rounded-2xl border border-white/80 bg-white/90 backdrop-blur-xl p-8 shadow-card text-center">
-      <button
-        onClick={onNew}
-        className="absolute top-4 right-4 rounded-lg p-1.5 text-steel-400 hover:bg-steel-100 hover:text-ink-700 transition-all"
-        title="Close & Start new call (Esc)"
-      >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
-      <p className="tnum text-xs font-bold text-navy">
-        CALL CLOSED · {call.company_name}
-      </p>
-      <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink-900">
-        {call.prospect_name || "Unknown prospect"}
-      </h1>
-      <div
-        className={`mt-3 inline-flex rounded-xs border px-3 py-1 tnum text-xs font-bold ${
-          outcome?.tone === "good"
-            ? "border-emerald-300 bg-emerald-50 text-emerald-800"
-            : outcome?.tone === "ok"
-            ? "border-navy-300 bg-navy-50 text-navy"
-            : "border-rose-300 bg-rose-50 text-rose-800"
-        }`}
-      >
-        {outcome?.label || call.outcome}
+    <div className="mx-auto max-w-[560px] overflow-hidden rounded-xl2 bg-white shadow-float">
+      <div className="bg-navy-900 px-7 pt-6 pb-5 text-white">
+        <p className="text-sm text-navy-200">Call saved{call.company_name ? `, ${call.company_name}` : ""}</p>
+        <h1 className="mt-1 text-[26px] font-extrabold leading-tight">{call.prospect_name || "Unknown prospect"}</h1>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-navy-200">
+          <span className={TONE[outcome?.tone] || "badge"}>{outcome?.label || call.outcome}</span>
+          <span className="tnum">{duration(call.duration_seconds)}</span>
+          <span aria-hidden>|</span>
+          <span>Reached {call.highest_stage_name}</span>
+        </div>
       </div>
 
-      <div className="mt-5 rounded-xs border border-steel-200/80 bg-steel-50/80 p-4 text-left">
-        <p className="tnum text-xs font-bold text-steel-400 mb-1">
-          WHAT A MANAGER READS
-        </p>
-        <p className="text-xs leading-relaxed text-ink-800 font-medium">{call.ai_summary}</p>
+      <div className="px-7 py-6 space-y-4">
+        <div>
+          <p className="label mb-1">What a manager reads</p>
+          <p className="text-[15px] leading-relaxed text-ink-900">{call.ai_summary}</p>
+        </div>
         {call.next_step && (
-          <div className="mt-3 pt-3 border-t border-steel-200">
-            <p className="tnum text-xs font-bold text-steel-400 mb-0.5">Next step</p>
-            <p className="text-xs text-ink-900 font-bold">{call.next_step}</p>
+          <div>
+            <p className="label mb-1">Next step</p>
+            <p className="text-[15px] font-semibold text-ink-950">{call.next_step}</p>
+          </div>
+        )}
+        {call.stage5_need_quote && (
+          <div>
+            <p className="label mb-1">Their need, in their words</p>
+            <p className="text-[15px] italic text-ink-800">“{call.stage5_need_quote}”</p>
           </div>
         )}
         {call.audit_warning && (
-          <div className="mt-3 rounded-xs border border-rose-300 bg-rose-50 p-3 text-left">
-            <p className="tnum text-xs font-bold text-rose-700 mb-0.5">Audit warning</p>
-            <p className="text-xs text-rose-800 leading-relaxed font-medium">{call.audit_warning}</p>
+          <div className="rounded-lg2 border border-stop/30 bg-stop-soft px-4 py-3">
+            <p className="text-sm font-semibold text-stop">Check this record</p>
+            <p className="mt-0.5 text-sm leading-relaxed text-ink-800">{call.audit_warning}</p>
           </div>
         )}
-      </div>
 
-      <p className="mt-4 tnum text-[11.5px] text-ink-500">
-        Duration: <span className="font-bold text-ink-900">{call.duration_seconds}s</span> · reached <span className="font-bold text-navy">{call.highest_stage_name}</span> ·{" "}
-        {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "no need quote"}
-      </p>
-
-      <div className="mt-6 flex justify-center gap-3">
-        <button className="btn-ghost" onClick={onFinished}>
-          See it in past calls
-        </button>
-        <button className="btn-primary" onClick={onNew}>
-          + Next Call
-        </button>
+        <div className="flex flex-wrap justify-end gap-3 border-t border-steel-200 pt-5">
+          <button className="btn-ghost" onClick={onFinished}>
+            See it in past calls
+          </button>
+          <button className="btn-primary" onClick={onNew} title="Esc">
+            Start the next call
+          </button>
+        </div>
       </div>
     </div>
   );

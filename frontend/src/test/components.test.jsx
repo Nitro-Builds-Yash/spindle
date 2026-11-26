@@ -19,11 +19,13 @@ describe("TapGrid", () => {
 describe("StageRail", () => {
   it("flags the current stage and lets you jump", () => {
     const onPick = vi.fn();
-    render(<StageRail stages={DEFAULT_CONTENT.stages} stageNo={3} onPick={onPick} />);
+    render(<StageRail stages={DEFAULT_CONTENT.stages} stageNo={3} onPick={onPick} logged={new Set([1])} />);
     const current = screen.getByRole("button", { current: "step" });
     expect(current).toHaveAttribute("title", DEFAULT_CONTENT.stages[2].name);
     fireEvent.click(screen.getByTitle(DEFAULT_CONTENT.stages[0].name));
     expect(onPick).toHaveBeenCalledWith(1);
+    // Stage 2 was jumped over with no tap: it must not look done.
+    expect(screen.getByTitle(`${DEFAULT_CONTENT.stages[1].name} (nothing tapped)`)).toBeInTheDocument();
   });
 });
 

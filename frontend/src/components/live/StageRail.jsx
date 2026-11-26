@@ -1,7 +1,7 @@
 import React from "react";
 
 /** The call as one thread: eight stops, finished ones checked, current one amber. */
-export default function StageRail({ stages, stageNo, onPick }) {
+export default function StageRail({ stages, stageNo, onPick, logged = new Set() }) {
   return (
     <ol className="relative mt-6 grid grid-cols-8" aria-label="Call stages">
       <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] rounded-full bg-navy-700" aria-hidden />
@@ -12,19 +12,23 @@ export default function StageRail({ stages, stageNo, onPick }) {
       />
       {stages.map((s) => {
         const now = s.number === stageNo;
-        const past = s.number < stageNo;
+        // Passed over without a tap (jumped ahead on the rail): not "done".
+        const past = s.number < stageNo && logged.has(s.number);
+        const skipped = s.number < stageNo && !past;
         return (
           <li key={s.key} className="relative flex flex-col items-center">
             <button
               type="button"
               onClick={() => onPick(s.number)}
               aria-current={now ? "step" : undefined}
-              title={s.name}
+              title={skipped ? `${s.name} (nothing tapped)` : s.name}
               className={`tnum relative z-10 flex h-[29px] w-[29px] items-center justify-center rounded-full text-[13px] font-bold transition-all duration-200 ${
                 now
                   ? "scale-110 bg-signal text-ink-950 ring-4 ring-signal/25 shadow-[0_0_18px_rgba(242,169,0,0.55)]"
                   : past
                   ? "bg-navy-300 text-navy-900 hover:bg-white"
+                  : skipped
+                  ? "bg-navy-900 text-navy-200 border-2 border-dashed border-navy-400 hover:border-white"
                   : "bg-navy-900 text-navy-300 border-2 border-navy-600 hover:border-navy-300"
               }`}
             >

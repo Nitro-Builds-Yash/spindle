@@ -299,6 +299,15 @@ def audit_fallback(call: dict[str, Any], logs: list[dict[str, Any]], outcome: st
                 "next_step_agreed needs a named day and time. Stage 7 recorded "
                 f"\"{_label(7, tap.get(7)) or 'nothing'}\"."
             )
+        if (
+            not warning
+            and outcome in ("next_step_agreed", "agreed_to_receive_report")
+            and not (call.get("next_step") or "").strip()
+        ):
+            warning = (
+                f"\"{name}\" but no next step is written. Note what was agreed, "
+                "e.g. \"Thursday 16:00 call, send one-pager on WhatsApp first\"."
+            )
         if not warning and not (call.get("stage5_need_quote") or "").strip():
             warning = (
                 "No Stage 5 quote. The record has no words from the prospect, which is "
@@ -409,7 +418,7 @@ Answer in JSON:
 """
 
 STAGE_FALLBACK_REPLIES = {
-    1: "Haan, Ramesh Varma speaking. Kaun baat kar rahe hain?",
+    1: "Haan, {prospect} speaking. Kaun baat kar rahe hain?",
     2: "Spindle? Look, I'm on the machine shop floor right now. Is this a sales call? Where did you get this number?",
     3: "Look, everyone is selling something. I can give you exactly two minutes. What do you people do?",
     4: "Right now our rework is touching 4.5% on the CNC line. Delivery schedules are slipping because of rework.",
@@ -449,7 +458,12 @@ def simulate_prospect_reply(
         except Exception:
             pass
 
+    who = (prospect_name or "").strip()
     fallback_text = STAGE_FALLBACK_REPLIES.get(stage_number, "Tell me what this is regarding.")
+    fallback_text = (
+        fallback_text.replace("{prospect}", who) if who
+        else fallback_text.replace("Haan, {prospect} speaking.", "Haan ji, bolo.")
+    )
     return {
         "reply": fallback_text,
         "reaction": "busy",

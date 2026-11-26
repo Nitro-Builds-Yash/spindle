@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
 import FollowUps from "../components/FollowUps.jsx";
 
@@ -291,102 +291,105 @@ export default function History({ content, onOpen, onNew }) {
 }
 
 function Drawer({ call, loading, onClose, onResume, when, tapLabel, stageName, outcome }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  useEffect(() => closeRef.current?.focus(), []);
+
+  const logs = call.stage_logs || [];
   return (
     <div className="fixed inset-0 z-50" onClick={onClose}>
-      <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-xs" />
+      <div className="absolute inset-0 bg-ink-950/40" />
       <aside
-        className="absolute inset-y-0 right-0 flex w-full max-w-[560px] flex-col overflow-y-auto border-l border-steel-200 bg-white shadow-float text-ink-950"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="drawer-title"
+        className="absolute inset-y-0 right-0 flex w-full max-w-[560px] flex-col overflow-y-auto bg-white shadow-float text-ink-950"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-steel-200/80 bg-white/95 px-6 py-5 backdrop-blur-md">
-          <div>
-            <p className="text-sm text-ink-500">{when(call.started_at)}</p>
-            <h2 className="mt-1 text-xl font-bold tracking-tight text-ink-950">
-              {call.prospect_name || "Unknown prospect"}
-            </h2>
-            <p className="text-xs text-ink-500 font-medium mt-0.5">
-              {[call.prospect_role, call.company_name, call.call_type].filter(Boolean).join(", ")}
-            </p>
+        <div className="sticky top-0 z-10 bg-navy-900 px-6 pt-5 pb-4 text-white">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-sm text-navy-200">{when(call.started_at)}</p>
+              <h2 id="drawer-title" className="mt-1 text-[22px] font-extrabold leading-tight truncate">
+                {call.prospect_name || "Unknown prospect"}
+              </h2>
+              <p className="text-sm text-navy-200 mt-0.5">
+                {[call.prospect_role, call.company_name, call.call_type].filter(Boolean).join(", ")}
+              </p>
+            </div>
+            <button
+              ref={closeRef}
+              className="rounded-lg2 border border-navy-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-navy-700"
+              onClick={onClose}
+              title="Esc"
+            >
+              Close
+            </button>
           </div>
-          <button className="btn-ghost px-3 py-1.5 text-xs" onClick={onClose}>
-            Close
-          </button>
-        </div>
-
-        <div className="space-y-4 px-6 py-6">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-navy-200">
             <span className={toneClass[outcome?.tone] || "badge"}>
-              {outcome?.label || call.outcome || "in progress"}
+              {call.status === "in_progress" ? "In progress" : outcome?.label || call.outcome || "Not logged"}
             </span>
-            <span className="badge">
-              Stage {call.highest_stage_reached}/8 · {call.highest_stage_name}
-            </span>
-            <span className="badge tnum font-bold text-ink-900">{call.duration_seconds}s</span>
+            <span>Reached {call.highest_stage_reached}. {call.highest_stage_name}</span>
+            <span aria-hidden>|</span>
+            <span className="tnum">{call.duration_seconds} s</span>
             {call.status === "in_progress" && (
-              <button className="text-xs tnum font-bold text-navy ml-auto hover:underline" onClick={onResume}>
-                Resume call →
+              <button className="ml-auto font-semibold text-signal hover:underline" onClick={onResume}>
+                Resume call
               </button>
             )}
           </div>
+        </div>
 
-          <div className="rounded-xl border border-steel-200/80 bg-steel-50/80 p-4">
-            <p className="tnum text-xs font-bold text-ink-500 mb-1">AI 1-line CRM summary</p>
-            <p className="text-xs text-ink-900 leading-relaxed font-medium">
-              {call.ai_summary || "No summary written."}
-            </p>
+        <div className="space-y-5 px-6 py-6">
+          <div>
+            <p className="label mb-1">What a manager reads</p>
+            <p className="text-[15px] leading-relaxed text-ink-900">{call.ai_summary || "No summary written."}</p>
           </div>
 
           {call.next_step && (
-            <div className="rounded-xl border border-steel-200/80 p-4">
-              <p className="tnum text-xs font-bold text-ink-500 mb-1">Next step agreed</p>
-              <p className="text-xs text-ink-950 font-bold">{call.next_step}</p>
+            <div>
+              <p className="label mb-1">Next step</p>
+              <p className="text-[15px] font-semibold text-ink-950">{call.next_step}</p>
             </div>
           )}
 
           {call.audit_warning && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
-              <p className="tnum text-xs font-bold text-rose-700">Audit inconsistency warning</p>
-              <p className="text-xs text-rose-900 leading-relaxed font-medium mt-1">
-                {call.audit_warning}
-              </p>
+            <div className="rounded-lg2 border border-stop/30 bg-stop-soft px-4 py-3">
+              <p className="text-sm font-semibold text-stop">Check this record</p>
+              <p className="mt-0.5 text-sm leading-relaxed text-ink-800">{call.audit_warning}</p>
             </div>
           )}
 
-          <div className="rounded-xl border border-steel-200/80 p-4">
-            <p className="tnum text-xs font-bold text-ink-500 mb-1">Prospect's exact words (Stage 5 Need Quote)</p>
-            <p className="text-xs italic text-ink-800 leading-relaxed font-serif">
+          <div>
+            <p className="label mb-1">Their need, in their words</p>
+            <p className="text-[15px] italic text-ink-800">
               {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "Nothing captured."}
             </p>
           </div>
 
           <div>
-            <p className="tnum text-xs font-bold text-ink-500 mb-2">Stage-by-stage progression</p>
-            <div className="space-y-2">
-              {(call.stage_logs || []).map((l) => (
-                <div key={l.id} className="grid grid-cols-[28px_1fr] gap-2.5 rounded-lg border border-steel-200/80 p-3 bg-steel-50/50">
-                  <span className="tnum text-xs font-bold text-steel-400">
-                    {String(l.stage_number).padStart(2, "0")}
+            <p className="label mb-2">Stage by stage</p>
+            <ol className="relative space-y-0 border-l-2 border-steel-200 ml-3">
+              {logs.map((l) => (
+                <li key={l.id || l.stage_number} className="relative pl-6 pb-4">
+                  <span className="tnum absolute -left-[13px] top-0 flex h-6 w-6 items-center justify-center rounded-full bg-navy text-xs font-bold text-white">
+                    {l.stage_number}
                   </span>
-                  <div>
-                    <div className="tnum text-xs text-navy font-bold">
-                      {stageName(Number(l.stage_number))}
-                    </div>
-                    <div className="text-xs font-semibold text-ink-950 mt-0.5">{tapLabel(l)}</div>
-                    {l.prospect_words && (
-                      <div className="mt-1 text-[11.5px] italic text-ink-600 border-l-2 border-steel-300 pl-2">
-                        “{l.prospect_words}”
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  <div className="text-sm font-semibold text-navy">{stageName(Number(l.stage_number))}</div>
+                  <div className="text-[15px] text-ink-950 mt-0.5">{tapLabel(l)}</div>
+                  {l.prospect_words && (
+                    <div className="mt-1 text-sm italic text-ink-600">“{l.prospect_words}”</div>
+                  )}
+                </li>
               ))}
-              {loading && (
-                <p className="text-xs text-navy-600 tnum animate-pulse py-2">Loading stage logs from Supabase…</p>
-              )}
-              {!loading && (call.stage_logs || []).length === 0 && (
-                <p className="text-xs text-steel-400 tnum">No stage logs saved.</p>
-              )}
-            </div>
+            </ol>
+            {loading && <p className="text-sm text-ink-500 py-2">Loading stages…</p>}
+            {!loading && logs.length === 0 && <p className="text-sm text-ink-500">No stages saved.</p>}
           </div>
         </div>
       </aside>

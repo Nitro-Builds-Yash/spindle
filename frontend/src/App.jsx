@@ -13,6 +13,9 @@ export default function App() {
   const [view, setView] = useState("start");
   const [callId, setCallId] = useState(() => localStorage.getItem(STORAGE_KEY) || null);
   const [wakingUp, setWakingUp] = useState(false);
+  // The open call has been saved: still viewable (summary), no longer "in progress".
+  const [callEnded, setCallEnded] = useState(false);
+  const inProgress = Boolean(callId) && !callEnded;
 
   const checkHealth = useCallback(async () => {
     try {
@@ -28,7 +31,13 @@ export default function App() {
   const openCall = useCallback((id) => {
     localStorage.setItem(STORAGE_KEY, id);
     setCallId(id);
+    setCallEnded(false);
     setView("live");
+  }, []);
+
+  const endCall = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCallEnded(true);
   }, []);
 
   useEffect(() => {
@@ -106,30 +115,16 @@ export default function App() {
             Start call
           </button>
           <button
-            onClick={() => {
-              if (callId) {
-                setView("live");
-              } else {
-                api
-                  .startCall({
-                    prospect_name: "Ramesh Varma",
-                    prospect_role: "Managing Director",
-                    company_name: "Sri Balaji Precision",
-                    company_kind: "mid-size private manufacturer",
-                    call_type: "first call",
-                  })
-                  .then((res) => openCall(res.call.id))
-                  .catch(() => setView("start"));
-              }
-            }}
+            onClick={() => setView("live")}
             className={`flex items-center gap-1.5 sm:gap-2 whitespace-nowrap px-2.5 sm:px-4 text-sm font-semibold border-b-[3px] transition-colors ${
               view === "live"
                 ? "border-navy text-ink-950"
                 : "border-transparent text-ink-500 hover:text-ink-900"
             }`}
           >
-            {callId && <span className="h-2 w-2 rounded-full bg-signal" aria-label="call in progress" />}
+            {inProgress && <span className="h-2 w-2 rounded-full bg-signal" aria-hidden />}
             Live call
+            {inProgress && <span className="sr-only"> (call in progress)</span>}
           </button>
           <button
             onClick={() => setView("history")}
@@ -151,7 +146,7 @@ export default function App() {
         {view === "start" && (
           <StartCall
             content={content}
-            hasCall={Boolean(callId)}
+            hasCall={inProgress}
             resume={() => setView("live")}
             onStart={openCall}
           />
@@ -165,11 +160,12 @@ export default function App() {
               onNew={startNewCall}
               onFinished={finishCall}
               onClear={clearCall}
+              onEnded={endCall}
             />
           ) : (
-            <div className="mx-auto max-w-md py-16 text-center rounded-2xl border border-steel-200/90 bg-white p-8 shadow-sm">
-                            <h3 className="text-lg font-bold text-ink-900 mt-1">No call in progress</h3>
-              <p className="text-xs text-ink-500 mt-1.5">
+            <div className="card mx-auto max-w-md p-8 text-center">
+              <h3 className="text-xl font-bold text-ink-950">No call in progress</h3>
+              <p className="text-sm text-ink-600 mt-1.5">
                 Start a call to open the eight-stage guide.
               </p>
               <div className="mt-5 flex justify-center gap-3">
