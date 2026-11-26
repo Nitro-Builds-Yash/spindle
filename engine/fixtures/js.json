@@ -1,0 +1,5132 @@
+{
+ "suggest": [
+  {
+   "logs": [],
+   "expect": "not_logged"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "not_interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "not_logged"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    }
+   ],
+   "expect": "not_logged"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "not_interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "not_logged"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "right_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "switchboard"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "wrong_person"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "wrong_person"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "call_later"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "busy"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "everything_fine"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    }
+   ],
+   "expect": "call_again"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "report_only"
+    }
+   ],
+   "expect": "agreed_to_receive_report"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "vague_yes"
+    }
+   ],
+   "expect": "interested"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": 1,
+     "what_happened": "language"
+    },
+    {
+     "stage_number": 3,
+     "what_happened": "whatsapp_first"
+    },
+    {
+     "stage_number": 5,
+     "what_happened": "named_need"
+    },
+    {
+     "stage_number": 7,
+     "what_happened": "referred"
+    }
+   ],
+   "expect": "follow_up"
+  },
+  {
+   "logs": [
+    {
+     "stage_number": "7",
+     "what_happened": "named_time"
+    }
+   ],
+   "expect": "next_step_agreed"
+  }
+ ]
+}
