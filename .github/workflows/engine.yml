@@ -5,9 +5,9 @@ name: Rust engine
 
 on:
   push:
-    paths: ["engine/**", "backend/app/llm.py", "backend/app/content.py", "frontend/src/lib/call.js", ".github/workflows/engine.yml"]
+    paths: ["engine/**", "backend/app/llm.py", "backend/app/content.py", "frontend/src/lib/call.js", "frontend/src/lib/engine.js", "frontend/src/test/engine.test.js", ".github/workflows/engine.yml"]
   pull_request:
-    paths: ["engine/**", "backend/app/llm.py", "backend/app/content.py", "frontend/src/lib/call.js", ".github/workflows/engine.yml"]
+    paths: ["engine/**", "backend/app/llm.py", "backend/app/content.py", "frontend/src/lib/call.js", "frontend/src/lib/engine.js", "frontend/src/test/engine.test.js", ".github/workflows/engine.yml"]
   workflow_dispatch:
 
 permissions:
