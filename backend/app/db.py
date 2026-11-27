@@ -47,7 +47,9 @@ CREATE TABLE IF NOT EXISTS calls (
     next_step TEXT,
     stage5_need_quote TEXT,
     ai_summary TEXT,
-    audit_warning TEXT
+    audit_warning TEXT,
+    follow_up_at TEXT,
+    follow_up_done INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS call_stage_logs (
     id TEXT PRIMARY KEY,
@@ -61,7 +63,14 @@ CREATE TABLE IF NOT EXISTS call_stage_logs (
     UNIQUE (call_id, stage_number)
 );
 CREATE INDEX IF NOT EXISTS idx_calls_started_at ON calls(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_logs_call ON call_stage_logs(call_id);
 """
+
+# Columns added after the first release; SQLite files created earlier get them
+# with ALTER TABLE, Supabase needs migrations/002_follow_ups.sql.
+LATE_COLUMNS = {"follow_up_at": "TEXT", "follow_up_done": "INTEGER NOT NULL DEFAULT 0"}
+LIGHT_FIELDS = "id,status,highest_stage_reached,outcome,audit_warning,started_at"
+PAGE = 1000
 
 CALL_FIELDS = (
     "prospect_name",
@@ -78,7 +87,12 @@ class SQLiteStore:
         os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
         with self._conn() as conn:
             conn.executescript(SCHEMA_SQLITE)
+            have = {r["name"] for r in conn.execute("PRAGMA table_info(calls)")}
+            for col, ddl in LATE_COLUMNS.items():
+                if col not in have:
+                    conn.execute(f"ALTER TABLE calls ADD COLUMN {col} {ddl}")
         self._lock = threading.Lock()
+        self.has_follow_ups = True
 
     def _conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.path, check_same_thread=False)
@@ -119,12 +133,13 @@ class SQLiteStore:
             r = conn.execute("SELECT * FROM calls WHERE id = ?", (call_id,)).fetchone()
         return dict(r) if r else None
 
-    def list_calls(self, limit: int = 100) -> list[dict[str, Any]]:
+    def list_calls(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
         with self._conn() as conn:
             calls = [
                 dict(r)
                 for r in conn.execute(
-                    "SELECT * FROM calls ORDER BY started_at DESC LIMIT ?", (limit,)
+                    "SELECT * FROM calls ORDER BY started_at DESC LIMIT ? OFFSET ?",
+                    (limit, offset),
                 ).fetchall()
             ]
             for c in calls:
@@ -187,6 +202,43 @@ class SQLiteStore:
             ]
 
 
+    # -- aggregate helpers (whole table, light columns) ----------------------
+    def all_calls_light(self) -> list[dict[str, Any]]:
+        with self._conn() as conn:
+            return [dict(r) for r in conn.execute(f"SELECT {LIGHT_FIELDS} FROM calls")]
+
+    def stage1_taps(self) -> dict[str, str]:
+        with self._conn() as conn:
+            return {
+                r["call_id"]: r["what_happened"]
+                for r in conn.execute(
+                    "SELECT call_id, what_happened FROM call_stage_logs WHERE stage_number = 1"
+                )
+            }
+
+    def open_calls(self) -> list[dict[str, Any]]:
+        """In-progress calls with the time of their last activity."""
+        with self._conn() as conn:
+            return [
+                dict(r)
+                for r in conn.execute(
+                    """SELECT c.*, COALESCE(MAX(l.created_at), c.started_at) AS last_activity
+                       FROM calls c LEFT JOIN call_stage_logs l ON l.call_id = c.id
+                       WHERE c.status = 'in_progress' GROUP BY c.id"""
+                )
+            ]
+
+    def follow_ups(self) -> list[dict[str, Any]]:
+        with self._conn() as conn:
+            return [
+                dict(r)
+                for r in conn.execute(
+                    """SELECT * FROM calls WHERE follow_up_at IS NOT NULL
+                       AND follow_up_done = 0 ORDER BY follow_up_at"""
+                )
+            ]
+
+
 class SupabaseStore:
     """PostgREST through httpx. Two tables, no SDK to break on a free tier."""
 
@@ -202,6 +254,9 @@ class SupabaseStore:
             },
             timeout=20.0,
         )
+        probe = self.client.get("/calls", params={"select": "follow_up_at", "limit": 1})
+        # False until migrations/002_follow_ups.sql has been run on the project.
+        self.has_follow_ups = probe.status_code == 200
 
     def _rows(self, r: httpx.Response) -> list[dict[str, Any]]:
         r.raise_for_status()
@@ -224,34 +279,71 @@ class SupabaseStore:
         rows = r.json()
         return rows[0] if rows else None
 
-    def list_calls(self, limit: int = 100) -> list[dict[str, Any]]:
+    def _logs_for_ids(self, ids: list[str], select: str = "*", extra: Optional[dict] = None) -> list[dict[str, Any]]:
+        """Fetch logs for many calls in chunks, so the URL never grows past limits."""
+        out: list[dict[str, Any]] = []
+        for i in range(0, len(ids), 80):
+            params = {"call_id": f"in.({','.join(ids[i:i + 80])})", "select": select,
+                      "order": "stage_number.asc"}
+            params.update(extra or {})
+            out += self._rows(self.client.get("/call_stage_logs", params=params))
+        return out
+
+    def _all(self, table: str, params: dict[str, Any]) -> list[dict[str, Any]]:
+        """Every row, a page at a time (PostgREST caps a single response)."""
+        out: list[dict[str, Any]] = []
+        offset = 0
+        while True:
+            page = self._rows(self.client.get(f"/{table}", params={**params, "limit": PAGE, "offset": offset}))
+            out += page
+            if len(page) < PAGE:
+                return out
+            offset += PAGE
+
+    def list_calls(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
         calls = self._rows(
             self.client.get(
                 "/calls",
-                params={"select": "*", "order": "started_at.desc", "limit": limit},
+                params={"select": "*", "order": "started_at.desc", "limit": limit, "offset": offset},
             )
         )
         if not calls:
             return calls
-        ids = ",".join(c["id"] for c in calls)
-        logs = self._rows(
-            self.client.get(
-                "/call_stage_logs",
-                params={
-                    "call_id": f"in.({ids})",
-                    "select": "*",
-                    "order": "stage_number.asc",
-                },
-            )
-        )
         by_call: dict[str, list] = {}
-        for log in logs:
+        for log in self._logs_for_ids([c["id"] for c in calls]):
             by_call.setdefault(log["call_id"], []).append(log)
         for c in calls:
             c["stage_logs"] = by_call.get(c["id"], [])
         return calls
 
+    def all_calls_light(self) -> list[dict[str, Any]]:
+        return self._all("calls", {"select": LIGHT_FIELDS, "order": "started_at.desc"})
+
+    def stage1_taps(self) -> dict[str, str]:
+        rows = self._all("call_stage_logs", {"select": "call_id,what_happened", "stage_number": "eq.1", "order": "call_id"})
+        return {r["call_id"]: r["what_happened"] for r in rows}
+
+    def open_calls(self) -> list[dict[str, Any]]:
+        calls = self._all("calls", {"select": "*", "status": "eq.in_progress", "order": "started_at"})
+        if not calls:
+            return calls
+        last: dict[str, str] = {}
+        for log in self._logs_for_ids([c["id"] for c in calls], "call_id,created_at"):
+            if log["created_at"] > last.get(log["call_id"], ""):
+                last[log["call_id"]] = log["created_at"]
+        for c in calls:
+            c["last_activity"] = max(str(c["started_at"]), last.get(c["id"], ""))
+        return calls
+
+    def follow_ups(self) -> list[dict[str, Any]]:
+        if not self.has_follow_ups:
+            return []
+        return self._all("calls", {"select": "*", "follow_up_at": "not.is.null",
+                                   "follow_up_done": "eq.false", "order": "follow_up_at"})
+
     def update_call(self, call_id: str, patch: dict[str, Any]) -> Optional[dict[str, Any]]:
+        if not self.has_follow_ups:
+            patch = {k: v for k, v in patch.items() if k not in LATE_COLUMNS}
         if patch:
             self._rows(
                 self.client.patch("/calls", params={"id": f"eq.{call_id}"}, json=patch)

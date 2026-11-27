@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { api } from "./api.js";
+import { api } from "./api";
 import { DEFAULT_CONTENT } from "./data/defaultContent.js";
 import StartCall from "./views/StartCall.jsx";
 import LiveCall from "./views/LiveCall.jsx";
@@ -13,6 +13,9 @@ export default function App() {
   const [view, setView] = useState("start");
   const [callId, setCallId] = useState(() => localStorage.getItem(STORAGE_KEY) || null);
   const [wakingUp, setWakingUp] = useState(false);
+  // The open call has been saved: still viewable (summary), no longer "in progress".
+  const [callEnded, setCallEnded] = useState(false);
+  const inProgress = Boolean(callId) && !callEnded;
 
   const checkHealth = useCallback(async () => {
     try {
@@ -28,7 +31,13 @@ export default function App() {
   const openCall = useCallback((id) => {
     localStorage.setItem(STORAGE_KEY, id);
     setCallId(id);
+    setCallEnded(false);
     setView("live");
+  }, []);
+
+  const endCall = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCallEnded(true);
   }, []);
 
   useEffect(() => {
@@ -72,88 +81,64 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f8fafc] text-ink-900">
+    <div className="flex min-h-screen flex-col text-ink-900">
       {/* Top Banner if Render backend is cold-starting */}
       {wakingUp && !health && (
-        <div className="bg-blue-50/90 border-b border-blue-200/80 px-4 py-2 text-center text-xs text-blue-900 flex items-center justify-center gap-2.5 backdrop-blur-xs">
+        <div className="bg-navy-50/90 border-b border-navy-200/80 px-4 py-2 text-center text-xs text-navy-900 flex items-center justify-center gap-2.5 backdrop-blur-xs">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0047ff] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0047ff]"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-navy opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-navy"></span>
           </span>
-          <span className="font-mono font-medium">Connecting to Render backend & Supabase... App features are ready.</span>
+          <span className="tnum font-medium">Waking up the server. This can take up to 30 seconds the first time.</span>
         </div>
       )}
 
-      {/* Enterprise Frosted Glass Header */}
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 sm:px-8 backdrop-blur-md shadow-xs">
-        {/* Brand Mark */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#0047ff] to-blue-700 text-white shadow-sm shadow-blue-500/25 font-mono text-sm font-bold">
-            S
-          </div>
-          <div>
-            <div className="text-[14px] font-bold tracking-tight text-ink-950">
-              Spindle
-            </div>
-            <div className="hidden md:flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block"></span>
-              <span>PostgreSQL Supabase · Gemini Flash Lite</span>
-            </div>
-          </div>
+      <header className="sticky top-0 z-30 border-b border-steel-200 bg-white">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-6 px-4 sm:px-6">
+        <div className="flex items-baseline gap-3">
+          <span className="display text-[22px] font-extrabold text-ink-950" style={{ fontStretch: "125%" }}>
+            Spindle
+          </span>
+          <span className="hidden md:inline text-sm text-ink-500">Live call guide</span>
         </div>
 
         {/* Central Segmented Pill Navigation: Start call | Live call | Past calls */}
-        <nav className="flex gap-1 rounded-xl bg-slate-100/90 border border-slate-200/80 p-1 shadow-inner">
+        <nav className="flex h-16 items-stretch gap-1" aria-label="Sections">
           <button
             onClick={() => setView("start")}
-            className={`rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
+            className={`whitespace-nowrap px-2.5 sm:px-4 text-sm font-semibold border-b-[3px] transition-colors ${
               view === "start"
-                ? "bg-white text-ink-950 shadow-xs ring-1 ring-slate-900/5"
-                : "text-slate-600 hover:text-ink-950"
+                ? "border-navy text-ink-950"
+                : "border-transparent text-ink-500 hover:text-ink-900"
             }`}
           >
             Start call
           </button>
           <button
-            onClick={() => {
-              if (callId) {
-                setView("live");
-              } else {
-                api
-                  .startCall({
-                    prospect_name: "Ramesh Varma",
-                    prospect_role: "Managing Director",
-                    company_name: "Sri Balaji Precision",
-                    company_kind: "mid-size private manufacturer",
-                    call_type: "first call",
-                  })
-                  .then((res) => openCall(res.call.id))
-                  .catch(() => setView("start"));
-              }
-            }}
-            className={`flex items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
+            onClick={() => setView("live")}
+            className={`flex items-center gap-1.5 sm:gap-2 whitespace-nowrap px-2.5 sm:px-4 text-sm font-semibold border-b-[3px] transition-colors ${
               view === "live"
-                ? "bg-white text-ink-950 shadow-xs ring-1 ring-slate-900/5"
-                : "text-slate-600 hover:text-ink-950"
+                ? "border-navy text-ink-950"
+                : "border-transparent text-ink-500 hover:text-ink-900"
             }`}
           >
-            {callId && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+            {inProgress && <span className="h-2 w-2 rounded-full bg-signal" aria-hidden />}
             Live call
+            {inProgress && <span className="sr-only"> (call in progress)</span>}
           </button>
           <button
             onClick={() => setView("history")}
-            className={`rounded-lg px-3 sm:px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 ${
+            className={`whitespace-nowrap px-2.5 sm:px-4 text-sm font-semibold border-b-[3px] transition-colors ${
               view === "history"
-                ? "bg-white text-ink-950 shadow-xs ring-1 ring-slate-900/5"
-                : "text-slate-600 hover:text-ink-950"
+                ? "border-navy text-ink-950"
+                : "border-transparent text-ink-500 hover:text-ink-900"
             }`}
           >
             Past calls
           </button>
         </nav>
 
-        {/* Clean right spacer for balanced navbar alignment */}
-        <div className="w-[80px] sm:w-[120px] hidden sm:block" />
+        </div>
       </header>
 
       {/* Main Container */}
@@ -161,7 +146,7 @@ export default function App() {
         {view === "start" && (
           <StartCall
             content={content}
-            hasCall={Boolean(callId)}
+            hasCall={inProgress}
             resume={() => setView("live")}
             onStart={openCall}
           />
@@ -175,17 +160,17 @@ export default function App() {
               onNew={startNewCall}
               onFinished={finishCall}
               onClear={clearCall}
+              onEnded={endCall}
             />
           ) : (
-            <div className="mx-auto max-w-md py-16 text-center rounded-2xl border border-slate-200/90 bg-white p-8 shadow-sm">
-              <p className="font-mono text-xs uppercase tracking-wider text-slate-400">Live Call Cockpit</p>
-              <h3 className="text-lg font-bold text-slate-900 mt-1">No active call in this session</h3>
-              <p className="text-xs text-slate-500 mt-1.5">
-                Start a live call or launch the simulation to use the 8-stage guide.
+            <div className="card mx-auto max-w-md p-8 text-center">
+              <h3 className="text-xl font-bold text-ink-950">No call in progress</h3>
+              <p className="text-sm text-ink-600 mt-1.5">
+                Start a call to open the eight-stage guide.
               </p>
               <div className="mt-5 flex justify-center gap-3">
                 <button className="btn-primary" onClick={() => setView("start")}>
-                  Start a call now →
+                  Start a call
                 </button>
               </div>
             </div>
@@ -200,34 +185,10 @@ export default function App() {
         )}
       </main>
 
-      {/* Enterprise Tech Stack Footer */}
-      <footer className="mt-auto border-t border-slate-200/80 bg-white/70 py-5 px-6 backdrop-blur-md">
-        <div className="mx-auto max-w-[1240px] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="font-semibold text-slate-700">Spindle</span>
-            <span className="text-slate-300">|</span>
-            <span>8-Stage Indian B2B Call Guide</span>
-          </div>
-
-          {/* Technology Stack Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px]">
-            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
-              Supabase PostgreSQL
-            </span>
-            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
-              Google Gemini Flash Lite
-            </span>
-            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
-              Python FastAPI
-            </span>
-            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 font-medium text-slate-700">
-              React 18 · Vite · Tailwind
-            </span>
-            <span className="rounded-md bg-blue-50 border border-blue-200 px-2 py-0.5 font-bold text-[#0047ff]">
-              100 Transcripts (T001–T100)
-            </span>
-          </div>
+      <footer className="mt-auto border-t border-steel-200 py-5 px-6">
+        <div className="mx-auto max-w-[1240px] flex flex-wrap items-center justify-between gap-2 text-sm text-ink-500">
+          <span>Spindle guides a cold call to an Indian manufacturer through eight stages.</span>
+          <span>Built on 100 real call transcripts.</span>
         </div>
       </footer>
     </div>

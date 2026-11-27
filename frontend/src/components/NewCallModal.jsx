@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api } from "../api.js";
+import { api } from "../api";
 
 const PRESETS = [
   {
@@ -57,23 +57,23 @@ export default function NewCallModal({ isOpen, onClose, onStart }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-6 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-[500px] rounded-2xl border border-white/80 bg-white/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl text-slate-900"
+        className="w-full max-w-[500px] rounded-2xl border border-white/80 bg-white/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl text-ink-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
+        <div className="flex items-center justify-between border-b border-steel-200/60 pb-3">
           <div>
             <h3 className="text-lg font-bold tracking-tight">Start New Cold Call</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-ink-500 mt-0.5">
               Select an authentic transcript preset or enter prospect info
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all"
+            className="rounded-lg p-1 text-steel-400 hover:bg-steel-100 hover:text-ink-700 transition-all"
           >
             ✕
           </button>
@@ -81,7 +81,7 @@ export default function NewCallModal({ isOpen, onClose, onStart }) {
 
         {/* 1-Click Transcript Presets */}
         <div className="mt-4 space-y-2">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <p className="tnum text-xs font-bold text-steel-400">
             1-Click Transcript Presets
           </p>
           {PRESETS.map((p) => (
@@ -89,20 +89,20 @@ export default function NewCallModal({ isOpen, onClose, onStart }) {
               key={p.company_name}
               disabled={busy}
               onClick={() => dial(p)}
-              className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white hover:border-[#0047ff] hover:bg-blue-50/40 hover:shadow-xs transition-all text-left"
+              className="w-full flex items-center justify-between p-3 rounded-xl border border-steel-200 bg-white hover:border-navy hover:bg-navy-50/40 hover:shadow-xs transition-all text-left"
             >
               <div>
-                <div className="text-xs font-bold text-slate-900">
+                <div className="text-xs font-bold text-ink-900">
                   {p.company_name}
                 </div>
-                <div className="text-[11px] text-slate-500 mt-0.5">
+                <div className="text-xs text-ink-500 mt-0.5">
                   {p.prospect_name} · {p.prospect_role}
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono">
+                <span className="text-xs text-steel-400 tnum">
                   {p.tag}
                 </span>
               </div>
-              <span className="font-mono text-[11px] font-bold text-[#0047ff] bg-blue-50 border border-blue-200/80 px-2.5 py-1 rounded-lg shrink-0">
+              <span className="tnum text-xs font-bold text-navy bg-navy-50 border border-navy-200/80 px-2.5 py-1 rounded-lg shrink-0">
                 Dial →
               </span>
             </button>
@@ -115,9 +115,9 @@ export default function NewCallModal({ isOpen, onClose, onStart }) {
             e.preventDefault();
             dial(form);
           }}
-          className="mt-5 pt-4 border-t border-slate-200/80 space-y-3"
+          className="mt-5 pt-4 border-t border-steel-200/80 space-y-3"
         >
-          <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <p className="tnum text-xs font-bold text-steel-400">
             Or Dial Custom Prospect
           </p>
           <div className="grid grid-cols-2 gap-2">
@@ -143,7 +143,7 @@ export default function NewCallModal({ isOpen, onClose, onStart }) {
             required
           />
 
-          {err && <p className="text-xs text-rose-600 font-mono">{err}</p>}
+          {err && <p className="text-xs text-rose-600 tnum">{err}</p>}
 
           <div className="flex justify-end gap-2 pt-2">
             <button

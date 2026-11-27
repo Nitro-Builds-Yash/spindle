@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { api } from "../api.js";
+import { api } from "../api";
+import CallList from "../components/CallList.jsx";
 
 const KINDS = [
   "mid-size private company",
@@ -20,7 +21,7 @@ const PRESETS = [
     company_name: "Sri Balaji Precision",
     company_kind: "mid-size private manufacturer",
     call_type: "first call",
-    industry: "Precision Machining · Coimbatore",
+    industry: "Precision Machining, Coimbatore",
   },
   {
     prospect_name: "Dev ji",
@@ -28,7 +29,7 @@ const PRESETS = [
     company_name: "Kalpana Chem Supplies",
     company_kind: "mid-size private company",
     call_type: "first call",
-    industry: "Chemical Processing · Gujarat",
+    industry: "Chemical Processing, Gujarat",
   },
   {
     prospect_name: "Vinod ji",
@@ -36,7 +37,7 @@ const PRESETS = [
     company_name: "ChromaChem India",
     company_kind: "mid-size private manufacturer",
     call_type: "first call",
-    industry: "Industrial Coatings · Pune",
+    industry: "Industrial Coatings, Pune",
   },
 ];
 
@@ -70,35 +71,55 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
   return (
     <div className="grid grid-cols-1 gap-12 pt-4 lg:grid-cols-[minmax(0,1fr)_360px]">
       <section className="max-w-[620px]">
-        <p className="eyebrow">Before you dial · Live Call Initiation</p>
-        <h1 className="mt-2 text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-ink-950">
-          The call is eight stages. The screen holds one at a time.
+        <h1 className="text-4xl sm:text-[46px] font-extrabold leading-[1.05] text-ink-950">
+          Eight stages. One on screen at a time.
         </h1>
-        <p className="mt-3 text-[14.5px] leading-relaxed text-slate-600">
-          Fill in who you are calling. The timer starts when the screen opens, and the
-          caller types nothing on the call except one tap and the prospect's own words.
+        <p className="mt-4 text-[16px] leading-relaxed text-ink-700 max-w-[52ch]">
+          Say who you're calling and start. During the call you only tap what happened
+          and type the prospect's own words.
         </p>
 
-        {/* Quick Start Call Session */}
-        <div className="mt-5 rounded-xl border border-slate-200/90 bg-white p-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-[#0047ff] border border-blue-200/80 shrink-0 mt-0.5">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-            </div>
-            <div>
-              <div className="text-xs font-mono font-bold uppercase tracking-wider text-ink-950">
-                Simulate Call Session
+        {/* The call, drawn as its eight stops; fills once on load */}
+        <div className="mt-8 rounded-xl2 bg-navy-900 px-6 pt-6 pb-5 shadow-float" aria-hidden>
+          <div className="relative grid grid-cols-8">
+            <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] rounded-full bg-navy-700" />
+            <span className="absolute left-[6.25%] right-[6.25%] top-[13px] h-[3px] origin-left rounded-full bg-gradient-to-r from-navy-300 via-navy-300 to-signal motion-safe:animate-[railFill_1.8s_cubic-bezier(.6,0,.2,1)_both]" />
+            {content.stages.map((st, i) => (
+              <div key={st.key} className="relative flex flex-col items-center">
+                <span
+                  className={`tnum relative z-10 flex h-[29px] w-[29px] items-center justify-center rounded-full text-[13px] font-bold ${
+                    i === 7
+                      ? "bg-signal text-ink-950 shadow-[0_0_18px_rgba(242,169,0,0.55)]"
+                      : "bg-navy-300 text-navy-900"
+                  }`}
+                  style={{ animation: `nodeOn ${0.35 + i * 0.2}s ease-out both` }}
+                >
+                  {st.number}
+                </span>
+                <span className="mt-2 hidden sm:block text-center text-[11px] leading-tight text-navy-200">{st.name}</span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Start an interactive 8-stage call with Ramesh Varma (Sri Balaji Precision).
+            ))}
+          </div>
+          <p className="mt-4 border-t border-navy-700 pt-3 text-sm text-navy-200">
+            The average call in the transcripts lasts 93.5 seconds. Spindle keeps you on the right stage for all of it.
+          </p>
+        </div>
+
+        {/* Quick Start Call Session */}
+        <div className="mt-7 rounded-xl2 border border-steel-200 bg-white px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div>
+              <div className="text-[15px] font-bold text-ink-950">
+                Practice first
+              </div>
+              <p className="text-sm text-ink-600 mt-0.5">
+                Run a call with Ramesh Varma of Sri Balaji Precision, played by the practice phone.
               </p>
             </div>
           </div>
           <button
             type="button"
-            className="btn-blue py-2 px-4.5 rounded-lg shadow-sm text-xs shrink-0"
+            className="btn-ghost shrink-0"
             onClick={() => {
               setBusy(true);
               api
@@ -115,15 +136,15 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
             }}
             disabled={busy}
           >
-            {busy ? "Opening..." : "Start Call Guide →"}
+            {busy ? "Opening…" : "Start practice call"}
           </button>
         </div>
 
         {hasCall && (
-          <div className="card mt-5 flex items-center justify-between p-4 text-xs text-slate-700 bg-blue-50/60 border-blue-200/80 shadow-xs">
-            <span className="font-medium">An active cold call is currently open in this session.</span>
-            <button className="font-mono text-xs font-bold text-[#0047ff] hover:underline uppercase" onClick={resume}>
-              Return to it →
+          <div className="mt-5 flex items-center justify-between rounded-xl2 border border-signal bg-signal-soft px-5 py-3.5 text-sm text-ink-900">
+            <span className="font-medium">You have a call in progress.</span>
+            <button className="tnum text-xs font-bold text-navy hover:underline" onClick={resume}>
+              Go back to it
             </button>
           </div>
         )}
@@ -131,7 +152,7 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
         <form onSubmit={start} className="card mt-6 grid gap-4 p-7 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="grid gap-1.5">
-              <span className="text-xs font-semibold text-ink-800">Prospect name</span>
+              <span className="text-sm font-semibold text-ink-800">Prospect name</span>
               <input
                 className="input"
                 value={form.prospect_name}
@@ -142,7 +163,7 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
               />
             </label>
             <label className="grid gap-1.5">
-              <span className="text-xs font-semibold text-ink-800">Role</span>
+              <span className="text-sm font-semibold text-ink-800">Role</span>
               <input
                 className="input"
                 value={form.prospect_role}
@@ -153,7 +174,7 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
           </div>
 
           <label className="grid gap-1.5">
-            <span className="text-xs font-semibold text-ink-800">Company name</span>
+            <span className="text-sm font-semibold text-ink-800">Company name</span>
             <input
               className="input"
               value={form.company_name}
@@ -165,7 +186,7 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="grid gap-1.5">
-              <span className="text-xs font-semibold text-ink-800">Company kind</span>
+              <span className="text-sm font-semibold text-ink-800">Company kind</span>
               <select
                 className="input cursor-pointer"
                 value={form.company_kind}
@@ -179,7 +200,7 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
               </select>
             </label>
             <label className="grid gap-1.5">
-              <span className="text-xs font-semibold text-ink-800">Call type</span>
+              <span className="text-sm font-semibold text-ink-800">Call type</span>
               <select className="input cursor-pointer" value={form.call_type} onChange={set("call_type")}>
                 <option value="first call">first call</option>
                 <option value="follow-up">follow-up</option>
@@ -187,27 +208,29 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
             </label>
           </div>
 
-          {err && <p className="text-xs text-rose-600 font-mono">{err}</p>}
+          {err && <p className="text-xs text-rose-600 tnum">{err}</p>}
 
-          <button className="btn-primary mt-3 py-3.5 shadow-md shadow-slate-900/10 text-xs" disabled={busy}>
-            {busy ? "Starting session…" : "Start the call →"}
+          <button className="btn-primary mt-3 py-3.5 text-[15px]" disabled={busy}>
+            {busy ? "Starting…" : "Start the call"}
           </button>
         </form>
       </section>
 
-      <aside className="space-y-6">
+      <aside className="space-y-8">
+        <CallList onStart={onStart} />
+
         <div>
-          <p className="eyebrow">The eight stages</p>
-          <ol className="mt-3 space-y-0 border-t border-slate-200/80">
+          <h2 className="text-lg font-bold text-ink-950">The eight stages</h2>
+          <ol className="mt-3 border-t border-steel-200">
             {content.stages.map((s) => (
-              <li key={s.key} className="border-b border-slate-200/80 py-2.5">
+              <li key={s.key} className="border-b border-steel-200 py-3">
                 <div className="flex gap-3">
-                  <span className="font-mono text-xs font-bold text-[#0047ff]">
-                    {String(s.number).padStart(2, "0")}
+                  <span className="tnum mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-steel-300 text-xs font-bold text-ink-700">
+                    {s.number}
                   </span>
                   <div>
-                    <div className="text-xs font-bold text-ink-950">{s.name}</div>
-                    <div className="text-[11.5px] leading-snug text-slate-500 mt-0.5">{s.purpose}</div>
+                    <div className="text-[15px] font-semibold text-ink-950">{s.name}</div>
+                    <div className="text-sm leading-snug text-ink-600 mt-0.5">{s.purpose}</div>
                   </div>
                 </div>
               </li>
@@ -216,29 +239,27 @@ export default function StartCall({ content, hasCall, resume, onStart }) {
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <p className="eyebrow">Transcript Presets</p>
-            <span className="font-mono text-[10px] text-slate-400">1-Click Load</span>
-          </div>
+          <h2 className="text-lg font-bold text-ink-950">Fill from a real call</h2>
+          <p className="text-sm text-ink-500 mt-0.5 mb-3">Prospects taken from the transcripts.</p>
           <div className="space-y-2">
             {PRESETS.map((p) => (
               <button
                 key={p.company_name}
                 onClick={() => setForm(p)}
-                className="w-full rounded-xl border border-slate-200/90 bg-white p-3 text-left hover:border-[#0047ff] hover:bg-blue-50/20 hover:shadow-card hover:-translate-y-0.5 transition-all duration-150 group"
+                className="w-full rounded-lg2 border border-steel-200 bg-white px-4 py-3 text-left hover:border-navy transition-colors group"
               >
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-bold text-ink-950 group-hover:text-[#0047ff] transition-colors">
+                  <div className="text-[15px] font-semibold text-ink-950">
                     {p.company_name}
                   </div>
-                  <span className="font-mono text-[9px] text-[#0047ff] opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-                    Load →
+                  <span className="text-sm text-navy opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 font-semibold">
+                    Use
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-500 font-medium mt-0.5">
-                  {p.prospect_name} · {p.prospect_role}
+                <div className="text-sm text-ink-600 mt-0.5">
+                  {p.prospect_name}, {p.prospect_role}
                 </div>
-                <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                <div className="text-xs text-ink-400 mt-0.5">
                   {p.industry}
                 </div>
               </button>

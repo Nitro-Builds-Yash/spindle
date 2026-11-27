@@ -241,21 +241,58 @@ Spindle connects to a production **Supabase PostgreSQL** instance with Row Level
 
 ---
 
-## 🧪 Automated Testing & CI Pipeline
+## 🦀 Rust engine (WebAssembly)
 
-Spindle includes a comprehensive automated test suite in `backend/tests/test_api.py` covering:
-- Health check and stages schema integrity
-- Full call lifecycle: Start &rarr; Stage 1 &rarr; Stage 5 Quote &rarr; Pre-close Consistency Audit &rarr; Close
-- Real-time simulated prospect responses
-- CRM CSV export data generation
-- Error boundaries and non-existent UUID handling
+`engine/` is a Rust crate with Spindle's call rules: reading which stage the prospect's words point to, the fallback cue, the close audit, the manager summary and the suggested outcome. CI compiles it to WebAssembly (`frontend/src/engine/pkg`) and the browser runs it directly, so:
+
+- **Cues are instant and work offline.** Asking for a cue shows the on-device line at once; the model's answer replaces it when it arrives.
+- **Live stage read.** As the prospect's words are typed or dictated, Spindle says "Sounds like *Objection* (stage 6)" with a one-tap jump.
+- **The pre-close check is instant**, also offline; the server's check (which may use the model) still has the final word.
+
+The rules exist in Python too (for the API). `engine/tests/parity.rs` replays 3,700+ cases generated from the Python and JavaScript (`engine/fixtures/gen_python.py`, `gen_js.mjs`), so the three can't drift: CI fails if a rule changes in one place only.
 
 ```bash
-cd backend
-pytest -v
+cd engine && cargo test          # parity + unit tests
+wasm-pack build --release --target web --out-dir ../frontend/src/engine/pkg --no-pack
 ```
 
-GitHub Actions automatically executes this test suite and runs `npm run build` on every push to `main`:
+If the WebAssembly build is missing, the app falls back to the server's rules with no change in behaviour.
+
+## 🧰 Working features for a calling team
+
+- **Call list:** import a CSV of prospects (needs `name` and `company` columns; `role`, `kind`, `phone` optional) on the Start screen and work through it top to bottom. The list stays in that browser.
+- **Follow-ups:** when an outcome means someone should call back, the close dialog asks for a callback time. Past calls lists them as overdue, today or upcoming, with **Add to calendar** (`.ics`), **Mark done** and **Call now**.
+- **Offline taps:** if the connection drops mid-call (or the free Render server is waking up), taps are saved in the browser and sent when it's back. A call is never closed while taps are still waiting.
+- **Abandoned calls:** a call left open with no activity for `ABANDON_AFTER_MINUTES` (default 30) is closed automatically and kept out of the drop-off chart and connect rate.
+- **Dictation → cue:** when dictation stops, Spindle asks for the next line automatically.
+
+### Operations settings (backend)
+
+| Variable | Default | What it does |
+|---|---|---|
+| `SPINDLE_ACCESS_TOKEN` | unset | Shared token for `/api/*` |
+| `ALLOWED_ORIGINS` | local dev only | Frontend URLs allowed by CORS |
+| `LLM_TIMEOUT_SECONDS` | `4` | Ceiling for one AI answer |
+| `AI_RATE_PER_MINUTE` | `30` | AI requests per client per minute (429 after) |
+| `ABANDON_AFTER_MINUTES` | `30` | When an untouched open call is closed |
+| `SENTRY_DSN` / `VITE_SENTRY_DSN` | unset | Optional error tracking, backend / frontend |
+
+### Database migrations
+
+New installs: run `schema.sql`. Existing Supabase projects: also run `migrations/002_follow_ups.sql` once (adds the follow-up columns). Until then follow-ups are hidden and `/health` shows a warning; everything else works.
+
+## 🧪 Automated Testing & CI Pipeline
+
+- **Backend** (`backend/tests/test_api.py`, pytest): call lifecycle, audit, CSV export and formula escaping, access token, CORS, LLM deadline and fallback, AI rate limit, abandoned-call sweep, follow-ups and the calendar file, paging, and Supabase paging/chunking against a fake PostgREST.
+- **Frontend** (`frontend/src/test`, Vitest + Testing Library): CSV parsing, call helpers, the offline outbox, the stage rail, tap grid and call list.
+- **Lint and types:** ESLint (React + hooks rules) and `tsc` over the typed API client (`src/api.ts`).
+
+```bash
+cd backend && pytest -q
+cd frontend && npm run lint && npm run typecheck && npm test && npm run build
+```
+
+GitHub Actions runs all of it, plus `npm audit`, on every push and pull request to `main`:
 [![CI Pipeline](https://github.com/Nitro-Builds-Yash/spindle/actions/workflows/ci.yml/badge.svg)](https://github.com/Nitro-Builds-Yash/spindle/actions)
 
 ---

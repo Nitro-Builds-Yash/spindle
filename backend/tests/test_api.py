@@ -201,7 +201,7 @@ def test_llm_failure_falls_back_and_is_reported(monkeypatch):
 
     monkeypatch.setenv("LLM_PROVIDER", "gemini")
     monkeypatch.setenv("LLM_API_KEY", "fake")
-    monkeypatch.setattr(llm.httpx, "post", boom)
+    monkeypatch.setattr(llm._http, "post", boom)
     r = client.post("/api/ai/cue", json={"stage_number": 6, "prospect_words": "we have big four"})
     assert r.status_code == 200 and r.json()["source"] == "rules"
     health = client.get("/health").json()
@@ -221,7 +221,7 @@ def test_llm_respects_deadline(monkeypatch):
         raise RuntimeError("slow")
 
     monkeypatch.setenv("LLM_TIMEOUT_SECONDS", "0.5")
-    monkeypatch.setattr(llm.httpx, "post", slow)
+    monkeypatch.setattr(llm._http, "post", slow)
     start = time.monotonic()
     try:
         llm._gemini("m1", "k", "p", time.monotonic() + llm._budget())
@@ -230,3 +230,141 @@ def test_llm_respects_deadline(monkeypatch):
     # Only one attempt fits in the budget, and its timeout is capped by it.
     assert len(calls) == 1 and calls[0] <= 0.5
     assert time.monotonic() - start < 1.0
+
+
+# --------------------------------------------------------------------------- #
+# Abandoned calls, stats, follow-ups, rate limit, paging
+# --------------------------------------------------------------------------- #
+
+from app import main as main_mod  # noqa: E402
+
+
+def _new_call(name="Test Prospect"):
+    r = client.post("/api/calls", json={"prospect_name": name, "company_name": "Co"})
+    return r.json()["call"]["id"]
+
+
+def test_stale_call_is_abandoned_and_kept_out_of_funnel():
+    cid = _new_call("Stale Sam")
+    main_mod.store.update_call(cid, {"started_at": "2020-01-01T00:00:00+00:00"})
+    before = client.get("/api/stats").json()
+    main_mod.sweep_abandoned(force=True)
+    call = client.get(f"/api/calls/{cid}").json()["call"]
+    assert call["status"] == "dropped" and call["outcome"] == "not_logged"
+    assert call["audit_warning"] == main_mod.ABANDONED_NOTE
+    after = client.get("/api/stats").json()
+    assert after["abandoned"] >= 1
+    assert sum(after["ended_by_stage"].values()) == sum(before["ended_by_stage"].values())
+
+
+def test_recent_call_is_not_abandoned():
+    cid = _new_call()
+    main_mod.sweep_abandoned(force=True)
+    assert client.get(f"/api/calls/{cid}").json()["call"]["status"] == "in_progress"
+
+
+def test_follow_up_flow_and_calendar_file():
+    cid = _new_call("Follow Fiona")
+    r = client.post(f"/api/calls/{cid}/close", json={
+        "outcome": "next_step_agreed", "next_step": "Call Wed",
+        "follow_up_at": "2030-01-15T15:00:00+05:30",
+    })
+    assert r.status_code == 200
+    due = client.get("/api/follow-ups").json()["follow_ups"]
+    mine = [f for f in due if f["id"] == cid]
+    assert mine and mine[0]["due"] == "later"
+    ics = client.get(f"/api/calls/{cid}/follow-up.ics")
+    assert ics.status_code == 200 and "text/calendar" in ics.headers["content-type"]
+    assert "DTSTART:20300115T093000Z" in ics.text and "Call back Follow Fiona\\, Co" in ics.text
+    client.post(f"/api/calls/{cid}/follow-up/done")
+    assert not [f for f in client.get("/api/follow-ups").json()["follow_ups"] if f["id"] == cid]
+
+
+def test_follow_up_requires_timezone():
+    cid = _new_call()
+    r = client.post(f"/api/calls/{cid}/close", json={
+        "outcome": "follow_up", "follow_up_at": "2030-01-15T15:00:00"})
+    assert r.status_code == 422
+
+
+def test_ai_rate_limit(monkeypatch):
+    monkeypatch.setenv("AI_RATE_PER_MINUTE", "3")
+    main_mod._ai_hits.clear()
+    codes = [client.post("/api/ai/cue", json={"stage_number": 1}).status_code for _ in range(4)]
+    assert codes == [200, 200, 200, 429]
+    main_mod._ai_hits.clear()
+
+
+def test_list_calls_offset_pages():
+    for i in range(3):
+        _new_call(f"Page {i}")
+    first = client.get("/api/calls?limit=2").json()["calls"]
+    second = client.get("/api/calls?limit=2&offset=2").json()["calls"]
+    assert len(first) == 2 and first[0]["id"] != second[0]["id"]
+
+
+def test_supabase_store_chunks_and_pages():
+    """Fake PostgREST: 2,300 calls, logs fetched in chunks, pages of 1000."""
+    import httpx
+    from urllib.parse import parse_qs, urlparse
+    from app.db import SupabaseStore
+
+    calls = [{"id": f"c{i:04d}", "status": "completed", "highest_stage_reached": 2,
+              "outcome": None, "audit_warning": None, "started_at": "2026-01-01"} for i in range(2300)]
+    seen_log_queries = []
+
+    def handler(req: httpx.Request):
+        q = {k: v[0] for k, v in parse_qs(urlparse(str(req.url)).query).items()}
+        path = req.url.path
+        if path.endswith("/calls"):
+            if q.get("select") == "follow_up_at":
+                return httpx.Response(400, json={"message": "column does not exist"})
+            off, lim = int(q.get("offset", 0)), int(q.get("limit", 100))
+            return httpx.Response(200, json=calls[off:off + lim])
+        if path.endswith("/call_stage_logs"):
+            ids = q["call_id"][4:-1].split(",")
+            seen_log_queries.append(len(ids))
+            return httpx.Response(200, json=[{"call_id": i, "stage_number": 1, "what_happened": "x",
+                                              "created_at": "2026-01-01"} for i in ids])
+        return httpx.Response(404)
+
+    store = SupabaseStore.__new__(SupabaseStore)
+    store.client = httpx.Client(base_url="http://fake/rest/v1", transport=httpx.MockTransport(handler))
+    store.has_follow_ups = False
+
+    assert len(store.all_calls_light()) == 2300            # 3 pages
+    page = store.list_calls(500)
+    assert len(page) == 500 and all(c["stage_logs"] for c in page)
+    assert max(seen_log_queries) <= 80                       # URL stays short
+    store.update_call  # follow-up fields are stripped when the column is missing
+    assert store.follow_ups() == []
+
+
+# --------------------------------------------------------------------------- #
+# Bug fixes: practice-phone name, live audit duration, empty next step
+# --------------------------------------------------------------------------- #
+
+def test_practice_phone_uses_the_real_prospect_name(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    r = client.post("/api/ai/simulate", json={
+        "stage_number": 1, "caller_message": "Hello", "prospect_name": "Meera Iyer", "company_name": "Iyer Polymers"})
+    assert "Meera Iyer" in r.json()["reply"] and "Ramesh" not in r.json()["reply"]
+
+
+def test_pre_close_audit_uses_time_so_far(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    cid = _new_call()
+    main_mod.store.update_call(cid, {"started_at": "2020-01-01T00:00:00+00:00"})
+    for n, tap in [(1, "right_person"), (5, "named_need"), (7, "named_time")]:
+        client.post(f"/api/calls/{cid}/stage-log", json={"stage_number": n, "what_happened": tap, "prospect_words": "need help"})
+    r = client.post(f"/api/calls/{cid}/audit", json={"outcome": "next_step_agreed", "next_step": "Thu 4pm call"})
+    assert "0 seconds" not in (r.json().get("warning") or "")
+
+
+def test_next_step_agreed_without_next_step_is_flagged(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    cid = _new_call()
+    for n, tap in [(1, "right_person"), (7, "named_time")]:
+        client.post(f"/api/calls/{cid}/stage-log", json={"stage_number": n, "what_happened": tap})
+    r = client.post(f"/api/calls/{cid}/audit", json={"outcome": "next_step_agreed", "next_step": ""})
+    assert "no next step" in r.json()["warning"]

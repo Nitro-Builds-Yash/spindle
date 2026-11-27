@@ -1,5 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { api } from "../api.js";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { api } from "../api";
+import FollowUps from "../components/FollowUps.jsx";
+
+const PAGE = 100;
 
 function when(iso) {
   if (!iso) return "";
@@ -7,7 +10,7 @@ function when(iso) {
   const now = new Date();
   const time = d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
   if (d.toDateString() === now.toDateString()) return `Today ${time}`;
-  return `${d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}, ${time}`;
+  return `${d.toLocaleDateString("en-IN", { day:"2-digit", month : "short"})}, ${time}`;
 }
 
 const toneClass = {
@@ -26,6 +29,32 @@ export default function History({ content, onOpen, onNew }) {
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  async function loadMore() {
+    setLoadingMore(true);
+    try {
+      const d = await api.listCalls(PAGE, calls.length);
+      setCalls((prev) => [...prev, ...d.calls.filter((c) => !prev.some((p) => p.id === c.id))]);
+      setHasMore(d.calls.length === PAGE);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
+  async function callAgain(f) {
+    const { call } = await api.startCall({
+      prospect_name: f.prospect_name,
+      prospect_role: f.prospect_role,
+      company_name: f.company_name,
+      company_kind: f.company_kind,
+      call_type: "follow-up",
+    });
+    onOpen(call.id);
+  }
 
   useEffect(() => {
     if (!openId) {
@@ -47,8 +76,11 @@ export default function History({ content, onOpen, onNew }) {
 
   useEffect(() => {
     api
-      .listCalls()
-      .then((d) => setCalls(d.calls))
+      .listCalls(PAGE)
+      .then((d) => {
+        setCalls(d.calls);
+        setHasMore(d.calls.length === PAGE);
+      })
       .catch((e) => setErr(e.message));
     api.stats().then(setStats).catch(() => {});
   }, []);
@@ -78,8 +110,8 @@ export default function History({ content, onOpen, onNew }) {
     );
   }, [calls, filterQuery]);
 
-  if (err) return <div className="py-20 text-center text-rose-600 font-mono text-sm">{err}</div>;
-  if (!calls) return <div className="py-20 text-center text-slate-500 font-mono text-sm">Loading past calls…</div>;
+  if (err) return <div className="py-20 text-center text-rose-600 tnum text-sm">{err}</div>;
+  if (!calls) return <div className="py-20 text-center text-ink-500 tnum text-sm">Loading past calls…</div>;
 
   const exportCSV = async () => {
     // Server export: one source of truth, formula-escaped, and sends the token.
@@ -97,57 +129,57 @@ export default function History({ content, onOpen, onNew }) {
   return (
     <div className="flex flex-col gap-8 max-w-[1020px] mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/80 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">The Second Screen · Performance Analytics</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-ink-950">Past calls</h1>
-          <p className="text-sm text-slate-600 mt-1 max-w-[65ch]">
-            After a call is saved it appears here with the stage it reached. A list like this is how a caller sees where their calls end.
+                    <h1 className="text-4xl font-extrabold text-ink-950">Past calls</h1>
+          <p className="text-[15px] text-ink-600 mt-2 max-w-[60ch]">
+            Every saved call, with how far it got. Open one to see what was tapped at each stage.
           </p>
         </div>
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
           <button
             onClick={exportCSV}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition-all shadow-2xs"
+            className="btn-ghost"
             title="Export all logged calls to CSV"
           >
-            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-3.5 h-3.5 text-ink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Export CSV
           </button>
           <button className="btn-primary" onClick={onNew}>
-            + New call
+            New call
           </button>
         </div>
       </div>
 
-      {/* Analytics Snapshot Bar */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[160px_220px_1fr]">
-        <div className="card flex flex-col justify-center p-5">
-          <span className="font-mono text-4xl font-bold text-ink-950 leading-none">{stats?.calls ?? calls.length}</span>
-          <span className="label mt-2">Total calls logged</span>
+      <FollowUps onCallAgain={callAgain} />
+
+      {/* Numbers band */}
+      <div className="grid grid-cols-1 sm:grid-cols-[170px_230px_1fr] overflow-hidden rounded-xl2 bg-navy-900 text-white shadow-float">
+        <div className="flex flex-col justify-end p-6 border-b sm:border-b-0 sm:border-r border-navy-700">
+          <span className="display tnum text-[56px] font-extrabold leading-none">{stats?.calls ?? calls.length}</span>
+          <span className="mt-3 text-sm font-semibold text-navy-200">
+            Calls logged{stats?.abandoned ? <span className="block font-normal text-navy-300">{stats.abandoned} abandoned</span> : null}
+          </span>
         </div>
-        <div className="card flex flex-col justify-center p-5">
-          <span className="font-mono text-4xl font-bold text-[#0047ff] leading-none">
+        <div className="flex flex-col justify-end p-6 border-b sm:border-b-0 sm:border-r border-navy-700">
+          <span className="display tnum text-[56px] font-extrabold leading-none text-signal">
             {Math.round((stats?.connect_rate || 0) * 100)}%
           </span>
-          <span className="label mt-2">Reached right person</span>
+          <span className="mt-3 text-sm font-semibold text-navy-200">Reached the right person</span>
         </div>
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-1">
-            <span className="label">Where calls ended (Stage Drop-off Funnel)</span>
-            <span className="font-mono text-[10px] text-slate-400">Stages 1–8</span>
-          </div>
-          <div className="mt-3 grid grid-cols-8 items-end gap-2 border-b border-slate-100 pb-1.5">
+        <div className="p-6">
+          <span className="text-sm font-semibold text-navy-200">Stage where each call ended</span>
+          <div className="mt-3 grid grid-cols-8 items-end gap-2">
             {Object.entries(byStage).map(([n, c]) => (
-              <div key={n} className="grid h-[54px] grid-rows-[12px_1fr_12px] items-end justify-items-center gap-0.5">
-                <span className="font-mono text-[9px] text-slate-500 font-bold">{c || ""}</span>
+              <div key={n} className="grid h-[112px] grid-rows-[16px_1fr_18px] items-end justify-items-center gap-1">
+                <span className="tnum text-xs font-bold text-white">{c || ""}</span>
                 <div
-                  className="w-full max-w-[20px] self-end rounded-t-sm bg-gradient-to-t from-[#0047ff] to-blue-500 transition-all hover:brightness-110"
+                  className={`w-full max-w-[28px] self-end rounded-t-[3px] ${c === peak && c ? "bg-signal" : "bg-navy-300"}`}
                   style={{ height: `${c ? Math.max(10, (c / peak) * 100) : 0}%` }}
                 />
-                <span className="font-mono text-[10px] text-slate-500 font-semibold">{n}</span>
+                <span className="tnum w-full border-t border-navy-700 pt-1 text-center text-xs font-semibold text-navy-200">{n}</span>
               </div>
             ))}
           </div>
@@ -161,65 +193,81 @@ export default function History({ content, onOpen, onNew }) {
             type="text"
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            placeholder="Search by prospect, company, outcome..."
-            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#0047ff] focus:ring-2 focus:ring-blue-500/15 shadow-2xs"
+            placeholder="Search prospect, company or outcome"
+            className="input"
           />
           {filterQuery && (
             <button
               onClick={() => setFilterQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-steel-400 hover:text-ink-600 text-xs font-bold"
             >
               ✕
             </button>
           )}
         </div>
-        <span className="font-mono text-xs text-slate-400">
-          Showing {filteredCalls.length} of {calls.length} calls
+        <span className="tnum text-sm text-ink-500">
+          {filteredCalls.length} of {calls.length} calls
         </span>
       </div>
 
       {/* Reference Card List (Matches ClinicBooks Past Calls Exactly) */}
       {filteredCalls.length === 0 ? (
-        <div className="card p-16 text-center text-slate-500 font-mono text-sm">
-          {filterQuery ? "No calls match your search query." : "No calls recorded yet. Click '+ New call' above to dial your first prospect."}
+        <div className="card p-16 text-center text-ink-500 tnum text-sm">
+          {filterQuery ? "No calls match that search." : "No calls yet. Start one with New call."}
         </div>
       ) : (
-        <div className="space-y-3">
+        <ul className="card divide-y divide-steel-200 overflow-hidden">
           {filteredCalls.map((c) => {
             const outcome = outcomeByKey[c.outcome];
             const live = c.status === "in_progress";
+            const abandoned = (c.audit_warning || "").startsWith("Abandoned");
+            const reached = Number(c.highest_stage_reached) || 1;
             return (
-              <div
-                key={c.id}
-                onClick={() => setOpenId(c.id)}
-                className="rounded-xl border border-slate-200/90 bg-white p-4.5 hover:border-ink-950 hover:shadow-card hover:-translate-y-0.5 transition-all duration-150 cursor-pointer"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1">
+              <li key={c.id}>
+                <button
+                  type="button"
+                  onClick={() => setOpenId(c.id)}
+                  className="grid w-full grid-cols-1 sm:grid-cols-[minmax(0,1fr)_190px_120px] items-center gap-3 sm:gap-6 px-5 py-4 text-left hover:bg-steel-50 transition-colors"
+                >
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2.5">
-                      <h4 className="font-bold text-[14.5px] text-ink-950 tracking-tight">
+                      <span className="font-semibold text-[15px] text-ink-950 truncate">
                         {c.prospect_name || "Unknown prospect"}
-                        {c.company_name ? `, ${c.company_name}` : ""}
-                      </h4>
-                      {live && <span className="badge badge-live">Live</span>}
+                        {c.company_name ? <span className="font-normal text-ink-600">, {c.company_name}</span> : null}
+                      </span>
+                      {live && <span className="badge badge-live">In progress</span>}
+                      {!live && abandoned && <span className="badge">Abandoned</span>}
+                      {!live && !abandoned && outcome && <span className={toneClass[outcome.tone] || "badge"}>{outcome.label}</span>}
                     </div>
-                    <p className="text-xs text-slate-600 mt-1 line-clamp-1 font-medium">
-                      {c.next_step || c.ai_summary || "No notes logged for this call."}
+                    <p className="text-sm text-ink-500 mt-1 truncate">
+                      {c.next_step || c.ai_summary || "Nothing noted on this call."}
                     </p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0047ff] bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-sm">
-                      {c.highest_stage_name}
-                    </span>
-                    <p className="font-mono text-[11px] text-slate-400 mt-1 font-medium">
-                      {when(c.started_at)}
+                  <div title={`Reached stage ${reached}: ${c.highest_stage_name}`}>
+                    <div className="flex gap-1" aria-hidden>
+                      {Array.from({ length: 8 }, (_, i) => (
+                        <span
+                          key={i}
+                          className={`h-1.5 flex-1 rounded-full ${i < reached ? (live && i === reached - 1 ? "bg-signal" : "bg-navy") : "bg-steel-200"}`}
+                        />
+                      ))}
+                    </div>
+                    <p className="mt-1.5 text-xs text-ink-600">
+                      {reached}. {c.highest_stage_name}
                     </p>
                   </div>
-                </div>
-              </div>
+                  <p className="tnum text-sm text-ink-500 sm:text-right">{when(c.started_at)}</p>
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ul>
+      )}
+
+      {hasMore && !filterQuery && (
+        <button className="btn-ghost self-center" onClick={loadMore} disabled={loadingMore}>
+          {loadingMore ? "Loading…" : "Show older calls"}
+        </button>
       )}
 
       {(selectedDetail || selected) && (
@@ -242,103 +290,106 @@ export default function History({ content, onOpen, onNew }) {
   );
 }
 
-function Drawer({ call, loading, content, onClose, onResume, when, tapLabel, stageName, outcome }) {
+function Drawer({ call, loading, onClose, onResume, when, tapLabel, stageName, outcome }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  useEffect(() => closeRef.current?.focus(), []);
+
+  const logs = call.stage_logs || [];
   return (
     <div className="fixed inset-0 z-50" onClick={onClose}>
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" />
+      <div className="absolute inset-0 bg-ink-950/40" />
       <aside
-        className="absolute inset-y-0 right-0 flex w-full max-w-[560px] flex-col overflow-y-auto border-l border-slate-200 bg-white shadow-float text-ink-950"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="drawer-title"
+        className="absolute inset-y-0 right-0 flex w-full max-w-[560px] flex-col overflow-y-auto bg-white shadow-float text-ink-950"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-200/80 bg-white/95 px-6 py-5 backdrop-blur-md">
-          <div>
-            <p className="eyebrow">{when(call.started_at)}</p>
-            <h2 className="mt-1 text-xl font-bold tracking-tight text-ink-950">
-              {call.prospect_name || "Unknown prospect"}
-            </h2>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
-              {[call.prospect_role, call.company_name, call.call_type].filter(Boolean).join(" · ")}
-            </p>
+        <div className="sticky top-0 z-10 bg-navy-900 px-6 pt-5 pb-4 text-white">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-sm text-navy-200">{when(call.started_at)}</p>
+              <h2 id="drawer-title" className="mt-1 text-[22px] font-extrabold leading-tight truncate">
+                {call.prospect_name || "Unknown prospect"}
+              </h2>
+              <p className="text-sm text-navy-200 mt-0.5">
+                {[call.prospect_role, call.company_name, call.call_type].filter(Boolean).join(", ")}
+              </p>
+            </div>
+            <button
+              ref={closeRef}
+              className="rounded-lg2 border border-navy-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-navy-700"
+              onClick={onClose}
+              title="Esc"
+            >
+              Close
+            </button>
           </div>
-          <button className="btn-ghost px-3 py-1.5 text-xs" onClick={onClose}>
-            ✕ Close
-          </button>
-        </div>
-
-        <div className="space-y-4 px-6 py-6">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-navy-200">
             <span className={toneClass[outcome?.tone] || "badge"}>
-              {outcome?.label || call.outcome || "in progress"}
+              {call.status === "in_progress" ? "In progress" : outcome?.label || call.outcome || "Not logged"}
             </span>
-            <span className="badge">
-              Stage {call.highest_stage_reached}/8 · {call.highest_stage_name}
-            </span>
-            <span className="badge font-mono font-bold text-ink-900">{call.duration_seconds}s</span>
+            <span>Reached {call.highest_stage_reached}. {call.highest_stage_name}</span>
+            <span aria-hidden>|</span>
+            <span className="tnum">{call.duration_seconds} s</span>
             {call.status === "in_progress" && (
-              <button className="text-xs font-mono font-bold text-[#0047ff] ml-auto hover:underline" onClick={onResume}>
-                Resume call →
+              <button className="ml-auto font-semibold text-signal hover:underline" onClick={onResume}>
+                Resume call
               </button>
             )}
           </div>
+        </div>
 
-          <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-4">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">AI 1-line CRM summary</p>
-            <p className="text-xs text-ink-900 leading-relaxed font-medium">
-              {call.ai_summary || "No summary written."}
-            </p>
+        <div className="space-y-5 px-6 py-6">
+          <div>
+            <p className="label mb-1">What a manager reads</p>
+            <p className="text-[15px] leading-relaxed text-ink-900">{call.ai_summary || "No summary written."}</p>
           </div>
 
           {call.next_step && (
-            <div className="rounded-xl border border-slate-200/80 p-4">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Next step agreed</p>
-              <p className="text-xs text-ink-950 font-bold">{call.next_step}</p>
+            <div>
+              <p className="label mb-1">Next step</p>
+              <p className="text-[15px] font-semibold text-ink-950">{call.next_step}</p>
             </div>
           )}
 
           {call.audit_warning && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700">Audit inconsistency warning</p>
-              <p className="text-xs text-rose-900 leading-relaxed font-medium mt-1">
-                {call.audit_warning}
-              </p>
+            <div className="rounded-lg2 border border-stop/30 bg-stop-soft px-4 py-3">
+              <p className="text-sm font-semibold text-stop">Check this record</p>
+              <p className="mt-0.5 text-sm leading-relaxed text-ink-800">{call.audit_warning}</p>
             </div>
           )}
 
-          <div className="rounded-xl border border-slate-200/80 p-4">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Prospect's exact words (Stage 5 Need Quote)</p>
-            <p className="text-xs italic text-slate-800 leading-relaxed font-serif">
+          <div>
+            <p className="label mb-1">Their need, in their words</p>
+            <p className="text-[15px] italic text-ink-800">
               {call.stage5_need_quote ? `“${call.stage5_need_quote}”` : "Nothing captured."}
             </p>
           </div>
 
           <div>
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Stage-by-stage progression</p>
-            <div className="space-y-2">
-              {(call.stage_logs || []).map((l) => (
-                <div key={l.id} className="grid grid-cols-[28px_1fr] gap-2.5 rounded-lg border border-slate-200/80 p-3 bg-slate-50/50">
-                  <span className="font-mono text-xs font-bold text-slate-400">
-                    {String(l.stage_number).padStart(2, "0")}
+            <p className="label mb-2">Stage by stage</p>
+            <ol className="relative space-y-0 border-l-2 border-steel-200 ml-3">
+              {logs.map((l) => (
+                <li key={l.id || l.stage_number} className="relative pl-6 pb-4">
+                  <span className="tnum absolute -left-[13px] top-0 flex h-6 w-6 items-center justify-center rounded-full bg-navy text-xs font-bold text-white">
+                    {l.stage_number}
                   </span>
-                  <div>
-                    <div className="font-mono text-[10px] uppercase tracking-wider text-[#0047ff] font-bold">
-                      {stageName(Number(l.stage_number))}
-                    </div>
-                    <div className="text-xs font-semibold text-ink-950 mt-0.5">{tapLabel(l)}</div>
-                    {l.prospect_words && (
-                      <div className="mt-1 text-[11.5px] italic text-slate-600 border-l-2 border-slate-300 pl-2">
-                        “{l.prospect_words}”
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  <div className="text-sm font-semibold text-navy">{stageName(Number(l.stage_number))}</div>
+                  <div className="text-[15px] text-ink-950 mt-0.5">{tapLabel(l)}</div>
+                  {l.prospect_words && (
+                    <div className="mt-1 text-sm italic text-ink-600">“{l.prospect_words}”</div>
+                  )}
+                </li>
               ))}
-              {loading && (
-                <p className="text-xs text-blue-600 font-mono animate-pulse py-2">Loading stage logs from Supabase…</p>
-              )}
-              {!loading && (call.stage_logs || []).length === 0 && (
-                <p className="text-xs text-slate-400 font-mono">No stage logs saved.</p>
-              )}
-            </div>
+            </ol>
+            {loading && <p className="text-sm text-ink-500 py-2">Loading stages…</p>}
+            {!loading && logs.length === 0 && <p className="text-sm text-ink-500">No stages saved.</p>}
           </div>
         </div>
       </aside>

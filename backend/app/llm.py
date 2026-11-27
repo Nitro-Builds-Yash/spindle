@@ -20,6 +20,13 @@ import httpx
 
 log = logging.getLogger("spindle.llm")
 
+# One pooled client for every model call: reuses TLS connections instead of a
+# fresh handshake per cue (~100-300 ms saved each time).
+_http = httpx.Client(
+    limits=httpx.Limits(max_connections=20, max_keepalive_connections=10, keepalive_expiry=60),
+    http2=False,
+)
+
 from .content import (
     OUTCOME_BY_KEY,
     POSITIVE_OUTCOMES,
@@ -65,7 +72,7 @@ last_error: Optional[str] = None
 
 
 def _openai_compatible(base: str, model: str, key: str, prompt: str, timeout: float) -> str:
-    r = httpx.post(
+    r = _http.post(
         f"{base}/chat/completions",
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
         json={
@@ -95,7 +102,7 @@ def _gemini(model: str, key: str, prompt: str, deadline: float) -> str:
             errors.append("deadline reached")
             break
         try:
-            r = httpx.post(
+            r = _http.post(
                 f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent",
                 headers={"x-goog-api-key": key},
                 json={
@@ -292,14 +299,24 @@ def audit_fallback(call: dict[str, Any], logs: list[dict[str, Any]], outcome: st
                 "next_step_agreed needs a named day and time. Stage 7 recorded "
                 f"\"{_label(7, tap.get(7)) or 'nothing'}\"."
             )
+        if (
+            not warning
+            and outcome in ("next_step_agreed", "agreed_to_receive_report")
+            and not (call.get("next_step") or "").strip()
+        ):
+            warning = (
+                f"\"{name}\" but no next step is written. Note what was agreed, "
+                "e.g. \"Thursday 16:00 call, send one-pager on WhatsApp first\"."
+            )
         if not warning and not (call.get("stage5_need_quote") or "").strip():
             warning = (
                 "No Stage 5 quote. The record has no words from the prospect, which is "
                 "what the next call is built on."
             )
-        if not warning and int(call.get("duration_seconds") or 0) < 30:
+        secs = int(call.get("duration_seconds") or 0)
+        if not warning and secs < 30:
             warning = (
-                f"The call was {call.get('duration_seconds', 0)} seconds. That is short "
+                f"The call was {secs} seconds. That is short "
                 f"for \"{name}\"."
             )
     elif tap.get(1) == "wrong_person" and outcome == "not_interested":
@@ -402,7 +419,7 @@ Answer in JSON:
 """
 
 STAGE_FALLBACK_REPLIES = {
-    1: "Haan, Ramesh Varma speaking. Kaun baat kar rahe hain?",
+    1: "Haan, {prospect} speaking. Kaun baat kar rahe hain?",
     2: "Spindle? Look, I'm on the machine shop floor right now. Is this a sales call? Where did you get this number?",
     3: "Look, everyone is selling something. I can give you exactly two minutes. What do you people do?",
     4: "Right now our rework is touching 4.5% on the CNC line. Delivery schedules are slipping because of rework.",
@@ -442,7 +459,12 @@ def simulate_prospect_reply(
         except Exception:
             pass
 
+    who = (prospect_name or "").strip()
     fallback_text = STAGE_FALLBACK_REPLIES.get(stage_number, "Tell me what this is regarding.")
+    fallback_text = (
+        fallback_text.replace("{prospect}", who) if who
+        else fallback_text.replace("Haan, {prospect} speaking.", "Haan ji, bolo.")
+    )
     return {
         "reply": fallback_text,
         "reaction": "busy",

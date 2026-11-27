@@ -1,0 +1,83 @@
+name: Rust engine
+
+# Builds engine/ (Rust) to WebAssembly for the frontend and proves it gives
+# the same answers as the Python and JavaScript rules.
+
+on:
+  push:
+    paths: ["engine/**", "backend/app/llm.py", "backend/app/content.py", "frontend/src/lib/call.js", "frontend/src/lib/engine.js", "frontend/src/test/engine.test.js", ".github/workflows/engine.yml"]
+  pull_request:
+    paths: ["engine/**", "backend/app/llm.py", "backend/app/content.py", "frontend/src/lib/call.js", "frontend/src/lib/engine.js", "frontend/src/test/engine.test.js", ".github/workflows/engine.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  engine:
+    name: Parity, lint and WebAssembly build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install backend deps (for the fixture generator)
+        run: pip install -r backend/requirements.txt
+
+      - name: Fixtures are current (Python and JS rules)
+        run: |
+          python engine/fixtures/gen_python.py > engine/fixtures/python.json
+          node engine/fixtures/gen_js.mjs > engine/fixtures/js.json
+          git diff --exit-code engine/fixtures || {
+            echo "::error::Rules changed but engine/fixtures were not regenerated. Run the two generators and commit."; exit 1; }
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: engine
+
+      - name: Format
+        working-directory: engine
+        run: cargo fmt --check
+      - name: Clippy
+        working-directory: engine
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Parity tests (Rust vs Python and JS)
+        working-directory: engine
+        run: cargo test
+
+      - name: Install wasm-pack
+        run: curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
+      - name: Build WebAssembly
+        working-directory: engine
+        run: |
+          wasm-pack build --release --target web --out-dir ../frontend/src/engine/pkg --no-pack
+          rm -f ../frontend/src/engine/pkg/.gitignore
+          ls -l ../frontend/src/engine/pkg
+          echo "### spindle-engine.wasm: $(stat -c%s ../frontend/src/engine/pkg/spindle_engine_bg.wasm) bytes" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Frontend tests against the built engine
+        working-directory: frontend
+        run: |
+          npm ci
+          npx vitest run src/test/engine.test.js
+
+      - name: Commit the built engine
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          git add frontend/src/engine/pkg
+          if git diff --cached --quiet; then echo "Engine build unchanged."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Build Rust engine (WebAssembly) [skip ci]"
+          git push
