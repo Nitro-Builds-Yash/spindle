@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import sqlite3
 import threading
+import time
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Optional
@@ -254,9 +255,39 @@ class SupabaseStore:
             },
             timeout=20.0,
         )
-        probe = self.client.get("/calls", params={"select": "follow_up_at", "limit": 1})
-        # False until migrations/002_follow_ups.sql has been run on the project.
-        self.has_follow_ups = probe.status_code == 200
+        self._follow_ups: Optional[bool] = None
+        self._follow_ups_checked = 0.0
+
+    @property
+    def has_follow_ups(self) -> bool:
+        """Whether migrations/002_follow_ups.sql has been run on the project.
+
+        Checked lazily, never at import: a network blip while the server starts
+        must not stop it from starting. Unknown (unreachable) counts as False and
+        is retried a minute later; a known False is rechecked every 5 minutes, so
+        running the migration takes effect without a redeploy.
+        """
+        now = time.monotonic()
+        known = getattr(self, "_follow_ups", None)
+        checked = getattr(self, "_follow_ups_checked", 0.0)
+        wait = 300 if known is False else 60
+        if known is True or (checked and now - checked < wait):
+            return bool(self._follow_ups)
+        self._follow_ups_checked = now
+        try:
+            probe = self.client.get("/calls", params={"select": "follow_up_at", "limit": 1}, timeout=5.0)
+        except httpx.HTTPError:
+            return bool(self._follow_ups)
+        if probe.status_code == 200:
+            self._follow_ups = True
+        elif probe.status_code in (400, 404):
+            self._follow_ups = False
+        return bool(self._follow_ups)
+
+    @has_follow_ups.setter
+    def has_follow_ups(self, value: bool) -> None:
+        self._follow_ups = value
+        self._follow_ups_checked = time.monotonic()
 
     def _rows(self, r: httpx.Response) -> list[dict[str, Any]]:
         r.raise_for_status()

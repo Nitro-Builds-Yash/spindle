@@ -368,3 +368,23 @@ def test_next_step_agreed_without_next_step_is_flagged(monkeypatch):
         client.post(f"/api/calls/{cid}/stage-log", json={"stage_number": n, "what_happened": tap})
     r = client.post(f"/api/calls/{cid}/audit", json={"outcome": "next_step_agreed", "next_step": ""})
     assert "no next step" in r.json()["warning"]
+
+
+def test_supabase_store_starts_when_supabase_is_unreachable(monkeypatch):
+    """Production crash 2026-11-27: a DNS failure during start-up killed the
+    server because the follow-up column check ran in the constructor."""
+    import httpx
+    from app import db
+
+    def no_dns(request):
+        raise httpx.ConnectError("[Errno -2] Name or service not known")
+
+    real_client = httpx.Client
+    monkeypatch.setattr(db.httpx, "Client", lambda **kw: real_client(**{**kw, "transport": httpx.MockTransport(no_dns)}))
+    store = db.SupabaseStore("https://example.supabase.co", "key")   # must not raise
+    assert store.has_follow_ups is False                              # unknown -> off, retried later
+
+    ok = lambda request: httpx.Response(200, json=[])
+    store.client = real_client(base_url="https://example.supabase.co/rest/v1", transport=httpx.MockTransport(ok))
+    store._follow_ups_checked = 0.0                                   # pretend the retry window passed
+    assert store.has_follow_ups is True
