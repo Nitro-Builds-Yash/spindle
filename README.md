@@ -241,6 +241,23 @@ Spindle connects to a production **Supabase PostgreSQL** instance with Row Level
 
 ---
 
+## 🦀 Rust engine (WebAssembly)
+
+`engine/` is a Rust crate with Spindle's call rules: reading which stage the prospect's words point to, the fallback cue, the close audit, the manager summary and the suggested outcome. CI compiles it to WebAssembly (`frontend/src/engine/pkg`) and the browser runs it directly, so:
+
+- **Cues are instant and work offline.** Asking for a cue shows the on-device line at once; the model's answer replaces it when it arrives.
+- **Live stage read.** As the prospect's words are typed or dictated, Spindle says "Sounds like *Objection* (stage 6)" with a one-tap jump.
+- **The pre-close check is instant**, also offline; the server's check (which may use the model) still has the final word.
+
+The rules exist in Python too (for the API). `engine/tests/parity.rs` replays 3,700+ cases generated from the Python and JavaScript (`engine/fixtures/gen_python.py`, `gen_js.mjs`), so the three can't drift: CI fails if a rule changes in one place only.
+
+```bash
+cd engine && cargo test          # parity + unit tests
+wasm-pack build --release --target web --out-dir ../frontend/src/engine/pkg --no-pack
+```
+
+If the WebAssembly build is missing, the app falls back to the server's rules with no change in behaviour.
+
 ## 🧰 Working features for a calling team
 
 - **Call list:** import a CSV of prospects (needs `name` and `company` columns; `role`, `kind`, `phone` optional) on the Start screen and work through it top to bottom. The list stays in that browser.

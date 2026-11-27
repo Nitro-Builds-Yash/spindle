@@ -313,9 +313,10 @@ def audit_fallback(call: dict[str, Any], logs: list[dict[str, Any]], outcome: st
                 "No Stage 5 quote. The record has no words from the prospect, which is "
                 "what the next call is built on."
             )
-        if not warning and int(call.get("duration_seconds") or 0) < 30:
+        secs = int(call.get("duration_seconds") or 0)
+        if not warning and secs < 30:
             warning = (
-                f"The call was {call.get('duration_seconds', 0)} seconds. That is short "
+                f"The call was {secs} seconds. That is short "
                 f"for \"{name}\"."
             )
     elif tap.get(1) == "wrong_person" and outcome == "not_interested":

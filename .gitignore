@@ -28,3 +28,6 @@ Thumbs.db
 
 # Local notes
 *.local.md
+
+# Rust engine build output
+engine/target/

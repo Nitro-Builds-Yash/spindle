@@ -6,6 +6,7 @@ import CallSummary from "../components/live/CallSummary.jsx";
 import StageRail from "../components/live/StageRail.jsx";
 import TapGrid from "../components/live/TapGrid.jsx";
 import { clock } from "../lib/call.js";
+import { useEngine } from "../lib/engine.js";
 import {
   speakText,
   stopSpeaking,
@@ -100,6 +101,19 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear, 
     [stages, stageNo]
   );
   const next = stages.find((s) => s.number === stageNo + 1);
+  const engine = useEngine(content);
+
+  // Live stage read: as the prospect's words are typed or dictated, the Rust
+  // engine says which stage they point to (microseconds, no network).
+  const [heardStage, setHeardStage] = useState(null);
+  useEffect(() => {
+    if (!engine) return;
+    const t = setTimeout(() => {
+      const n = engine.detectStage(words);
+      setHeardStage(n && n !== stageNo ? n : null);
+    }, 200);
+    return () => clearTimeout(t);
+  }, [engine, words, stageNo]);
 
   const load = useCallback(async () => {
     try {
@@ -151,16 +165,16 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear, 
   }, [stage, closing]);
 
   async function askCue(text) {
+    const said = typeof text === "string" ? text : words;
+    // Instant line from the on-device engine; the model's answer replaces it
+    // when (if) it arrives. Offline, the local line simply stays.
+    if (engine) setCue(engine.cue(stageNo, said));
     setCueBusy(true);
     try {
-      const res = await api.cue({
-        stage_number: stageNo,
-        prospect_words: typeof text === "string" ? text : words,
-        call_id: callId,
-      });
+      const res = await api.cue({ stage_number: stageNo, prospect_words: said, call_id: callId });
       setCue(res);
     } catch (e) {
-      setErr(e.message);
+      if (!engine) setErr(e.message);
     } finally {
       setCueBusy(false);
     }
@@ -397,12 +411,25 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear, 
             value={words}
             onChange={(e) => setWords(e.target.value)}
             placeholder="Type, click quotes above, or click 🎤 Dictate to speak..."
-            className={`w-full rounded-xs border bg-white/90 backdrop-blur-xs px-3 py-2 text-[12.5px] text-ink-900 outline-none transition-all placeholder:text-steel-400 font-sans ${
-              isListening
-                ? "border-rose-400 ring-2 ring-rose-500/20 bg-rose-50/20"
-                : "border-steel-300/90 focus:border-navy focus:ring-2 focus:ring-navy-500/15"
-            }`}
+            className={`input text-[15px] ${isListening ? "border-stop ring-[3px] ring-stop/15" : ""}`}
           />
+          {heardStage && (
+            <div role="status" className="mt-2 flex items-center justify-between gap-3 rounded-lg2 border border-signal bg-signal-soft px-3.5 py-2 text-sm text-ink-900">
+              <span>
+                Sounds like <strong>{stages.find((x) => x.number === heardStage)?.name}</strong> (stage {heardStage}).
+              </span>
+              <button
+                type="button"
+                className="shrink-0 font-semibold text-navy hover:underline"
+                onClick={() => {
+                  setStageNo(heardStage);
+                  setHeardStage(null);
+                }}
+              >
+                Go there
+              </button>
+            </div>
+          )}
           {cue && (
             <div className="mt-2.5 rounded-lg border border-navy-200/90 bg-gradient-to-r from-navy-50/95 to-indigo-50/90 backdrop-blur-xs p-3 text-xs text-navy-950 shadow-2xs">
               <div className="flex items-center justify-between mb-1">
@@ -474,6 +501,7 @@ export default function LiveCall({ callId, content, onNew, onFinished, onClear, 
       {closing && (
         <CloseModal
           callId={callId}
+          call={call}
           content={content}
           logs={logs}
           stageNo={stageNo}

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../../api";
 import { CALLBACK_OUTCOMES, localSlot, localToIsoWithOffset, suggestOutcome } from "../../lib/call.js";
+import { useEngine } from "../../lib/engine.js";
 
-export default function CloseModal({ callId, content, logs, stageNo, onCancel, onClosed }) {
+export default function CloseModal({ callId, call, content, logs, stageNo, onCancel, onClosed }) {
   const [outcome, setOutcome] = useState(() => suggestOutcome(logs));
   const [nextStep, setNextStep] = useState("");
   const [note, setNote] = useState("");
@@ -21,8 +22,30 @@ export default function CloseModal({ callId, content, logs, stageNo, onCancel, o
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onCancel]);
 
+  const engine = useEngine(content);
+
   useEffect(() => {
     let live = true;
+    // 1. Instant check on this device (Rust engine), works offline.
+    if (engine) {
+      const quote = logs.find((l) => Number(l.stage_number) === 5)?.prospect_words || "";
+      const started = call?.started_at ? new Date(call.started_at).getTime() : Date.now();
+      setAudit(
+        engine.audit(
+          {
+            prospect_name: call?.prospect_name,
+            company_name: call?.company_name,
+            highest_stage_name: call?.highest_stage_name,
+            next_step: nextStep,
+            stage5_need_quote: quote,
+            duration_seconds: Math.max(0, Math.round((Date.now() - started) / 1000)),
+          },
+          logs,
+          outcome
+        )
+      );
+    }
+    // 2. The server's check (may use the model) replaces it when it arrives.
     const t = setTimeout(() => {
       api
         .audit(callId, { outcome, next_step: nextStep })
@@ -33,7 +56,7 @@ export default function CloseModal({ callId, content, logs, stageNo, onCancel, o
       live = false;
       clearTimeout(t);
     };
-  }, [callId, outcome, nextStep]);
+  }, [engine, call, logs, callId, outcome, nextStep]);
 
   async function submit() {
     setBusy(true);
